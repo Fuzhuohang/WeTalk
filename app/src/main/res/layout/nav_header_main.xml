@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="176dp"
     android:background="@drawable/side_nav_bar"
@@ -16,6 +18,15 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="bottom">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/drawee_img"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/dragon"
+            fresco:roundAsCircle="true"
+            fresco:roundedCornerRadius="20dp"
+            tools:src="@android:drawable/btn_star_big_on" />
 
         <ImageView
             android:id="@+id/headPortrait"

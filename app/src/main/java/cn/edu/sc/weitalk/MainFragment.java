@@ -18,8 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toolbar;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.net.URI;
 import java.util.ArrayList;
 
 import cn.edu.sc.weitalk.R;
@@ -80,7 +82,8 @@ public class MainFragment extends Fragment {
 //        Toolbar toolbar = view.findViewById(R.id.toolbar);
 //        setSupporActionBar(toolbar);
 //        ViewPager viewPager = view.findViewById(R.id.main_viewpager);
-
+//        SimpleDraweeView temp=view.findViewById(R.id.drawee_img);
+//        temp.setImageURI("res://drawable/" + R.drawable.dragon);
 
 
         return view;

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 
 import cn.edu.sc.weitalk.R;
 
-/**
+/**我是fcy
  * A simple {@link Fragment} subclass.
  * Use the {@link CircleOfFriendsFragment#newInstance} factory method to
  * create an instance of this fragment.

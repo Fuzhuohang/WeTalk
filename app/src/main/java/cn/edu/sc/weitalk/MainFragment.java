@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import cn.edu.sc.weitalk.R;
 
-/**kgjhkhjjkhbhfghfghghhfghfg
+/**kgjhkhjjkhbhfghfghghhfghfggfgrgr
  * A simple {@link Fragment} subclass.
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.

@@ -28,13 +28,6 @@
             fresco:roundedCornerRadius="20dp"
             tools:src="@android:drawable/btn_star_big_on" />
 
-        <ImageView
-            android:id="@+id/headPortrait"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="Navigation header"
-            app:srcCompat="@mipmap/ic_launcher_round" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

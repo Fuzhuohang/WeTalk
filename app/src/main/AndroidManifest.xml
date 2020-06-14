@@ -13,9 +13,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".TestCircle">
             <intent-filter>
-                <action android:name="dvcvd" />
+                <action android:name="dvcvbfbfbd" />
 
-                <category android:name="vdvdvd" />
+                <category android:name="vdvdbgfbgbvd" />
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">

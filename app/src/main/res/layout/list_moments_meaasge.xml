@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/iconInMoments"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/dragon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        fresco:roundAsCircle="true"
+        fresco:roundedCornerRadius="20dp"
+        tools:src="@android:drawable/btn_star_big_on" />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:text="李可"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@+id/iconInMoments"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="2017年12月3日"
+        app:layout_constraintStart_toEndOf="@+id/iconInMoments"
+        app:layout_constraintTop_toBottomOf="@+id/name" />
+
+    <LinearLayout
+        android:id="@+id/imagegroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text"></LinearLayout>
+
+    <ImageView
+        android:id="@+id/likebutton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="28dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imagegroup"
+        app:srcCompat="@drawable/dianzan"
+        tools:srcCompat="@drawable/dianzan" />
+
+    <ImageView
+        android:id="@+id/commentbuttton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imagegroup"
+        app:srcCompat="@drawable/pinglun"
+        tools:srcCompat="@drawable/pinglun" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="35dp"
+        android:layout_height="34dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="36dp"
+        android:gravity="center"
+        android:text="18"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/commentbuttton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/likebutton"
+        app:layout_constraintTop_toBottomOf="@+id/imagegroup" />
+
+    <LinearLayout
+        android:id="@+id/commentsgroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/likebutton"></LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -22,34 +22,6 @@
 <!--                    app:contentScrim="?attr/colorPrimary">-->
 
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-
-            <com.facebook.drawee.view.SimpleDraweeView
-                android:id="@+id/toolbar_img"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:src="@drawable/dragon"
-                fresco:roundAsCircle="true"
-                fresco:roundedCornerRadius="20dp"
-                tools:src="@android:drawable/btn_star_big_on" />
-
-            <TextView
-                android:id="@+id/page_name"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginRight="53dp"
-                android:textSize="20sp"
-                android:gravity="center"/>
-
-
-
-        </androidx.appcompat.widget.Toolbar>
-
         <!--                </com.google.android.material.appbar.CollapsingToolbarLayout>-->
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -59,5 +31,53 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="55dp" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/themeColor"
+        app:layout_anchor="@+id/appbar"
+        app:layout_anchorGravity="center"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/toolbar_img"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/dragon"
+            fresco:roundAsCircle="true"
+            fresco:roundedCornerRadius="20dp"
+            tools:src="@android:drawable/btn_star_big_on" />
+
+        <TextView
+            android:id="@+id/page_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginRight="53dp"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/vector"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+
+        android:layout_marginLeft="340dp"
+        android:layout_marginRight="0dp">
+
+        <ImageView
+            android:id="@+id/buttonview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

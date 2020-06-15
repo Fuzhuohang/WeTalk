@@ -1,33 +1,26 @@
-package cn.edu.sc.weitalk;
+package cn.edu.sc.weitalk.fragment;
 
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
-import android.widget.Toolbar;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
-import java.net.URI;
 import java.util.ArrayList;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 
 /**kgjhkhjjkhbhfghfghghhfghfggfgrgr
  * A simple {@link Fragment} subclass.

@@ -1,4 +1,4 @@
-package cn.edu.sc.weitalk;
+package cn.edu.sc.weitalk.fragment;
 
 import android.os.Bundle;
 

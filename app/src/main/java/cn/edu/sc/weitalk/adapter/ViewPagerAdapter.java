@@ -1,4 +1,4 @@
-package cn.edu.sc.weitalk;
+package cn.edu.sc.weitalk.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

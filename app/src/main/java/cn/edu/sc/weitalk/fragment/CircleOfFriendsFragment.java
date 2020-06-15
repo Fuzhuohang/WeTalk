@@ -1,4 +1,4 @@
-package cn.edu.sc.weitalk;
+package cn.edu.sc.weitalk.fragment;
 
 import android.os.Bundle;
 
@@ -10,12 +10,12 @@ import android.view.ViewGroup;
 
 import cn.edu.sc.weitalk.R;
 
-/**
+/**我是fcy
  * A simple {@link Fragment} subclass.
- * Use the {@link InfoFragment#newInstance} factory method to
+ * Use the {@link CircleOfFriendsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class InfoFragment extends Fragment {
+public class CircleOfFriendsFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class InfoFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public InfoFragment() {
+    public CircleOfFriendsFragment() {
         // Required empty public constructor
     }
 
@@ -36,11 +36,11 @@ public class InfoFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment InfoFragment.
+     * @return A new instance of fragment CircleOfFriendsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static InfoFragment newInstance(String param1, String param2) {
-        InfoFragment fragment = new InfoFragment();
+    public static CircleOfFriendsFragment newInstance(String param1, String param2) {
+        CircleOfFriendsFragment fragment = new CircleOfFriendsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +61,6 @@ public class InfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_info, container, false);
+        return inflater.inflate(R.layout.fragment_circle_of_friends, container, false);
     }
 }

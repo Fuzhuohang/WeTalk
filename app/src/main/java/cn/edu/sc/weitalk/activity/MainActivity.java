@@ -1,4 +1,4 @@
-package cn.edu.sc.weitalk;
+package cn.edu.sc.weitalk.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -6,6 +6,8 @@ import androidx.navigation.ui.AppBarConfiguration;
 import android.os.Bundle;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+
+import cn.edu.sc.weitalk.R;
 
 public class MainActivity extends AppCompatActivity {
 

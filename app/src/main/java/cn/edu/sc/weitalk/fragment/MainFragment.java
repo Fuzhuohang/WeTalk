@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.viewpager.widget.ViewPager;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toolbar;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -34,6 +37,7 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private AppBarConfiguration mAppBarConfiguration,bAppBarConfiguration;
+    private TextView pagename;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -89,6 +93,18 @@ public class MainFragment extends Fragment {
 //        TextView name=headerView.findViewById(R.id.Username);
 //        name.setText("111111");
 
+//        Toolbar toolbar = view.findViewById(R.id.toolbar);
+        SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
+        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
+        pagename = view.findViewById(R.id.page_name);
+        DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
+        temp2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(navigationView);
+            }
+        });
+
 
 
         return view;
@@ -108,6 +124,18 @@ public class MainFragment extends Fragment {
         viewList.add(circleOfFriendsFragment);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(),viewList);
         viewPager.setAdapter(viewPagerAdapter);
+
+        switch (viewPager.getCurrentItem()){
+            case 0:
+                pagename.setText("消息");
+                break;
+            case 1:
+                pagename.setText("联系人");
+                break;
+            case 2:
+                pagename.setText("朋友圈");
+                break;
+        }
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -133,12 +161,15 @@ public class MainFragment extends Fragment {
                 switch (item.getItemId()){
                     case R.id.message_b:
                         viewPager.setCurrentItem(0,true);
+                        pagename.setText("消息");
                         break;
                     case R.id.lxr_b:
                         viewPager.setCurrentItem(1,true);
+                        pagename.setText("联系人");
                         break;
                     case R.id.pyq_b:
                         viewPager.setCurrentItem(2,true);
+                        pagename.setText("朋友圈");
                         break;
                 }
                 return true;

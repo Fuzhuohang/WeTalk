@@ -6,24 +6,32 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
+            android:icon="@drawable/mingpian"
+
             android:title="我的名片" />
         <item
             android:id="@+id/nav_gallery"
-            android:title="我的二维码"/>
+            android:icon="@drawable/erweima1"
+            android:title="我的二维码" />
         <item
             android:id="@+id/nav_slideshow"
+            android:icon="@drawable/ziyuan"
             android:title="扫一扫" />
         <item
             android:id="@+id/tbgz"
+            android:icon="@drawable/guanzhu"
             android:title="我的特别关注" />
         <item
             android:id="@+id/hmd"
+            android:icon="@drawable/chakantiezigengduoheimingdan"
             android:title="黑名单" />
         <item
             android:id="@+id/setting"
+            android:icon="@drawable/icon_test"
             android:title="设置" />
         <item
             android:id="@+id/exit"
+            android:icon="@drawable/tuichudenglu"
             android:title="退出登录" />
     </group>
 </menu>

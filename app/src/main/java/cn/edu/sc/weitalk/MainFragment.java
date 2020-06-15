@@ -16,10 +16,13 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -82,8 +85,17 @@ public class MainFragment extends Fragment {
 //        Toolbar toolbar = view.findViewById(R.id.toolbar);
 //        setSupporActionBar(toolbar);
 //        ViewPager viewPager = view.findViewById(R.id.main_viewpager);
+        //View view1=view.findViewById(R.id.nav_view);
+        //Fresco.initialize(getContext());
 //        SimpleDraweeView temp=view.findViewById(R.id.drawee_img);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
+        NavigationView navigationView=view.findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        SimpleDraweeView temp=headerView.findViewById(R.id.drawee_img);
+        temp.setImageURI("res://drawable/" + R.drawable.dragon);
+//        TextView name=headerView.findViewById(R.id.Username);
+//        name.setText("111111");
+
 
 
         return view;

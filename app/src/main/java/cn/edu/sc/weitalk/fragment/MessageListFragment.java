@@ -1,12 +1,16 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -21,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.activity.TalksActivity;
+import cn.edu.sc.weitalk.javabean.Talks;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,6 +44,8 @@ public class MessageListFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private ArrayList list;
+
+    private boolean isTwoPane;
 
     public MessageListFragment() {
         // Required empty public constructor
@@ -71,6 +79,17 @@ public class MessageListFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+//        if(getActivity().findViewById(R.id.fragment)!=null){
+//            isTwoPane=true;
+//        }else {
+//            isTwoPane=false;
+//        }
+        isTwoPane=false;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -83,12 +102,37 @@ public class MessageListFragment extends Fragment {
         messageList.setAdapter(adapter);
         setListViewHeightBasedOnChildren(messageList);
 
+        messageList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("TAUCH",""+position);
+                HashMap map = (HashMap)list.get(position);
+                Talks talks = new Talks();
+                talks.setTalksName((String) map.get("talksObj"));
+                talks.setFriendHeaderURL((String) map.get("image"));
+                talks.setMessage((String)map.get("lastMessage"));
+                talks.setMyHeaderURL("res://drawable/" + R.drawable.dragon);
+                if (isTwoPane){
+                    Log.i("TALKS",""+isTwoPane);
+                }else {
+                    Log.i("TALKS",""+isTwoPane);
+                    Intent intent = new Intent(getActivity(), TalksActivity.class);
+                    intent.putExtra("TalksName",talks.getTalksName());
+                    intent.putExtra("FriendHeaderURL",talks.getFriendHeaderURL());
+                    intent.putExtra("Message",talks.getMessage());
+                    intent.putExtra("MyHeaderURL",talks.getMyHeaderURL());
+                    startActivity(intent);
+                }
+            }
+        });
 
         RefreshRelativeLayout refresh_message = (RefreshRelativeLayout)view.findViewById(R.id.refresh_message);
         refresh_message.setPositiveRefresher(new PositiveRefresherWithText(true));
         refresh_message.setPositiveEnable(true);
+        refresh_message.setNegativeEnable(false);
         refresh_message.setPositiveOverlayUsed(true);
         refresh_message.setPositiveDragEnable(true);
+
         refresh_message.addPositiveRefreshListener(new ISingleRefreshListener() {
             @Override
             public void onRefresh() {

@@ -1,19 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_index_friend_list"
+        android:layout_width="match_parent"
+        android:layout_height="18dp"
+        android:text="A"
+        android:textSize="12sp"
+        android:textColor="@color/colorTheme"
+        android:gravity="center_vertical"
+        android:background="@color/colorBlankBackground"
+        android:paddingLeft="16dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_fiend_list"
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/head_ic_friend_list"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="10dp"/>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="46dp">
 
+            <TextView
+                android:id="@+id/tv_username_friend_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="用户名"
+                android:textColor="@color/colorPlaneText"
+                android:textSize="14sp"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorBlankBackground"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
     </LinearLayout>
 
-</ScrollView>
+</LinearLayout>

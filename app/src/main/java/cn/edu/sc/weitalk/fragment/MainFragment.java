@@ -114,11 +114,11 @@ public class MainFragment extends Fragment {
         //btnVector=view.findViewById(R.id.btnVector);
         btn=view.findViewById(R.id.buttonview);
         btn.setVisibility(View.GONE);
-        DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
+        DrawerLayout drawerLayout1=view.findViewById(R.id.drawerlayout);
         temp2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawerLayout.openDrawer(navigationView);
+                drawerLayout1.openDrawer(navigationView);
             }
         });
 

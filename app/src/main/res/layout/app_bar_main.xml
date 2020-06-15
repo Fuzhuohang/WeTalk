@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
@@ -12,13 +13,13 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-                <com.google.android.material.appbar.CollapsingToolbarLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:toolbarId="@+id/toolbar"
-                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+<!--                <com.google.android.material.appbar.CollapsingToolbarLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    app:toolbarId="@+id/toolbar"-->
+<!--                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"-->
 
-                    app:contentScrim="?attr/colorPrimary">
+<!--                    app:contentScrim="?attr/colorPrimary">-->
 
 
         <androidx.appcompat.widget.Toolbar
@@ -26,17 +27,37 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"></androidx.appcompat.widget.Toolbar>
-                </com.google.android.material.appbar.CollapsingToolbarLayout>
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/toolbar_img"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/dragon"
+                fresco:roundAsCircle="true"
+                fresco:roundedCornerRadius="20dp"
+                tools:src="@android:drawable/btn_star_big_on" />
+
+            <TextView
+                android:id="@+id/page_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="53dp"
+                android:textSize="20sp"
+                android:gravity="center"/>
+
+
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <!--                </com.google.android.material.appbar.CollapsingToolbarLayout>-->
     </com.google.android.material.appbar.AppBarLayout>
 
 
-
     <include
-        android:id="@+id/vp"
         layout="@layout/content_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="55dp"/>
+        android:layout_marginTop="55dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -3,12 +3,67 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_alignParentBottom="true"
+    android:layout_centerInParent="false"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="false"
     tools:context=".fragment.FriendListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="好友列表" />
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_search_friend_list"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="5dp"
+            android:text="搜索"
+            android:textSize="16sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_big_letter"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="400dp"
+                android:background="@drawable/big_letter_dialog"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:text="A"
+                android:textColor="@color/colorBigLetter"
+                android:textSize="22sp"
+                android:visibility="gone" />
+
+            <ListView
+                android:id="@+id/lv_fiend_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="false"
+                android:layout_centerHorizontal="false"
+                android:paddingBottom="55dp">
+
+            </ListView>
+
+            <cn.edu.sc.weitalk.widget.LetterIndexView
+                android:id="@+id/letterIndexView"
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="70dp" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
 
 </FrameLayout>

@@ -11,6 +11,11 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
+
+import com.mbg.library.DefaultPositiveRefreshers.PositiveRefresherWithText;
+import com.mbg.library.ISingleRefreshListener;
+import com.mbg.library.RefreshRelativeLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -77,6 +82,21 @@ public class MessageListFragment extends Fragment {
                 new String[]{"image","talksObj","lastMessage"},new int[]{R.id.talks_img,R.id.talksObj,R.id.lastMessage});
         messageList.setAdapter(adapter);
         setListViewHeightBasedOnChildren(messageList);
+
+
+        RefreshRelativeLayout refresh_message = (RefreshRelativeLayout)view.findViewById(R.id.refresh_message);
+        refresh_message.setPositiveRefresher(new PositiveRefresherWithText(true));
+        refresh_message.setPositiveEnable(true);
+        refresh_message.setPositiveOverlayUsed(true);
+        refresh_message.setPositiveDragEnable(true);
+        refresh_message.addPositiveRefreshListener(new ISingleRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Toast.makeText(getContext(),"刷新成功！",Toast.LENGTH_LONG).show();
+                refresh_message.positiveRefreshComplete();
+            }
+        });
+
         return view;
     }
 

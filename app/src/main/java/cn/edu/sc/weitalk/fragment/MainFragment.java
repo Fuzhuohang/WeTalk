@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.viewpager.widget.ViewPager;
@@ -96,10 +97,11 @@ public class MainFragment extends Fragment {
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
         temp2.setImageURI("res://drawable/" + R.drawable.dragon);
         pagename = view.findViewById(R.id.page_name);
+        DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
         temp2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                drawerLayout.openDrawer(navigationView);
             }
         });
 

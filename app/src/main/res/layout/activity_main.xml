@@ -8,7 +8,7 @@
 
 
     <fragment
-        android:id="@+id/fragment"
+        android:id="@+id/fragment_main"
         android:name="cn.edu.sc.weitalk.fragment.MainFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

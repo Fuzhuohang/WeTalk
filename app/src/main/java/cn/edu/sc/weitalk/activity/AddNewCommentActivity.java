@@ -8,8 +8,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -18,10 +20,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
 public class AddNewCommentActivity extends BaseActivity {
     private EditText editView;
@@ -29,6 +35,9 @@ public class AddNewCommentActivity extends BaseActivity {
     private ConstraintLayout constraintLayout;
     private ImageView returnImage;
     private TextView btnCommit;
+    private ImageView selectedImage;
+    //private byte[] image;
+    private Uri imageUri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +46,11 @@ public class AddNewCommentActivity extends BaseActivity {
         returnImage=findViewById(R.id.returnimageview);
         constraintLayout=findViewById(R.id.addimageinmoment);
         btnCommit=findViewById(R.id.buttoncommit);
+        selectedImage=findViewById(R.id.selectedimage);
         context=AddNewCommentActivity.this;
         editView.setFocusable(true);
         editView.requestFocus();
+        imageUri=null;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -90,6 +101,16 @@ public class AddNewCommentActivity extends BaseActivity {
 
                         }
                         else{
+                            Intent intent=new Intent();
+                            intent.putExtra("content",editView.getText().toString());
+                            if(imageUri!=null) {
+                                intent.putExtra("uri",imageUri.toString());
+                            }
+                            Date time=new Date();
+                            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            intent.putExtra("time",format.format(time));
+
+                            setResult(200,intent);
                             finish();
                         }
                     }
@@ -105,19 +126,17 @@ public class AddNewCommentActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
 
-            Uri uri = data.getData();
-
-//文件指针
-
-            Cursor cursor = this.getContentResolver().query(uri, null, null,
-
-                    null, null);
-
-            cursor.moveToFirst();
-
-            String path = cursor.getString(1);
-
-            //path就是用户选择文件的路径啦，至于参数为什么是1，这是我尝试的经验，拿到路径后你就可以调用那张图片显示给用户看或者做别的事
+                imageUri = data.getData();
+//                Bitmap bitmap = null;
+//                try {
+//                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                selectedImage.setImageURI(imageUri);
+                //图像转为字节流
+                //image = MomentsMessage.img(bitmap);
+//
 
 
             // }

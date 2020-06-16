@@ -55,7 +55,7 @@ Context context;
         String str1 = "<font color='#0997F7'>李佳峻:</font>我要上号！我要上号！我要上号！我要上号！我要上号！我要上号！我要上号！我要上号！我要上号！我要上号！";
         comment.setText(Html.fromHtml(str1));
         comment.setLayoutParams(params);
-        comment.setTextSize(20);
+        comment.setTextSize(16);
         holder.likebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

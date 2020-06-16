@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/themeColor"
+            android:background="@color/colorTheme"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <ImageView
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/themeColor"
+        android:background="@color/colorTheme"
         android:gravity="center"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
@@ -79,7 +79,7 @@
             android:layout_width="0dp"
             android:layout_height="35dp"
             android:layout_weight="1"
-            android:background="@color/themeColor"
+            android:background="@color/colorTheme"
             android:text="发送"
             android:textColor="#ffffff"
             android:textSize="20sp" />

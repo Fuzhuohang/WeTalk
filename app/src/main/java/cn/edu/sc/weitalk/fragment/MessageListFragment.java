@@ -109,20 +109,15 @@ public class MessageListFragment extends Fragment {
                 HashMap map = (HashMap)list.get(position);
                 Talks talks = new Talks();
                 talks.setTalksName((String) map.get("talksObj"));
-                talks.setUserName("aaa");
                 talks.setFriendHeaderURL((String) map.get("image"));
-                talks.setMessage((String)map.get("lastMessage"));
-                talks.setMyHeaderURL("res://drawable/" + R.drawable.dragon);
+                talks.setLastMessage((String)map.get("lastMessage"));
                 if (isTwoPane){
                     Log.i("TALKS",""+isTwoPane);
                 }else {
                     Log.i("TALKS",""+isTwoPane);
                     Intent intent = new Intent(getActivity(), TalksActivity.class);
                     intent.putExtra("TalksName",talks.getTalksName());
-                    intent.putExtra("UserName",talks.getUserName());
                     intent.putExtra("FriendHeaderURL",talks.getFriendHeaderURL());
-                    intent.putExtra("Message",talks.getMessage());
-                    intent.putExtra("MyHeaderURL",talks.getMyHeaderURL());
                     startActivity(intent);
                 }
             }

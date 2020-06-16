@@ -34,7 +34,8 @@ import cn.edu.sc.weitalk.javabean.Talks;
 public class TalksActivity extends AppCompatActivity {
     private ArrayList list;
     private Talks talks;
-    TalksAdapter talksAdapter;
+    private String MyHeaderURL;
+    private TalksAdapter talksAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +45,9 @@ public class TalksActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Intent intent = getIntent();
         talks = new Talks();
-        talks.setMyHeaderURL(intent.getStringExtra("MyHeaderURL"));
+        MyHeaderURL=intent.getStringExtra("MyHeaderURL");
         talks.setTalksName(intent.getStringExtra("TalksName"));
-        talks.setUserName(intent.getStringExtra("UserName"));
         talks.setFriendHeaderURL(intent.getStringExtra("FriendHeaderURL"));
-        talks.setMessage(intent.getStringExtra("Message"));
 
         TextView talks_name = findViewById(R.id.talks_name);
         talks_name.setText(talks.getTalksName());
@@ -62,7 +61,7 @@ public class TalksActivity extends AppCompatActivity {
 
         initMessageList();
         ListView talks_list = findViewById(R.id.talks_message_list);
-        talksAdapter = new TalksAdapter(TalksActivity.this,list);
+        talksAdapter = new TalksAdapter(TalksActivity.this,list,talks.getFriendHeaderURL(),MyHeaderURL);
         talks_list.setAdapter(talksAdapter);
         setListViewHeightBasedOnChildren(talks_list);
 
@@ -95,14 +94,14 @@ public class TalksActivity extends AppCompatActivity {
                 Date date = new Date();
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Message message = new Message();
-                message.setName(talks.getUserName());
+//                message.setName(talks.getUserName());
                 message.setMsgText(editMessage.getText().toString());
                 message.setMsgType(false);
-                message.setHeader_img(talks.getMyHeaderURL());
+//                message.setHeader_img(talks.getMyHeaderURL());
                 message.setDate(format.format(date));
                 list.add(message);
                 editMessage.setText("");
-                talksAdapter = new TalksAdapter(TalksActivity.this,list);
+                talksAdapter = new TalksAdapter(TalksActivity.this,list,talks.getFriendHeaderURL(),MyHeaderURL);
                 talks_list.setAdapter(talksAdapter);
                 setListViewHeightBasedOnChildren(talks_list);
                 scrollView.post(new Runnable() {
@@ -137,7 +136,7 @@ public class TalksActivity extends AppCompatActivity {
         for(int i=0;i<12;i++) {
             message = new Message();
             if(i%2==0){
-                message.setHeader_img(talks.getFriendHeaderURL());
+//                message.setHeader_img(talks.getFriendHeaderURL());
                 message.setMsgType(true);
                 String m="";
                 for(int j=0;j<=i;j++){
@@ -145,7 +144,7 @@ public class TalksActivity extends AppCompatActivity {
                 }
                 message.setMsgText(m);
             }else {
-                message.setHeader_img(talks.getMyHeaderURL());
+//                message.setHeader_img(talks.getMyHeaderURL());
                 message.setMsgType(false);
                 String m="";
                 for(int j=0;j<=i;j++){

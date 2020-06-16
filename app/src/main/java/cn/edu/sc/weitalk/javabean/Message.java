@@ -4,8 +4,8 @@ public class Message {
     public String msgText;
     public boolean msgType;
     public String date;
-    public String name;
-    public String header_img;
+    public String sendName;
+    public String receiveName;
 
     public void setMsgText(String msgText){
         this.msgText=msgText;
@@ -31,19 +31,19 @@ public class Message {
         return date;
     }
 
-    public void setName(String name){
-        this.name=name;
+    public void setSendName(String sendName){
+        this.sendName=sendName;
     }
 
-    public String getName(){
-        return name;
+    public String getSendName(){
+        return sendName;
     }
 
-    public void setHeader_img(String header_img){
-        this.header_img=header_img;
+    public void setReceiveName(String receiveName){
+        this.receiveName=receiveName;
     }
 
-    public String getHeader_img(){
-        return header_img;
+    public String getReceiveName(){
+        return receiveName;
     }
 }

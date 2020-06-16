@@ -1,6 +1,8 @@
 package cn.edu.sc.weitalk.javabean;
 
-public class Message {
+import org.litepal.crud.DataSupport;
+
+public class Message extends DataSupport {
     public String msgText;
     public boolean msgType;
     public String date;

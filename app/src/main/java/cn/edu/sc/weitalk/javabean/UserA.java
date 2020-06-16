@@ -1,6 +1,8 @@
 package cn.edu.sc.weitalk.javabean;
 
-public class User {
+import org.litepal.crud.DataSupport;
+
+public class UserA extends DataSupport {
     /**
      * Created by wangsong on 2016/4/24.
      */
@@ -9,10 +11,10 @@ public class User {
     private String pinyin;
     private String firstLetter;
 
-    public User() {
+    public UserA() {
     }
 
-    public User(String firstLetter, int img, String pinyin, String username) {
+    public UserA(String firstLetter, int img, String pinyin, String username) {
         this.firstLetter = firstLetter;
         this.img = img;
         this.pinyin = pinyin;

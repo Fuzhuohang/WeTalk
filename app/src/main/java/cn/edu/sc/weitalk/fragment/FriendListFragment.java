@@ -6,9 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -18,7 +16,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.adapter.FriendListAdapter;
-import cn.edu.sc.weitalk.javabean.User;
+import cn.edu.sc.weitalk.javabean.UserA;
 import cn.edu.sc.weitalk.widget.LetterIndexView;
 
 /**
@@ -32,7 +30,7 @@ public class FriendListFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private ArrayList<User> list;
+    private ArrayList<UserA> list;
     @BindView(R.id.btn_search_friend_list)
     Button btnSearch;
     @BindView(R.id.lv_fiend_list)
@@ -76,8 +74,8 @@ public class FriendListFragment extends Fragment {
 
         list = new ArrayList<>();
         for(int i = 0;i < 10;i++){
-            User user = new User("A", R.drawable.dragon,"long", "龙");
-            list.add(user);
+            UserA userA = new UserA("A", R.drawable.dragon,"long", "龙");
+            list.add(userA);
         }
     }
 

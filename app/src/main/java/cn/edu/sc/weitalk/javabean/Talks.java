@@ -1,6 +1,9 @@
 package cn.edu.sc.weitalk.javabean;
 
-public class Talks {
+import org.litepal.crud.DataSupport;
+
+public class Talks extends DataSupport {
+
 
     public String TalksName;
     public String FriendHeaderURL;

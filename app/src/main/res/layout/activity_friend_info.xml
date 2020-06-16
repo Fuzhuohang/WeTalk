@@ -17,7 +17,7 @@
             android:id="@+id/iv_back_friend_info"
             android:layout_width="match_parent"
             android:layout_height="265dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             fresco:srcCompat="@drawable/huoyin" />

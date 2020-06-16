@@ -29,12 +29,15 @@
                     android:layout_marginBottom="10dp"
                     android:background="@drawable/search_btn"
                     android:text="@string/search_btn"
+                    android:textColor="@color/colorGrayText"
                     android:textSize="16sp" />
 
                 <ListView
                     android:id="@+id/MessageList"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="0dp"/>
             </LinearLayout>
         </ScrollView>
     </com.mbg.library.RefreshRelativeLayout>

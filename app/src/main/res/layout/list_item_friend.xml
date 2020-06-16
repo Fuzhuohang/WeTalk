@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/tv_index_friend_list"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="22dp"
         android:background="@color/colorBackground3"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"
@@ -18,7 +18,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="65dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -33,7 +33,8 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="46dp">
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp">
 
             <TextView
                 android:id="@+id/tv_username_friend_list"
@@ -42,13 +43,13 @@
                 android:gravity="center_vertical"
                 android:text="用户名"
                 android:textColor="@color/colorPlaneText"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1px"
                 android:layout_alignParentBottom="true"
-                android:background="@color/colorBlankBackground" />
+                android:background="@color/colorBackground3" />
 
         </RelativeLayout>
     </LinearLayout>

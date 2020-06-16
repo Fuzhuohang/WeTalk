@@ -14,5 +14,6 @@
     <item
         android:id="@+id/pyq_b"
         android:title="朋友圈"
-        android:icon="@drawable/bottom_navg_icon_moments"/>
+        android:icon="@drawable/bottom_navg_icon_moments"
+        android:tooltipText="20sp"/>
 </menu>

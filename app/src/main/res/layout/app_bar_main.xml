@@ -37,9 +37,9 @@
         android:layout_width="match_parent"
         android:layout_height="76dp"
         android:background="@color/colorBar"
+        android:gravity="center"
         android:paddingTop="20dp"
         app:layout_anchor="@+id/appbar"
-        app:layout_anchorGravity="center"
         app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <com.facebook.drawee.view.SimpleDraweeView
@@ -56,10 +56,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginRight="53dp"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:paddingTop="14dp"
+            android:text="哈哈哈"
             android:textColor="@color/colorPlaneText"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
 
     </androidx.appcompat.widget.Toolbar>

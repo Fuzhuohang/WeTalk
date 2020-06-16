@@ -75,7 +75,7 @@ public class FriendListFragment extends Fragment {
         }
 
         list = new ArrayList<>();
-        for(int i = 0;i < 30;i++){
+        for(int i = 0;i < 10;i++){
             User user = new User("A", R.drawable.dragon,"long", "龙");
             list.add(user);
         }

@@ -49,7 +49,7 @@ public class LetterIndexView extends View {
         super(context, attrs, defStyleAttr);
         paint = new Paint();        //文字的画笔
         paint.setAntiAlias(true);   //抗锯齿
-        paint.setTextSize(24);  //字的大小
+        paint.setTextSize(36);  //字的大小
     }
 
     @Override

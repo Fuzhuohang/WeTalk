@@ -105,6 +105,7 @@ public class MainFragment extends Fragment {
         temp.setImageURI("res://drawable/" + R.drawable.dragon);
 //        TextView name=headerView.findViewById(R.id.Username);
 //        name.setText("111111");
+        navigationView.setItemIconTintList(null);   //设置icon为原本图片的颜色
 
         DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
         toolbar = view.findViewById(R.id.toolbar);

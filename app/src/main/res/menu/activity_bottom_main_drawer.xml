@@ -3,13 +3,16 @@
 
     <item
         android:id="@+id/message_b"
-        android:title="消息"/>
+        android:title="消息"
+        android:icon="@drawable/bottom_navg_icon_msg" />
 
     <item
         android:id="@+id/lxr_b"
-        android:title="联系人" />
+        android:title="联系人"
+        android:icon="@drawable/bottom_navg_icon_friends"/>
 
     <item
         android:id="@+id/pyq_b"
-        android:title="朋友圈"/>
+        android:title="朋友圈"
+        android:icon="@drawable/bottom_navg_icon_moments"/>
 </menu>

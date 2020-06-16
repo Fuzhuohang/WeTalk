@@ -8,16 +8,24 @@
     <com.mbg.library.RefreshRelativeLayout
         android:id="@+id/refresh_talks_message"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="55dp">
 
         <ScrollView
+            android:id="@+id/talks_scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical">
+
+                <ListView
+                    android:id="@+id/talks_message_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
         </ScrollView>
     </com.mbg.library.RefreshRelativeLayout>
 

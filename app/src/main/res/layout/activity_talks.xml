@@ -16,7 +16,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/themeColor"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <ImageView
@@ -30,8 +30,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginRight="53dp"
-                android:textSize="20sp"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textSize="20sp" />
 
 
         </androidx.appcompat.widget.Toolbar>
@@ -42,35 +42,47 @@
         layout="@layout/talks_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="55dp" />
+        android:layout_marginTop="55dp"
+        android:layout_gravity="bottom"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:orientation="horizontal"
-        android:background="@color/colorPrimary"
+        android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:gravity="center">
+        android:background="@color/themeColor"
+        android:gravity="center"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:orientation="horizontal">
 
-        <EditText
+        <MultiAutoCompleteTextView
             android:id="@+id/editMessage"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
-            android:background="@drawable/talks_edit"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textPersonName"/>
+            android:background="@drawable/talks_edit"
+            android:ems="10" />
+
+        <!--        <EditText-->
+        <!--            android:id="@+id/editMessage"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="35dp"-->
+        <!--            android:layout_marginLeft="15dp"-->
+        <!--            android:layout_weight="1"-->
+        <!--            android:background="@drawable/talks_edit"-->
+        <!--            android:ems="10"-->
+        <!--            android:inputType="textPersonName" />-->
 
         <Button
             android:id="@+id/sentMessage"
             android:layout_width="0dp"
             android:layout_height="35dp"
             android:layout_weight="1"
-            android:background="@drawable/send_btn"
+            android:background="@color/themeColor"
+            android:text="发送"
             android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:text="发送" />
+            android:textSize="20sp" />
 
         <ImageView
             android:id="@+id/addSend"

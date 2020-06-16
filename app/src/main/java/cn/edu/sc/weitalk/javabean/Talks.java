@@ -5,6 +5,7 @@ public class Talks {
     public String MyHeaderURL;
     public String FriendHeaderURL;
     public String Message;
+    public String UserName;
 
     public String getTalksName(){
         return TalksName;
@@ -12,6 +13,14 @@ public class Talks {
 
     public void setTalksName(String TalksName){
         this.TalksName=TalksName;
+    }
+
+    public String getUserName() {
+        return UserName;
+    }
+
+    public void setUserName(String UserName){
+        this.UserName = UserName;
     }
 
     public String getMyHeaderURL(){

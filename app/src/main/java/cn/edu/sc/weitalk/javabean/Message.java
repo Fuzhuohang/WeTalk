@@ -8,6 +8,7 @@ public class Message extends DataSupport {
     public String date;
     public String sendName;
     public String receiveName;
+    public boolean isRead;
 
     public void setMsgText(String msgText){
         this.msgText=msgText;
@@ -47,5 +48,13 @@ public class Message extends DataSupport {
 
     public String getReceiveName(){
         return receiveName;
+    }
+
+    public void setRead(boolean isRead){
+        this.isRead=isRead;
+    }
+
+    public boolean getRead(){
+        return isRead;
     }
 }

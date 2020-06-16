@@ -1,8 +1,12 @@
 package cn.edu.sc.weitalk.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.ui.AppBarConfiguration;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -25,7 +29,27 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         //DataSupport.deleteAll(MomentsMessage.class);
         Connector.getDatabase();
+        requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);
         bottomView.setItemIconTintList(null);
+    }
+    private void requestMyPermissions() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            //没有授权，编写申请权限代码
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 100);
+        } else {
+            //Log.d(TAG, "requestMyPermissions: 有写SD权限");
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            //没有授权，编写申请权限代码
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+        } else {
+            //Log.d(TAG, "requestMyPermissions: 有读SD权限");
+        }
     }
 }

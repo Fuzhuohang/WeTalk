@@ -1,11 +1,14 @@
 package cn.edu.sc.weitalk.adapter;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -25,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
@@ -36,6 +42,9 @@ Context context;
     public ArrayList<MomentsMessage> moments;
     public ArrayList<Bitmap> icons;
     public ArrayList<Bitmap> contentImages;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
     public momentsMessageAdapter(Context context){
         messageTextList=new ArrayList<String>();
         for(int i=0;i<100;i++){
@@ -92,23 +101,31 @@ Context context;
                 holder.imageSelected.setLayoutParams(params);
             }
         //动态生成评论
-//        TextView comment=new TextView(context);
-//        holder.comments.addView(comment);
-//        holder.comments.setVisibility(View.VISIBLE);
-//        holder.comments.setBackgroundResource(R.drawable.fillet);
-//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
-//        params.width =LinearLayout.LayoutParams.MATCH_PARENT;
-//        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-//        //评论内容显示，html转为字符串保留格式
-//        String str1 = "<font color='#0997F7'>"+comments.get(1).getCommentPerName()+":</font>"+comments.get(0).getContent();
-//        comment.setText(Html.fromHtml(str1));
-//        comment.setLayoutParams(params);
-//        comment.setTextSize(16);
-        //
+        TextView comment=new TextView(context);
+        holder.comments.addView(comment);
+        holder.comments.setVisibility(View.VISIBLE);
+        holder.comments.setBackgroundResource(R.drawable.fillet);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
+        params.width =LinearLayout.LayoutParams.MATCH_PARENT;
+        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        //评论内容显示，html转为字符串保留格式
+        String str1 = "<font color='#0997F7'>"+"平凡之路"+":</font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
+        comment.setText(Html.fromHtml(str1));
+        comment.setLayoutParams(params);
+        comment.setTextSize(16);
+        if(temp.getLikeCounter()>0){
+            holder.likeCounter.setVisibility(View.VISIBLE);
+            holder.likeCounter.setText(temp.getLikeCounter()+"");
+        }else
+            holder.likeCounter.setVisibility(View.INVISIBLE);
+
         holder.likebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.likeCounter.setVisibility(View.VISIBLE);
                 holder.likebutton.setImageResource(R.drawable.dianzanle);
+                holder.likeCounter.setText((Integer.parseInt(holder.likeCounter.getText().toString())+1)+"");
+
             }
         });
         return holder;
@@ -126,6 +143,11 @@ Context context;
         //Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), icons.get(position), null, null));
         //holder.icon.setImageURI(uri);
         holder.icon.setImageURI(temp.getHeadshot());
+        if(temp.getLikeCounter()>0){
+            holder.likeCounter.setVisibility(View.VISIBLE);
+            holder.likeCounter.setText(temp.getLikeCounter()+"");
+        }else
+            holder.likeCounter.setVisibility(View.INVISIBLE);
         //消息图片
         if(!(" ".equals(temp.getMomentImage()))){
             if(holder.imageSelected!=null) {
@@ -152,11 +174,13 @@ Context context;
         return moments.size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         SimpleDraweeView icon;
         TextView name;
         TextView time;
         TextView Text;
+        TextView likeCounter;
         ImageView imageSelected;
         ImageView likebutton;
         ImageView commentbutton;
@@ -172,6 +196,7 @@ Context context;
             commentbutton=itemView.findViewById(R.id.commentbuttton);
             imagesGroup=itemView.findViewById(R.id.imagegroup);
             comments=itemView.findViewById(R.id.commentsgroup);
+            likeCounter=itemView.findViewById(R.id.textView);
             imageSelected=null;
 
         }

@@ -13,17 +13,17 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import java.util.List;
 
 import cn.edu.sc.weitalk.R;
-import cn.edu.sc.weitalk.javabean.UserA;
+import cn.edu.sc.weitalk.javabean.Friend;
 
 /**
  * Created by wangsong on 2016/4/24.
  */
 public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
-    private List<UserA> list;
+    private List<Friend> list;
     private Context context;
     private LayoutInflater inflater;
 
-    public FriendListAdapter(Context context, List<UserA> list) {
+    public FriendListAdapter(Context context, List<Friend> list) {
         this.context = context;
         this.list = list;
         inflater = LayoutInflater.from(context);
@@ -57,9 +57,9 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        UserA userA = list.get(position);
-        holder.username.setText(userA.getUsername());
-        holder.headIcon.setImageURI("res://drawable/" + userA.getImg());
+        Friend friend = list.get(position);
+        holder.username.setText(friend.getUsername());
+        holder.headIcon.setImageURI("res://drawable/" + friend.getImg());
         //获得当前position是属于哪个分组
         int sectionForPosition = getSectionForPosition(position);
         //获得该分组第一项的position
@@ -68,7 +68,7 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
         //如果是，则显示showLetter，否则隐藏
         if (position == positionForSection) {
             holder.showLetter.setVisibility(View.VISIBLE);
-            holder.showLetter.setText(userA.getFirstLetter());
+            holder.showLetter.setText(friend.getFirstLetter());
         } else {
             holder.showLetter.setVisibility(View.GONE);
         }

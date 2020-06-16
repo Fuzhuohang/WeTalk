@@ -34,7 +34,7 @@ import cn.edu.sc.weitalk.fragment.TalksFragment;
 import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.Talks;
 
-public class TalksActivity extends AppCompatActivity {
+public class TalksActivity extends BaseActivity {
     private List<Message> list;
     private String MyHeaderURL,talksName,FriendHeaderURL;
     private String Myname = "myname";

@@ -23,7 +23,7 @@ import java.util.TimerTask;
 
 import cn.edu.sc.weitalk.R;
 
-public class AddNewCommentActivity extends AppCompatActivity {
+public class AddNewCommentActivity extends BaseActivity {
     private EditText editView;
     private Context context;
     private ConstraintLayout constraintLayout;

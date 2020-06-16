@@ -15,8 +15,9 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="76dp"
             android:background="@color/colorTheme"
+            android:paddingTop="20dp"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <ImageView
@@ -31,6 +32,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="53dp"
                 android:gravity="center"
+                android:textColor="@color/white"
                 android:textSize="20sp" />
 
 
@@ -42,24 +44,25 @@
         layout="@layout/talks_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="55dp"
-        android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:layout_marginTop="76dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@color/colorTheme"
+        android:background="@color/colorBackground3"
         android:gravity="center"
+        android:orientation="horizontal"
         android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:orientation="horizontal">
+        android:paddingBottom="10dp">
 
         <MultiAutoCompleteTextView
             android:id="@+id/editMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:background="@drawable/talks_edit"
             android:ems="10" />

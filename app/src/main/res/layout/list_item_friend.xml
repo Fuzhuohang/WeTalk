@@ -9,7 +9,7 @@
         android:id="@+id/tv_index_friend_list"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@color/colorBlankBackground2"
+        android:background="@color/colorBackground3"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"
         android:text="A"
@@ -18,18 +18,18 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_height="55dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/head_ic_friend_list"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_marginLeft="25dp"
             android:layout_marginRight="10dp"
             fresco:roundAsCircle="true"
-            fresco:roundedCornerRadius="20dp"/>
+            fresco:roundedCornerRadius="20dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -39,16 +39,16 @@
                 android:id="@+id/tv_username_friend_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center_vertical"
                 android:text="用户名"
                 android:textColor="@color/colorPlaneText"
-                android:textSize="16sp"
-                android:gravity="center_vertical"/>
+                android:textSize="18sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="1px"
-                android:background="@color/colorBlankBackground"
-                android:layout_alignParentBottom="true"/>
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorBlankBackground" />
 
         </RelativeLayout>
     </LinearLayout>

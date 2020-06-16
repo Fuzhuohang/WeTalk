@@ -60,7 +60,7 @@ public class LetterIndexView extends View {
             if (i == choosedPosition) {
                 paint.setColor(Color.RED);
             } else {
-                paint.setColor(Color.parseColor("#0C7CD1"));
+                paint.setColor(getResources().getColor(R.color.colorTheme));
             }
             //1.字母  2.x  3.y            文字rightPadding = 文字宽度 / 2
             canvas.drawText(letters[i], (getWidth() - paint.measureText(letters[i])) / 2, (i + 1) * perTextHeight, paint);

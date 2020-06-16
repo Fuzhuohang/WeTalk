@@ -1,20 +1,20 @@
 package cn.edu.sc.weitalk.javabean;
 
-import org.litepal.crud.DataSupport;
-
-public class UserA extends DataSupport {
+public class Friend {
     /**
      * Created by wangsong on 2016/4/24.
      */
     private int img;
     private String username;
+    private String userId;
+    private String note;
     private String pinyin;
     private String firstLetter;
 
-    public UserA() {
+    public Friend() {
     }
 
-    public UserA(String firstLetter, int img, String pinyin, String username) {
+    public Friend(String firstLetter, int img, String pinyin, String username) {
         this.firstLetter = firstLetter;
         this.img = img;
         this.pinyin = pinyin;
@@ -51,5 +51,21 @@ public class UserA extends DataSupport {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 }

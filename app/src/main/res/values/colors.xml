@@ -11,5 +11,9 @@
     <color name="colorBigLetter">#CBFFFFFF</color>
     <color name="colorFaBiao">#FFD1CBCB</color>
     <color name="white">#FFFFFF</color>
-    <color name="colorBar">#DAF1F1F1</color>
+    <color name="colorBar">#EFEFEF</color>
+    <color name="colorBackground3">#33888888</color>
+    <color name="colorMaskBack">#4D888888</color>
+    <color name="colorMaskHeadIc">#80888888</color>
+    <color name="colorBtnDown">#037A9E</color>
 </resources>

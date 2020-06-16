@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     package="cn.edu.sc.weitalk">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -24,20 +25,18 @@
                 android:resource="@xml/provider_paths" />
         </provider>
         
-        <activity android:name=".activity.LoginActivity"></activity>
-        <activity android:name=".activity.RegisterActivity" >
+        <activity android:name=".activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TestCircle">
-<!--            <intent-filter>-->
-<!--                <action android:name="dvcvbfbfbd" />-->
+        <activity android:name=".activity.RegisterActivity" >
 
-<!--                <category android:name="vdvdbgfbgbvd" />-->
-<!--            </intent-filter>-->
+        </activity>
+        <activity android:name=".TestCircle">
+
         </activity>
         <activity android:name=".activity.MainActivity">
         </activity>

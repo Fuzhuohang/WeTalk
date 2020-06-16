@@ -26,6 +26,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,8 +39,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.edu.sc.weitalk.R;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class RegisterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
+    private String IPaddress="http://localhost:8083";
+
     private EditText edtName;
     private EditText edtPassword;
     private EditText edtPassword2;
@@ -66,16 +78,84 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         txtDate=findViewById(R.id.txtDate);
         head=findViewById(R.id.head);
         edtName=findViewById(R.id.edtName);
-        edtPassword=findViewById(R.id.edtPassword);
+        edtPassword=findViewById(R.id.edtLPassword);
         edtPassword2=findViewById(R.id.edtPassword2);
         edtPhone=findViewById(R.id.edtPhone);
         edtEmail=findViewById(R.id.edtEmail);
         edtlocation=findViewById(R.id.edtLocation);
         btnRegister=findViewById(R.id.btnRegister);
+        //默认头像地址
+        mCurrentPhotoPath="";
+
+
+//        SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
+//        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //判断为空，密码确认是否一样
+                String password=edtPassword.getText().toString();
+                String password2=edtPassword2.getText().toString();
+                String name=edtName.getText().toString();
+                String phone=edtPhone.getText().toString();
+                String email=edtEmail.getText().toString();
+                String location=edtlocation.getText().toString();
+                String birthday=txtDate.getText().toString();
+                if(name==null){
+                    edtName.setError("不能为空");
+                }else if(password==null){
+                    edtPassword.setError("不能为空");
+                }else if(password2==null){
+                    edtPassword2.setError("不能为空");
+                }else if(email==null){
+                    edtEmail.setError("不能为空");
+                }else if(location==null){
+                    edtlocation.setError("不能为空");
+                }else if(phone==null){
+                    edtPhone.setError("不能为空");
+                }else if(birthday==null) {
+                    txtDate.setError("不能为空");
+                }else if(!password.equals(password2)){
+                    edtPassword2.setError("两次输入密码不同");
+                }else{
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try{
+                                OkHttpClient client=new OkHttpClient();
+                                RequestBody requestBody=new FormBody.Builder()
+                                        .add("password",password)
+                                        .add("name",name)
+                                        .add("headURL",mCurrentPhotoPath)
+                                        .add("birthday",txtDate.getText().toString())
+                                        .add("phone",phone)
+                                        .add("eMail",email)
+                                        .add("location",location)
+                                        .build();
+                                Request request=new Request.Builder()
+                                        .url(IPaddress+"/post-api/register")
+                                        .post(requestBody)
+                                        .build();
 
+                                Response response=client.newCall(request).execute();
+                                final String responseData=response.body().string();
+                                Gson gson=new Gson();
+                                JSONObject jsonObject=new JSONObject(responseData);
+                                String status=jsonObject.getString("status");
+                                JSONObject JSONData=jsonObject.getJSONObject("data");
+                                String userID=JSONData.getString("userID");
+
+                                Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
+                                intent.putExtra("userID",userID);
+                                startActivity(intent);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
             }
         });
 

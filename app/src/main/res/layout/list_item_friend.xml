@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_index_friend_list"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@color/colorBlankBackground2"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:text="A"
+        android:textColor="@color/colorTheme"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/head_ic_friend_list"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="10dp"
+            fresco:roundAsCircle="true"
+            fresco:roundedCornerRadius="20dp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="46dp">
+
+            <TextView
+                android:id="@+id/tv_username_friend_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="用户名"
+                android:textColor="@color/colorPlaneText"
+                android:textSize="16sp"
+                android:gravity="center_vertical"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@color/colorBlankBackground"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

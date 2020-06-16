@@ -14,7 +14,7 @@ public class TestCircle extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.nav_header_main);
-        SimpleDraweeView temp=findViewById(R.id.drawee_img);
+        SimpleDraweeView temp=findViewById(R.id.icon);
         temp.setImageURI("res://drawable/" + R.drawable.dragon);
     }
 

@@ -13,6 +13,7 @@
 
 
         <include
+            android:id="@+id/bar"
             layout="@layout/app_bar_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -41,7 +41,7 @@
         android:id="@+id/head"
         android:layout_width="131dp"
         android:layout_height="108dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/relativeLayout"
@@ -52,7 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginStart="160dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="5dp"
         android:text="选择头像"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/head" />
@@ -61,7 +61,7 @@
         android:id="@+id/edtName"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="15dp"
         android:ems="10"
         android:hint="请输入你的昵称"
         android:inputType="textPersonName"
@@ -71,7 +71,7 @@
         app:layout_constraintTop_toBottomOf="@+id/btnhead" />
 
     <EditText
-        android:id="@+id/edtPassword"
+        android:id="@+id/edtLPassword"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginTop="5dp"
@@ -93,7 +93,7 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/edtLPassword" />
 
     <EditText
         android:id="@+id/edtPhone"
@@ -143,7 +143,7 @@
         android:id="@+id/btnDate"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="5dp"
         android:text="选择生日"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edtLocation" />

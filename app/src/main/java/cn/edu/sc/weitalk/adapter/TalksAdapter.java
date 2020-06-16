@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -29,13 +30,13 @@ public class TalksAdapter extends BaseAdapter {
     }
 
     private static final String TAG = TalksAdapter.class.getSimpleName();
-    private ArrayList data;
+    private List<Message> data;
     private Context context;
     private LayoutInflater mInflater;
     private String Receive_Header;
     private String Send_Header;
 
-    public TalksAdapter(Context context, ArrayList data,String Receiver_Header,String Send_Header){
+    public TalksAdapter(Context context, List<Message> data,String Receiver_Header,String Send_Header){
         this.context= context;
         this.data = data;
         this.Receive_Header = Receiver_Header;
@@ -90,6 +91,15 @@ public class TalksAdapter extends BaseAdapter {
             viewHolder.header_img = convertView.findViewById(R.id.header_img);
             viewHolder.talks_message = convertView.findViewById(R.id.talks_message);
             viewHolder.isComMsg=isComMsg;
+
+            if (isComMsg){
+                viewHolder.header_img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(context,"这是好友头像",Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
 
             convertView.setTag(viewHolder);
         }else {

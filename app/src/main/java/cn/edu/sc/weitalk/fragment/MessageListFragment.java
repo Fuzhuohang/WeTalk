@@ -21,11 +21,19 @@ import com.mbg.library.DefaultPositiveRefreshers.PositiveRefresherWithText;
 import com.mbg.library.ISingleRefreshListener;
 import com.mbg.library.RefreshRelativeLayout;
 
+import org.litepal.LitePal;
+import org.litepal.LitePalBase;
+import org.litepal.LitePalDB;
+import org.litepal.crud.DataSupport;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
+import cn.edu.sc.weitalk.adapter.TalksListAdapter;
 import cn.edu.sc.weitalk.javabean.Talks;
 
 /**
@@ -43,9 +51,11 @@ public class MessageListFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private ArrayList list;
+    private List<Talks> list;
 
     private boolean isTwoPane;
+
+    private TalksListAdapter adapter;
 
     public MessageListFragment() {
         // Required empty public constructor
@@ -97,8 +107,7 @@ public class MessageListFragment extends Fragment {
         initArrayList();
         Button btnSearch = view.findViewById(R.id.btnSearch);
         ListView messageList = view.findViewById(R.id.MessageList);
-        SimpleAdapter adapter = new SimpleAdapter(getContext(),list,R.layout.message_list_item,
-                new String[]{"image","talksObj","lastMessage"},new int[]{R.id.talks_img,R.id.talksObj,R.id.lastMessage});
+        adapter = new TalksListAdapter(list, getContext());
         messageList.setAdapter(adapter);
         setListViewHeightBasedOnChildren(messageList);
 
@@ -106,18 +115,13 @@ public class MessageListFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("TAUCH",""+position);
-                HashMap map = (HashMap)list.get(position);
-                Talks talks = new Talks();
-                talks.setTalksName((String) map.get("talksObj"));
-                talks.setFriendHeaderURL((String) map.get("image"));
-                talks.setLastMessage((String)map.get("lastMessage"));
                 if (isTwoPane){
                     Log.i("TALKS",""+isTwoPane);
                 }else {
                     Log.i("TALKS",""+isTwoPane);
                     Intent intent = new Intent(getActivity(), TalksActivity.class);
-                    intent.putExtra("TalksName",talks.getTalksName());
-                    intent.putExtra("FriendHeaderURL",talks.getFriendHeaderURL());
+                    intent.putExtra("TalksName",list.get(position).getTalksName());
+                    intent.putExtra("FriendHeaderURL",list.get(position).getFriendHeaderURL());
                     startActivity(intent);
                 }
             }
@@ -142,14 +146,15 @@ public class MessageListFragment extends Fragment {
     }
 
     public void initArrayList(){
-        list = new ArrayList();
+        DataSupport.deleteAll(Talks.class);
         for(int i=0;i<12;i++){
-            HashMap map = new HashMap();
-            map.put("image","res://drawable/" + R.drawable.dragon);
-            map.put("talksObj","会话名称"+(i+1));
-            map.put("lastMessage","这是最近的一条消息。");
-            list.add(map);
+            Talks talks = new Talks();
+            talks.setFriendHeaderURL("res://drawable/" + R.drawable.dragon);
+            talks.setTalksName("会话名称"+(i+1));
+            talks.setLastMessage("这是最近的一条消息。");
+            talks.save();
         }
+        list = DataSupport.findAll(Talks.class);
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView){

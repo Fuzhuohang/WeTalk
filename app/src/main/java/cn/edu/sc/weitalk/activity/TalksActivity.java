@@ -21,9 +21,12 @@ import com.mbg.library.DefaultPositiveRefreshers.PositiveRefresherWithText;
 import com.mbg.library.ISingleRefreshListener;
 import com.mbg.library.RefreshRelativeLayout;
 
+import org.litepal.crud.DataSupport;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.adapter.TalksAdapter;
@@ -32,9 +35,9 @@ import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.Talks;
 
 public class TalksActivity extends AppCompatActivity {
-    private ArrayList list;
-    private Talks talks;
-    private String MyHeaderURL;
+    private List<Message> list;
+    private String MyHeaderURL,talksName,FriendHeaderURL;
+    private String Myname = "myname";
     private TalksAdapter talksAdapter;
 
     @Override
@@ -44,13 +47,12 @@ public class TalksActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Intent intent = getIntent();
-        talks = new Talks();
         MyHeaderURL=intent.getStringExtra("MyHeaderURL");
-        talks.setTalksName(intent.getStringExtra("TalksName"));
-        talks.setFriendHeaderURL(intent.getStringExtra("FriendHeaderURL"));
+        talksName=intent.getStringExtra("TalksName");
+        FriendHeaderURL=intent.getStringExtra("FriendHeaderURL");
 
         TextView talks_name = findViewById(R.id.talks_name);
-        talks_name.setText(talks.getTalksName());
+        talks_name.setText(talksName);
         ImageView back_btn = findViewById(R.id.back_btn);
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,7 +63,7 @@ public class TalksActivity extends AppCompatActivity {
 
         initMessageList();
         ListView talks_list = findViewById(R.id.talks_message_list);
-        talksAdapter = new TalksAdapter(TalksActivity.this,list,talks.getFriendHeaderURL(),MyHeaderURL);
+        talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
         talks_list.setAdapter(talksAdapter);
         setListViewHeightBasedOnChildren(talks_list);
 
@@ -94,14 +96,15 @@ public class TalksActivity extends AppCompatActivity {
                 Date date = new Date();
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 Message message = new Message();
-//                message.setName(talks.getUserName());
                 message.setMsgText(editMessage.getText().toString());
                 message.setMsgType(false);
-//                message.setHeader_img(talks.getMyHeaderURL());
                 message.setDate(format.format(date));
+                message.setSendName(Myname);
+                message.setReceiveName(talksName);
+                message.save();
                 list.add(message);
                 editMessage.setText("");
-                talksAdapter = new TalksAdapter(TalksActivity.this,list,talks.getFriendHeaderURL(),MyHeaderURL);
+                talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
                 talks_list.setAdapter(talksAdapter);
                 setListViewHeightBasedOnChildren(talks_list);
                 scrollView.post(new Runnable() {
@@ -131,10 +134,9 @@ public class TalksActivity extends AppCompatActivity {
     }
 
     private void initMessageList(){
-        Message message;
-        list=new ArrayList();
+        DataSupport.deleteAll(Message.class);
         for(int i=0;i<12;i++) {
-            message = new Message();
+            Message message = new Message();
             if(i%2==0){
 //                message.setHeader_img(talks.getFriendHeaderURL());
                 message.setMsgType(true);
@@ -143,6 +145,8 @@ public class TalksActivity extends AppCompatActivity {
                     m += "这是收到的第"+(i/2+1)+"条消息，";
                 }
                 message.setMsgText(m);
+                message.setSendName(talksName);
+                message.setReceiveName(Myname);
             }else {
 //                message.setHeader_img(talks.getMyHeaderURL());
                 message.setMsgType(false);
@@ -151,9 +155,12 @@ public class TalksActivity extends AppCompatActivity {
                     m += "这是发出的第"+(i/2+1)+"条消息，";
                 }
                 message.setMsgText(m);
+                message.setSendName(Myname);
+                message.setReceiveName(talksName);
             }
-            list.add(message);
+            message.save();
         }
+        list = DataSupport.findAll(Message.class);
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView){

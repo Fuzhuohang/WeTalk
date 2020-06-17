@@ -47,7 +47,7 @@ public class TalksActivity extends BaseActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Intent intent = getIntent();
-        MyHeaderURL=intent.getStringExtra("MyHeaderURL");
+//        MyHeaderURL=intent.getStringExtra("MyHeaderURL");
         talksName=intent.getStringExtra("TalksName");
         FriendHeaderURL=intent.getStringExtra("FriendHeaderURL");
 

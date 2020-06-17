@@ -1,14 +1,29 @@
 package cn.edu.sc.weitalk.javabean;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
+
 import org.litepal.crud.DataSupport;
 
+import java.io.ByteArrayOutputStream;
+
 public class MomentsMessage extends DataSupport {
+    private String momentID;
+
+    public String getMomentID() {
+        return momentID;
+    }
+
+    public void setMomentID(String momentID) {
+        this.momentID = momentID;
+    }
+
     private  String publisherID;
     private String publisherName;
     private  String Date;
     private  String content;
-    private byte[] headshot;//头像
-    private byte[] momentImage;//朋友圈消息包含的的图片
+    private String headshot;//头像
+    private String momentImage;//朋友圈消息包含的的图片
     private int likeCounter;
 
     public String getPublisherID() {
@@ -43,19 +58,19 @@ public class MomentsMessage extends DataSupport {
         this.content = content;
     }
 
-    public byte[] getHeadshot() {
+    public String getHeadshot() {
         return headshot;
     }
 
-    public void setHeadshot(byte[] headshot) {
+    public void setHeadshot(String headshot) {
         this.headshot = headshot;
     }
 
-    public byte[] getMomentImage() {
+    public String getMomentImage() {
         return momentImage;
     }
 
-    public void setMomentImage(byte[] momentImage) {
+    public void setMomentImage(String momentImage) {
         this.momentImage = momentImage;
     }
 
@@ -67,5 +82,10 @@ public class MomentsMessage extends DataSupport {
         this.likeCounter = likeCounter;
     }
 
+    public static byte[]img(Bitmap bitmap){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
 
 }

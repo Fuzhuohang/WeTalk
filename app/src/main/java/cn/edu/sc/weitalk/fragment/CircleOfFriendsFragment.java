@@ -33,7 +33,7 @@ public class CircleOfFriendsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private View view;
-    private momentsMessageAdapter adapter;
+    public momentsMessageAdapter adapter;
     private RecyclerView recyclerView;
     private NestedScrollView scrollView;
     // TODO: Rename and change types of parameters

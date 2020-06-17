@@ -1,5 +1,7 @@
 package cn.edu.sc.weitalk.javabean;
 
+import java.util.Date;
+
 public class Friend {
     /**
      * Created by wangsong on 2016/4/24.
@@ -8,8 +10,15 @@ public class Friend {
     private String username;
     private String userId;
     private String note;
-    private String pinyin;
-    private String firstLetter;
+    private String location;
+    private String birthday;
+    private String phoneNum;
+    private String email;
+    private boolean status;
+    //以下字段非映射字段
+    public String pinyin;
+    public String firstLetter;
+
 
     public Friend() {
     }
@@ -67,5 +76,45 @@ public class Friend {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public String getPhoneNum() {
+        return phoneNum;
+    }
+
+    public void setPhoneNum(String phoneNum) {
+        this.phoneNum = phoneNum;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

@@ -4,11 +4,14 @@ import org.litepal.crud.DataSupport;
 
 import java.sql.Date;
 
+import cn.edu.sc.weitalk.activity.FriendInfoActivity;
+
 
 public class Talks extends DataSupport {
 
 
     public String TalksName;
+    public String FriendID;
     public String FriendHeaderURL;
     public String LastMessage;
     public Date LastMessageDate;
@@ -20,6 +23,14 @@ public class Talks extends DataSupport {
 
     public void setTalksName(String TalksName){
         this.TalksName=TalksName;
+    }
+
+    public String getFriendID(){
+        return FriendID;
+    }
+
+    public void setFriendID(String friendID){
+        this.FriendID = friendID;
     }
 
     public String getFriendHeaderURL(){

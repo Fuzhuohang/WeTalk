@@ -2,6 +2,7 @@ package cn.edu.sc.weitalk.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,12 +18,16 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.Friend;
+import cn.edu.sc.weitalk.javabean.Talks;
 
 public class FriendInfoActivity extends BaseActivity {
 
     private Friend friend;
     private boolean isYourself = false;
+    private String HeaderUrl;
 
+    @BindView(R.id.btn_add_friend)
+    Button btnAddFriend;
     @BindView(R.id.head_ic_friend_info)
     SimpleDraweeView headIcFriendInfo;
     @BindView(R.id.iv_back_friend_info)
@@ -66,8 +71,9 @@ public class FriendInfoActivity extends BaseActivity {
         //从intent读取好友的id
         Intent intent = getIntent();
         String friendId = intent.getStringExtra("id");
+        HeaderUrl="res://drawable/" + R.drawable.tu;
 
-        headIcFriendInfo.setImageURI("res://drawable/" + R.drawable.tu);
+        headIcFriendInfo.setImageURI(HeaderUrl);
     }
 
     @OnClick({R.id.btn_back_friend_info, R.id.btn_send_msg_friend_info})
@@ -80,8 +86,29 @@ public class FriendInfoActivity extends BaseActivity {
              * 点击按钮发消息
              */
             case R.id.btn_send_msg_friend_info:
+                String id = tvIdNickFriendInfo.getText().toString();
+                Log.i("SendMessage",id);
+                List<Talks> list = DataSupport.select("*").where("FriendID=?",id).find(Talks.class);
+                if (list.size()==0){
+                    Talks talks = new Talks();
+                    talks.setTalksName(tvNickFriendInfo.getText().toString());
+                    talks.setFriendID(id);
+                    talks.setFriendHeaderURL(HeaderUrl);
+                    talks.setUnReadNum(0);
+                    talks.save();
+                }
 
+                Intent intent = new Intent(FriendInfoActivity.this, TalksActivity.class);
+                intent.putExtra("TalksName",tvNickFriendInfo.getText().toString());
+                intent.putExtra("FriendHeaderURL",HeaderUrl);
+                startActivity(intent);
+                finish();
                 break;
         }
+    }
+
+    @OnClick(R.id.btn_add_friend)
+    public void onViewClicked() {
+
     }
 }

@@ -17,7 +17,7 @@
             android:id="@+id/iv_back_friend_info"
             android:layout_width="match_parent"
             android:layout_height="265dp"
-            android:scaleType="fitXY"
+            android:scaleType="centerCrop"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             fresco:srcCompat="@drawable/huoyin" />
@@ -63,13 +63,12 @@
             android:id="@+id/tv_id_nick_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginStart="5dp"
             android:gravity="center"
-            android:text="ID:  908290107（昵称）"
+            android:text="908290107"
             android:textColor="@color/colorPlaneText"
-            app:layout_constraintStart_toEndOf="@+id/head_ic_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/iv_back_friend_info" />
+            app:layout_constraintStart_toEndOf="@+id/tv_0_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_0_friend_info" />
 
         <ImageView
             android:id="@+id/iv_status_friend_info"
@@ -83,61 +82,61 @@
             android:id="@+id/tv_note_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="备    注："
-            app:layout_constraintStart_toStartOf="@+id/tv_nickname_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/tv_nickname_friend_info" />
+            android:text="17-陕西-范**"
+            app:layout_constraintStart_toEndOf="@+id/tv_2_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_2_friend_info" />
 
         <TextView
             android:id="@+id/tv_nickname_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="昵    称："
-            app:layout_constraintStart_toStartOf="@+id/head_ic_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/head_ic_friend_info" />
+            android:text="一剑"
+            app:layout_constraintStart_toEndOf="@+id/tv_1_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_1_friend_info" />
 
         <TextView
             android:id="@+id/tv_location_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="地    区："
-            app:layout_constraintStart_toStartOf="@+id/tv_note_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/tv_note_friend_info" />
+            android:text="陕西-宝鸡"
+            app:layout_constraintStart_toEndOf="@+id/tv_3_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_3_friend_info" />
 
         <TextView
             android:id="@+id/tv_birthday_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="生    日："
-            app:layout_constraintStart_toStartOf="@+id/tv_location_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/tv_location_friend_info" />
+            android:text="xx月xx日"
+            app:layout_constraintStart_toEndOf="@+id/tv_4_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_4_friend_info" />
 
         <TextView
             android:id="@+id/tv_phone_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="手机号："
-            app:layout_constraintStart_toStartOf="@+id/tv_birthday_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/tv_birthday_friend_info" />
+            android:text="139****1034"
+            app:layout_constraintStart_toEndOf="@+id/tv_5_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_5_friend_info" />
 
         <TextView
             android:id="@+id/tv_email_friend_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="30dp"
             android:gravity="center"
-            android:text="邮    箱："
-            app:layout_constraintStart_toStartOf="@+id/tv_phone_friend_info"
-            app:layout_constraintTop_toBottomOf="@+id/tv_phone_friend_info" />
+            android:text="90*****07@qq.com"
+            app:layout_constraintStart_toEndOf="@+id/tv_6_friend_info"
+            app:layout_constraintTop_toTopOf="@+id/tv_6_friend_info" />
 
         <TextView
             android:id="@+id/tv_title_friend_info"
@@ -175,6 +174,71 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/tv_1_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="昵    称："
+            app:layout_constraintStart_toStartOf="@+id/head_ic_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/head_ic_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_2_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="备    注："
+            app:layout_constraintStart_toStartOf="@+id/tv_1_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/tv_1_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_3_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="地    区："
+            app:layout_constraintStart_toStartOf="@+id/tv_2_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/tv_2_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_4_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="生    日："
+            app:layout_constraintStart_toStartOf="@+id/tv_3_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/tv_3_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_5_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="手机号："
+            app:layout_constraintStart_toStartOf="@+id/tv_4_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/tv_4_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_6_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="邮    箱："
+            app:layout_constraintStart_toStartOf="@+id/tv_5_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/tv_5_friend_info" />
+
+        <TextView
+            android:id="@+id/tv_0_friend_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:text="ID："
+            app:layout_constraintStart_toEndOf="@+id/head_ic_friend_info"
+            app:layout_constraintTop_toBottomOf="@+id/iv_back_friend_info" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -183,6 +247,17 @@
         android:layout_weight="1"
         android:gravity="center">
 
+
+        <Button
+            android:id="@+id/btn_add_friend"
+            android:layout_width="160dp"
+            android:layout_height="45dp"
+            android:background="@drawable/btn_send_msg_friend_info"
+            android:fontFamily="sans-serif-medium"
+            android:text="加为好友"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btn_send_msg_friend_info"

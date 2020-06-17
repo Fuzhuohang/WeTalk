@@ -16,9 +16,11 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.Talks;
 import okhttp3.FormBody;
@@ -36,21 +38,20 @@ public class MainService extends Service {
 
     class GetMessageThread extends Thread{
         public void run(){
-            Date time = new Date();
+            String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
             while (true){
                 try{
-
                     Thread.sleep(1000);
                     OkHttpClient okHttpClient = new OkHttpClient();
                     RequestBody requestBody = new FormBody.Builder()
                             .add("recipient",UserID)
-                            .add("Time",time.toString())
+                            .add("Time",time)
                             .build();
                     Request request = new Request.Builder()
                             .url(IPaddress+"/get-api/getMessage")
                             .post(requestBody)
                             .build();
-                    time = new Date();
+                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
                     Gson gson = new Gson();
@@ -86,6 +87,10 @@ public class MainService extends Service {
                             talks.save();
                         }
 
+                    }else {
+                        JSONObject data = jsonObject.getJSONObject("data");
+                        String msg = data.getString("msg");
+                        Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

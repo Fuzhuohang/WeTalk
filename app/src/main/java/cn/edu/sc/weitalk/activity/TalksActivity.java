@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.textclassifier.TextLinks;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -17,12 +18,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.mbg.library.DefaultPositiveRefreshers.PositiveRefresherWithText;
 import com.mbg.library.ISingleRefreshListener;
 import com.mbg.library.RefreshRelativeLayout;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,11 +38,17 @@ import cn.edu.sc.weitalk.adapter.TalksAdapter;
 import cn.edu.sc.weitalk.fragment.TalksFragment;
 import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.Talks;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class TalksActivity extends BaseActivity {
+    private String IPaddress="http://localhost:8081";
     private List<Message> list;
     private String MyHeaderURL,talksName,FriendHeaderURL;
-    private String Myname = "myname";
+    private String MyID = "123456";
     private TalksAdapter talksAdapter;
 
     @Override
@@ -95,13 +106,13 @@ public class TalksActivity extends BaseActivity {
             public void onClick(View v) {
                 Date date = new Date();
                 SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String msgContent=editMessage.getText().toString();
                 Message message = new Message();
-                message.setMsgText(editMessage.getText().toString());
+                message.setMsgText(msgContent);
                 message.setMsgType(false);
                 message.setDate(format.format(date));
-                message.setSendName(Myname);
+                message.setSendName(MyID);
                 message.setReceiveName(talksName);
-                message.save();
                 list.add(message);
                 editMessage.setText("");
                 talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
@@ -111,6 +122,42 @@ public class TalksActivity extends BaseActivity {
                     @Override
                     public void run() {
                         scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                    }
+                });
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try{
+                            OkHttpClient okHttpClient = new OkHttpClient();
+                            RequestBody requestBody = new FormBody.Builder()
+                                    .add("senderID",MyID)
+                                    .add("recipient",talksName)
+                                    .add("content",msgContent)
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url(IPaddress+"/post-api/sendMessage")
+                                    .post(requestBody)
+                                    .build();
+
+                            Response response = okHttpClient.newCall(request).execute();
+                            String responseData = response.body().string();
+                            Gson gson = new Gson();
+                            JSONObject jsonObject = new JSONObject(responseData);
+                            String status = jsonObject.getString("status");
+                            if (status=="200"){
+                                message.save();
+                            }else {
+                                JSONObject data = jsonObject.getJSONObject("data");
+                                String msg = data.getString("msg");
+                                Toast.makeText(TalksActivity.this,msg,Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(TalksActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Toast.makeText(TalksActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
@@ -146,7 +193,7 @@ public class TalksActivity extends BaseActivity {
                 }
                 message.setMsgText(m);
                 message.setSendName(talksName);
-                message.setReceiveName(Myname);
+                message.setReceiveName(MyID);
             }else {
 //                message.setHeader_img(talks.getMyHeaderURL());
                 message.setMsgType(false);
@@ -155,7 +202,7 @@ public class TalksActivity extends BaseActivity {
                     m += "这是发出的第"+(i/2+1)+"条消息，";
                 }
                 message.setMsgText(m);
-                message.setSendName(Myname);
+                message.setSendName(MyID);
                 message.setReceiveName(talksName);
             }
             message.save();

@@ -13,6 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import org.litepal.crud.DataSupport;
+
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;

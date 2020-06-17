@@ -43,7 +43,7 @@
                 <category android:name="vdvdbgfbgbvd" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.TalksActivity" />
+        <activity android:name=".activity.TalksActivity"  />
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

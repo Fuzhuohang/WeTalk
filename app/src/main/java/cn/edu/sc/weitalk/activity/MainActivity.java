@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         //DataSupport.deleteAll(MomentsMessage.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
-        bindService(intent,mainConn,BIND_AUTO_CREATE);
+//        bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();
         requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);

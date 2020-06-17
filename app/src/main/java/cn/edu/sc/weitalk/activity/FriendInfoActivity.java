@@ -103,7 +103,6 @@ public class FriendInfoActivity extends BaseActivity {
                 intent.putExtra("FriendHeaderURL",HeaderUrl);
                 startActivity(intent);
                 finish();
-
                 break;
         }
     }

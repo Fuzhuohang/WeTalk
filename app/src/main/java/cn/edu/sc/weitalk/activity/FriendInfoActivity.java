@@ -86,13 +86,13 @@ public class FriendInfoActivity extends BaseActivity {
              * 点击按钮发消息
              */
             case R.id.btn_send_msg_friend_info:
-                String[] id = tvIdNickFriendInfo.getText().toString().split("  ");
-                Log.i("SendMessage",id[0]+" "+id[1]);
-                List<Talks> list = DataSupport.select("*").where("FriendID=?",id[1]).find(Talks.class);
+                String id = tvIdNickFriendInfo.getText().toString();
+                Log.i("SendMessage",id);
+                List<Talks> list = DataSupport.select("*").where("FriendID=?",id).find(Talks.class);
                 if (list.size()==0){
                     Talks talks = new Talks();
                     talks.setTalksName(tvNickFriendInfo.getText().toString());
-                    talks.setFriendID(id[1]);
+                    talks.setFriendID(id);
                     talks.setFriendHeaderURL(HeaderUrl);
                     talks.setUnReadNum(0);
                     talks.save();

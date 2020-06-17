@@ -1,6 +1,9 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -34,6 +37,7 @@ import java.util.ArrayList;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
+import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
 /**kgjhkhjjkhbhfghfghghhfghfggfgrgr
  * A simple {@link Fragment} subclass.
@@ -49,7 +53,9 @@ public class MainFragment extends Fragment {
     private AppBarConfiguration mAppBarConfiguration,bAppBarConfiguration;
     private TextView pagename;
     private Toolbar toolbar;
-
+    MessageListFragment messageListFragment;
+    FriendListFragment friendListFragment;
+    CircleOfFriendsFragment circleOfFriendsFragment;
     //private LinearLayout btnVector;
    private ImageView btn;
     // TODO: Rename and change types of parameters
@@ -135,9 +141,9 @@ public class MainFragment extends Fragment {
         final ViewPager viewPager = getView().findViewById(R.id.main_viewpager);
         final BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottom_view);
         final ArrayList viewList = new ArrayList<Fragment>();
-        MessageListFragment messageListFragment = new MessageListFragment();
-        FriendListFragment friendListFragment = new FriendListFragment();
-        CircleOfFriendsFragment circleOfFriendsFragment = new CircleOfFriendsFragment();
+        messageListFragment = new MessageListFragment();
+        friendListFragment = new FriendListFragment();
+        circleOfFriendsFragment = new CircleOfFriendsFragment();
         viewList.add(messageListFragment);
         viewList.add(friendListFragment);
         viewList.add(circleOfFriendsFragment);
@@ -213,7 +219,7 @@ public class MainFragment extends Fragment {
                             @Override
                             public void onClick(View v) {
                                 Intent intent=new Intent(getContext(), AddNewCommentActivity.class);
-                                startActivityForResult(intent,0);
+                                startActivityForResult(intent,200);
                             }
                         });
                         break;
@@ -227,8 +233,28 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==0&&requestCode==1)
-            Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
+        if(requestCode==200&&resultCode==200){
+            //生成新的朋友圈消息，存入数据库中
+            MomentsMessage temp=new MomentsMessage();
+            temp.setContent(data.getStringExtra("content"));
+            temp.setDate(data.getStringExtra("time"));
+            if(data.getStringExtra("uri")!=null){
+                temp.setMomentImage(data.getStringExtra("uri"));
+            }
+            else
+                temp.setMomentImage(" ");
+
+            temp.setPublisherID("123456789");
+            temp.setPublisherName("李可");
+            //temp.setMomentID("123");
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.gou, null);
+            temp.setHeadshot("res://drawable/" + R.drawable.dragon);
+            temp.setLikeCounter(0);
+            temp.save();
+            circleOfFriendsFragment.adapter.refreshData();
+
+        }
+            //Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -31,13 +32,24 @@ import android.widget.Toast;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
+import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**kgjhkhjjkhbhfghfghghhfghfggfgrgr
  * A simple {@link Fragment} subclass.
@@ -61,9 +73,9 @@ public class MainFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     public MainFragment() {
-        // Required empty public constructor
+
+
     }
 
     /**
@@ -141,6 +153,7 @@ public class MainFragment extends Fragment {
         final ViewPager viewPager = getView().findViewById(R.id.main_viewpager);
         final BottomNavigationView bottomNavigationView = getView().findViewById(R.id.bottom_view);
         final ArrayList viewList = new ArrayList<Fragment>();
+
         messageListFragment = new MessageListFragment();
         friendListFragment = new FriendListFragment();
         circleOfFriendsFragment = new CircleOfFriendsFragment();
@@ -149,7 +162,7 @@ public class MainFragment extends Fragment {
         viewList.add(circleOfFriendsFragment);
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(),viewList);
         viewPager.setAdapter(viewPagerAdapter);
-
+        viewPager.setOffscreenPageLimit(3);
         switch (viewPager.getCurrentItem()){
             case 0:
                 pagename.setText("消息");
@@ -229,7 +242,7 @@ public class MainFragment extends Fragment {
         });
 
     }
-
+//新建朋友圈消息的本地存储与实时发送
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -242,17 +255,51 @@ public class MainFragment extends Fragment {
                 temp.setMomentImage(data.getStringExtra("uri"));
             }
             else
-                temp.setMomentImage(" ");
-
-            temp.setPublisherID("123456789");
-            temp.setPublisherName("李可");
-            //temp.setMomentID("123");
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.gou, null);
+                temp.setMomentImage(null);
+            temp.setPublisherID("123456");
+            temp.setPublisherName("小明");
+//            temp.setPublisherID(data.getStringExtra("userID"));
+//            temp.setMomentID(0+"");
+//            temp.setPublisherName(data.getStringExtra("name"));
             temp.setHeadshot("res://drawable/" + R.drawable.dragon);
             temp.setLikeCounter(0);
-            temp.save();
-            circleOfFriendsFragment.adapter.refreshData();
+            //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
+            try{
+                OkHttpClient okHttpClient = new OkHttpClient();
+                RequestBody requestBody = new FormBody.Builder()
+                        .add("userID",temp.getPublisherID())
+                        .add("content",temp.getContent())
+                        .add("imgURL",null)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(R.string.IPAddress+"/post-api/sendShare")
+                        .post(requestBody)
+                        .build();
 
+                Response response = okHttpClient.newCall(request).execute();
+                String responseData = response.body().string();
+                JSONObject jsonObject = new JSONObject(responseData);
+                String status = jsonObject.getString("status");
+                if (status=="200"){
+                    JSONObject returnData = jsonObject.getJSONObject("data");
+                    temp.setMomentID(returnData.getString("shareID"));
+                    temp.save();
+                    circleOfFriendsFragment.adapter.refreshData();
+                    Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
+                }else {
+                    JSONObject returnData = jsonObject.getJSONObject("data");
+                    String msg = returnData.getString("msg");
+                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+            }
+//            temp.save();
+//            circleOfFriendsFragment.adapter.refreshData();
         }
             //Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
     }

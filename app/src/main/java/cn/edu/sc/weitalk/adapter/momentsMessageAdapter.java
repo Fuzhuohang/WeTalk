@@ -101,7 +101,7 @@ Context context;
 //        设置头像，bitmap转为URI，后显示为图片
         holder.icon.setImageURI(temp.getHeadshot());
         //消息图片
-            if(!(" ".equals(temp.getMomentImage()))) {
+            if(temp.getMomentImage()!=null) {
                 holder.imageSelected = new ImageView(context);
                 holder.imagesGroup.setVisibility(View.VISIBLE);
                 holder.imagesGroup.addView(holder.imageSelected);
@@ -196,7 +196,7 @@ Context context;
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
         //消息图片
-        if(!(" ".equals(temp.getMomentImage()))){
+        if(temp.getMomentImage()!=null){
             if(holder.imageSelected!=null) {
                 holder.imagesGroup.setVisibility(View.VISIBLE);
                 holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));

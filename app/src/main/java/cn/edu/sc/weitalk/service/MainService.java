@@ -128,7 +128,7 @@ public class MainService extends Service {
                             .url(IPaddress+"/get-api/getShare")
                             .post(requestBody)
                             .build();
-                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
+                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     //等待回复
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
@@ -144,25 +144,35 @@ public class MainService extends Service {
                             JSONObject jsonData = jsonDataArray.getJSONObject(i);
                             String sharedID=jsonData.getString("shareID");
                             cn.edu.sc.weitalk.javabean.MomentsMessage momentsMessage = new MomentsMessage();
-                            momentsMessage.setMomentID(sharedID);
-                            momentsMessage.setPublisherID(jsonData.getString("Sender"));
-                            //momentsMessage.setPublisherName(jsonData.getString("time"));
-                            momentsMessage.setContent(jsonData.getString("content"));
-                            momentsMessage.setDate(jsonData.getString("time"));
-                            momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
-                            momentsMessage.setPublisherName(jsonData.getString("sendername"));
-                            momentsMessage.setMomentImage(jsonData.getString("imgURL"));
-                            momentsMessage.save();
-
+                            List<MomentsMessage> list=DataSupport.select("*").where("MomentID=?",sharedID).find(MomentsMessage.class);
+                            if(list.isEmpty()) {
+                                momentsMessage.setMomentID(sharedID);
+                                momentsMessage.setPublisherID(jsonData.getString("senderID"));
+                                //momentsMessage.setPublisherName(jsonData.getString("time"));
+                                momentsMessage.setContent(jsonData.getString("content"));
+                                momentsMessage.setDate(jsonData.getString("time"));
+                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
+                                momentsMessage.setPublisherName(jsonData.getString("sendername"));
+                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
+                                momentsMessage.save();
+                            }
+                            else{
+                                momentsMessage=list.get(0);
+                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
+                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
+                                momentsMessage.updateAll("MomentID=?",sharedID);
+                            }
                             JSONArray jsonCommentsArray = jsonData.getJSONArray("comment");
                             for(int j=0;j<jsonCommentsArray.length();j++) {
                                 JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
-                                Comments comments = new Comments();
-                                comments.setMomentID(sharedID);
-                                comments.setContent(jsonComments.getString("content"));
-                                comments.setCommentPerName(jsonComments.getString("sendername"));
-                                comments.setCommentPerID(jsonComments.getString("senderID"));
-                                comments.save();
+                                if(DataSupport.select("*").where("senderID=? and content=?",jsonComments.getString("senderID"),jsonComments.getString("content")).find(Comments.class).size()==0) {
+                                    Comments comments = new Comments();
+                                    comments.setMomentID(sharedID);
+                                    comments.setContent(jsonComments.getString("content"));
+                                    comments.setCommentPerName(jsonComments.getString("sendername"));
+                                    comments.setCommentPerID(jsonComments.getString("senderID"));
+                                    comments.save();
+                                }
                             }
                         }
 
@@ -188,6 +198,7 @@ public class MainService extends Service {
         // TODO: Return the communication channel to the service.
 //        throw new UnsupportedOperationException("Not yet implemented");
         new Thread(new GetMessageThread()).start();
+        new Thread(new GetMomentsThread());
         return new MainBinder();
     }
 

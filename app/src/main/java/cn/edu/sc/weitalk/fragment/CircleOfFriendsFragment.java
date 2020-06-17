@@ -1,6 +1,8 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,11 +15,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.litepal.crud.DataSupport;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.adapter.momentsMessageAdapter;
+import cn.edu.sc.weitalk.javabean.Comments;
+import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.service.MainService;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static android.os.SystemClock.sleep;
 
@@ -39,9 +60,11 @@ public class CircleOfFriendsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
+    private String userID;
     public CircleOfFriendsFragment() {
         // Required empty public constructor
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
     }
 
     /**
@@ -122,5 +145,89 @@ public class CircleOfFriendsFragment extends Fragment {
 
 
         return view;
+    }
+
+    public void updateMoments(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    Thread.sleep(1000);
+                    String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("recipient",userID)
+                            .add("Time",time)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url(R.string.IPAddress+"/get-api/getShare")
+                            .post(requestBody)
+                            .build();
+
+                    //等待回复
+                    Response response = okHttpClient.newCall(request).execute();
+                    final String responseData = response.body().string();
+
+                    //获取数据
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    //判断状态是否正常
+                    if (status=="200"){
+                        //，写入两个json数组中
+                        JSONArray jsonDataArray = jsonObject.getJSONArray("data");
+                        for(int i=0;i<jsonDataArray.length();i++) {
+                            JSONObject jsonData = jsonDataArray.getJSONObject(i);
+                            String sharedID=jsonData.getString("shareID");
+                            cn.edu.sc.weitalk.javabean.MomentsMessage momentsMessage = new MomentsMessage();
+                            List<MomentsMessage> list= DataSupport.select("*").where("MomentID=?",sharedID).find(MomentsMessage.class);
+                            if(list.isEmpty()) {
+                                momentsMessage.setMomentID(sharedID);
+                                momentsMessage.setPublisherID(jsonData.getString("senderID"));
+                                //momentsMessage.setPublisherName(jsonData.getString("time"));
+                                momentsMessage.setContent(jsonData.getString("content"));
+                                momentsMessage.setDate(jsonData.getString("time"));
+                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
+                                momentsMessage.setPublisherName(jsonData.getString("sendername"));
+                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
+                                momentsMessage.save();
+                            }
+                            else{
+                                momentsMessage=list.get(0);
+                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
+                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
+                                momentsMessage.updateAll("MomentID=?",sharedID);
+                            }
+                            JSONArray jsonCommentsArray = jsonData.getJSONArray("comment");
+                            for(int j=0;j<jsonCommentsArray.length();j++) {
+                                JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
+                                if(DataSupport.select("*").where("senderID=? and content=?",jsonComments.getString("senderID"),jsonComments.getString("content")).find(Comments.class).size()==0) {
+                                    Comments comments = new Comments();
+                                    comments.setMomentID(sharedID);
+                                    comments.setContent(jsonComments.getString("content"));
+                                    comments.setCommentPerName(jsonComments.getString("sendername"));
+                                    comments.setCommentPerID(jsonComments.getString("senderID"));
+                                    comments.save();
+                                }
+                            }
+                        }
+                        adapter.refreshData();
+
+                    }else {
+                        JSONObject data = jsonObject.getJSONObject("data");
+                        String msg = data.getString("msg");
+                        Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 }

@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -98,8 +99,6 @@ public class AddNewCommentActivity extends BaseActivity {
                     public void onClick(View v) {
                         if(TextUtils.isEmpty(editView.getText())){
                             editView.setError("不能发表空的朋友圈哦！");
-
-
                         }
                         else{
                             Intent intent=new Intent();
@@ -110,7 +109,11 @@ public class AddNewCommentActivity extends BaseActivity {
                             Date time=new Date();
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             intent.putExtra("time",format.format(time));
-
+                            // 读取本地配置文件，获得用户头像，id
+//                            SharedPreferences config= getSharedPreferences("USER_INFO",MODE_PRIVATE);
+//                            intent.putExtra("myID",config.getString("userID",""));
+//                            intent.putExtra("myName",config.getString("name",""));
+//                            intent.putExtra("myHead",config.getString("headURL",""));
                             setResult(200,intent);
                             finish();
                         }
@@ -128,23 +131,7 @@ public class AddNewCommentActivity extends BaseActivity {
         if (resultCode == Activity.RESULT_OK) {
 
                 imageUri = data.getData();
-//                Bitmap bitmap = null;
-//                try {
-//                    bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
                 selectedImage.setImageURI(imageUri);
-//                String filePath = getImageAbsolutePath(AddNewCommentActivity, imageUri);
-//                File file = new File(filePath);
-//                imageUri = Uri.fromFile(file);
-
-                //图像转为字节流
-                //image = MomentsMessage.img(bitmap);
-//
-
-
-            // }
 
         }
 

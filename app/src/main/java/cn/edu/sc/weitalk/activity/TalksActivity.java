@@ -241,10 +241,7 @@ public class TalksActivity extends AppCompatActivity {
 //        list = DataSupport.findAll(Message.class);
         list = DataSupport.select("*").where("sendID=? or receiveID=?",FriendsID,FriendsID).find(Message.class);
         Collections.reverse(list);
-        showlist = new ArrayList<>();
-        if (list.size()==0){
-            Log.e("ERR","消息队列为空！");
-        }else if(list.size() <10){
+        if(list.size()<10){
             showlist.addAll(list.subList(count,list.size()));
             count=list.size();
         }else {

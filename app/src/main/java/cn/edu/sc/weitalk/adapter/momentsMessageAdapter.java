@@ -97,7 +97,7 @@ Context context;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
                 params.width = 300;
                 params.height = 300;
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
                 holder.imageSelected.setLayoutParams(params);
             }
         //动态生成评论
@@ -152,7 +152,7 @@ Context context;
         if(!(" ".equals(temp.getMomentImage()))){
             if(holder.imageSelected!=null) {
                 holder.imagesGroup.setVisibility(View.VISIBLE);
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
             }
             else {
                 holder.imageSelected = new ImageView(context);
@@ -161,7 +161,7 @@ Context context;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
                 params.width = 300;
                 params.height = 300;
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
                 holder.imageSelected.setLayoutParams(params);
             }
 

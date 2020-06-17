@@ -6,8 +6,13 @@ import androidx.core.content.ContextCompat;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import android.Manifest;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Binder;
 import android.os.Bundle;
+import android.os.IBinder;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -18,21 +23,42 @@ import org.litepal.tablemanager.Connector;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.service.MainService;
 
 public class MainActivity extends BaseActivity {
 
     BottomNavigationView bottomView;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
         //DataSupport.deleteAll(MomentsMessage.class);
+        Intent intent = new Intent(MainActivity.this, MainService.class);
+        bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();
         requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);
         bottomView.setItemIconTintList(null);
     }
+
+    ServiceConnection mainConn = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MainService.MainBinder binder = (MainService.MainBinder)service;
+            MainService mainService = binder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
+
     private void requestMyPermissions() {
 
         if (ContextCompat.checkSelfPermission(this,

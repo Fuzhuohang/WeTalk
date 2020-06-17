@@ -3,10 +3,17 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="colorTheme">#0B98D8</color>
+    <color name="colorTheme">#06A3D3</color>
     <color name="colorBlankBackground">#9950BAE8</color>
     <color name="colorBlankBackground2">#4D949C9F</color>
     <color name="colorPlaneText">#222222</color>
     <color name="colorBigLetterBackground">#802994E6</color>
     <color name="colorBigLetter">#CBFFFFFF</color>
+    <color name="colorFaBiao">#FFD1CBCB</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colorBar">#EFEFEF</color>
+    <color name="colorBackground3">#33888888</color>
+    <color name="colorMaskBack">#4D888888</color>
+    <color name="colorMaskHeadIc">#80888888</color>
+    <color name="colorBtnDown">#037A9E</color>
 </resources>

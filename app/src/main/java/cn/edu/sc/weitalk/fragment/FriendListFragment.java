@@ -1,14 +1,14 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -17,8 +17,9 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.activity.FriendInfoActivity;
 import cn.edu.sc.weitalk.adapter.FriendListAdapter;
-import cn.edu.sc.weitalk.javabean.User;
+import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.widget.LetterIndexView;
 
 /**
@@ -32,7 +33,7 @@ public class FriendListFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private ArrayList<User> list;
+    private ArrayList<Friend> list;
     @BindView(R.id.btn_search_friend_list)
     Button btnSearch;
     @BindView(R.id.lv_fiend_list)
@@ -74,10 +75,11 @@ public class FriendListFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+        //test, 生产user数据
         list = new ArrayList<>();
-        for(int i = 0;i < 10;i++){
-            User user = new User("A", R.drawable.dragon,"long", "龙");
-            list.add(user);
+        for(int i = 0;i < 50;i++){
+            Friend friend = new Friend("A", R.drawable.dragon,"long", "龙");
+            list.add(friend);
         }
     }
 
@@ -94,6 +96,16 @@ public class FriendListFragment extends Fragment {
         //设置ListView
         FriendListAdapter adapter = new FriendListAdapter(getContext(), list);
         lvFiendList.setAdapter(adapter);
+            //给list item添加点击事件，进入好友信息Activity
+        lvFiendList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getContext(), FriendInfoActivity.class);
+                Friend friend = list.get(position);
+                intent.putExtra("id", friend.getUserId());
+                startActivity(intent);
+            }
+        });
         lvFiendList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {

@@ -3,27 +3,32 @@ package cn.edu.sc.weitalk.activity;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import cn.edu.sc.weitalk.R;
 
-public class AddNewCommentActivity extends AppCompatActivity {
+public class AddNewCommentActivity extends BaseActivity {
     private EditText editView;
     private Context context;
     private ConstraintLayout constraintLayout;
     private ImageView returnImage;
+    private TextView btnCommit;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +36,7 @@ public class AddNewCommentActivity extends AppCompatActivity {
         editView=findViewById(R.id.editTxt);
         returnImage=findViewById(R.id.returnimageview);
         constraintLayout=findViewById(R.id.addimageinmoment);
+        btnCommit=findViewById(R.id.buttoncommit);
         context=AddNewCommentActivity.this;
         editView.setFocusable(true);
         editView.requestFocus();
@@ -57,6 +63,37 @@ public class AddNewCommentActivity extends AppCompatActivity {
                 finish();
             }
         });
+        new Thread(new Runnable() {
+            @SuppressLint("ResourceAsColor")
+            @Override
+            public void run() {
+                while(true) {
+                    if (TextUtils.isEmpty(editView.getText())) {
+                        //editView.setError("不能发表空的朋友圈哦！");
+                        btnCommit.setBackgroundResource(R.drawable.fabiaoqian);
+                        btnCommit.setTextColor(context.getResources().getColor(R.color.colorFaBiao));
+
+                    } else {
+                        btnCommit.setTextColor(context.getResources().getColor(R.color.white));
+                        btnCommit.setBackgroundResource(R.drawable.fabiaoqianhou);
+                        //btnCommit.setTextSt
+                    }
+                }
+            }
+        }).start();
+                btnCommit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(TextUtils.isEmpty(editView.getText())){
+                            editView.setError("不能发表空的朋友圈哦！");
+
+
+                        }
+                        else{
+                            finish();
+                        }
+                    }
+                });
 
 
     }

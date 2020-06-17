@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.viewpager.widget.ViewPager;
 
@@ -29,13 +30,17 @@ public class TalksAdapter extends BaseAdapter {
     }
 
     private static final String TAG = TalksAdapter.class.getSimpleName();
-    private ArrayList data;
+    private List<Message> data;
     private Context context;
     private LayoutInflater mInflater;
+    private String Receive_Header;
+    private String Send_Header;
 
-    public TalksAdapter(Context context, ArrayList data){
+    public TalksAdapter(Context context, List<Message> data,String Receiver_Header,String Send_Header){
         this.context= context;
         this.data = data;
+        this.Receive_Header = Receiver_Header;
+        this.Send_Header=Send_Header;
 
         mInflater = LayoutInflater.from(context);
     }
@@ -87,11 +92,24 @@ public class TalksAdapter extends BaseAdapter {
             viewHolder.talks_message = convertView.findViewById(R.id.talks_message);
             viewHolder.isComMsg=isComMsg;
 
+            if (isComMsg){
+                viewHolder.header_img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(context,"这是好友头像",Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
             convertView.setTag(viewHolder);
         }else {
             viewHolder=(ViewHolder)convertView.getTag();
         }
-        viewHolder.header_img.setImageURI(message.getHeader_img());
+        if(isComMsg){
+            viewHolder.header_img.setImageURI(Receive_Header);
+        }else {
+            viewHolder.header_img.setImageURI(Receive_Header);
+        }
         viewHolder.talks_message.setText(message.getMsgText());
 
         return convertView;

@@ -92,19 +92,27 @@ public class FriendInfoActivity extends BaseActivity {
             case R.id.btn_send_msg_friend_info:
                 String id = tvIdNickFriendInfo.getText().toString();
                 Log.i("SendMessage",id);
+                Talks talks;
                 List<Talks> list = DataSupport.select("*").where("FriendID=?",id).find(Talks.class);
                 if (list.size()==0){
-                    Talks talks = new Talks();
-                    talks.setTalksName(tvNickFriendInfo.getText().toString());
+                    talks = new Talks();
+                    if (tvNoteFriendInfo.getText().toString().length()!=0){
+                        talks.setTalksName(tvNoteFriendInfo.getText().toString());
+                    }else {
+                        talks.setTalksName(tvNickFriendInfo.getText().toString());
+                    }
                     talks.setFriendID(id);
                     talks.setFriendHeaderURL(HeaderUrl);
                     talks.setUnReadNum(0);
                     talks.save();
+                }else {
+                    talks = list.get(0);
                 }
 
                 Intent intent = new Intent(FriendInfoActivity.this, TalksActivity.class);
-                intent.putExtra("TalksName",tvNickFriendInfo.getText().toString());
-                intent.putExtra("FriendHeaderURL",HeaderUrl);
+                intent.putExtra("FriendsID",talks.getFriendID());
+                intent.putExtra("TalksName",talks.getTalksName());
+                intent.putExtra("FriendHeaderURL",talks.getFriendHeaderURL());
                 startActivity(intent);
                 finish();
                 break;

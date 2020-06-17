@@ -121,6 +121,7 @@ public class MessageListFragment extends Fragment {
                     Log.i("TALKS",""+isTwoPane);
                     Intent intent = new Intent(getActivity(), TalksActivity.class);
                     intent.putExtra("TalksName",list.get(position).getTalksName());
+                    intent.putExtra("FriendsID",list.get(position).getFriendID());
                     intent.putExtra("FriendHeaderURL",list.get(position).getFriendHeaderURL());
                     startActivity(intent);
                 }
@@ -146,15 +147,17 @@ public class MessageListFragment extends Fragment {
     }
 
     public void initArrayList(){
-        DataSupport.deleteAll(Talks.class);
-        for(int i=0;i<12;i++){
-            Talks talks = new Talks();
-            talks.setFriendHeaderURL("res://drawable/" + R.drawable.dragon);
-            talks.setTalksName("会话名称"+(i+1));
-            talks.setLastMessage("这是最近的一条消息。");
-            talks.save();
-        }
-        list = DataSupport.findAll(Talks.class);
+//        DataSupport.deleteAll(Talks.class);
+//        for(int i=0;i<12;i++){
+//            Talks talks = new Talks();
+//            talks.setFriendHeaderURL("res://drawable/" + R.drawable.dragon);
+//            talks.setTalksName("会话名称"+(i+1));
+//            talks.setLastMessage("这是最近的一条消息。");
+//            talks.setFriendID("111");
+//            talks.save();
+//        }
+//        list = DataSupport.findAll(Talks.class);
+        list = DataSupport.select("*").order("LastMessageDate").find(Talks.class);
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView){

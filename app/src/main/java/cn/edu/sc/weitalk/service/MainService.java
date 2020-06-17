@@ -23,6 +23,7 @@ import java.util.List;
 
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
+import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import cn.edu.sc.weitalk.javabean.Talks;
@@ -83,15 +84,26 @@ public class MainService extends Service {
 //                                talks.setTalksName(tvNickFriendInfo.getText().toString());
                                 talks.setFriendID(jsonData.getString("Sender"));
 //                                talks.setFriendHeaderURL();
+                                List<Friend> fl = DataSupport.select("*").where("userId=?",jsonData.getString("Sender")).find(Friend.class);
+                                if(fl.size()!=0){
+                                    Friend friend = fl.get(0);
+                                    if(friend.getNote().length()!=0){
+                                        talks.setTalksName(friend.getNote());
+                                    }else {
+                                        talks.setTalksName(friend.getUsername());
+                                    }
+                                }else {
+                                    talks.setTalksName(jsonData.getString("Sender"));
+                                }
                                 talks.setUnReadNum(0);
                                 talks.save();
                             }else {
                                 talks = list.get(0);
                             }
                             talks.setLastMessage(jsonData.getString("content"));
-//                            talks.setLastMessageDate(jsonData.getString("time"));
+                            talks.setLastMessageDate(jsonData.getString("time"));
                             talks.setUnReadNum(talks.getUnReadNum()+1);
-                            talks.save();
+                            talks.updateAll("FriendID=?",jsonData.getString("Sender"));
                         }
 
                     }else {

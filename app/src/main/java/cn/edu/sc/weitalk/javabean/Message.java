@@ -6,8 +6,8 @@ public class Message extends DataSupport {
     public String msgText;
     public boolean msgType;
     public String date;
-    public String sendName;
-    public String receiveName;
+    public String sendID;
+    public String receiveID;
     public boolean isRead;
 
     public void setMsgText(String msgText){
@@ -34,20 +34,20 @@ public class Message extends DataSupport {
         return date;
     }
 
-    public void setSendName(String sendName){
-        this.sendName=sendName;
+    public void setSendName(String sendID){
+        this.sendID=sendID;
     }
 
     public String getSendName(){
-        return sendName;
+        return sendID;
     }
 
-    public void setReceiveName(String receiveName){
-        this.receiveName=receiveName;
+    public void setReceiveName(String receiveID){
+        this.receiveID=receiveID;
     }
 
     public String getReceiveName(){
-        return receiveName;
+        return receiveID;
     }
 
     public void setRead(boolean isRead){

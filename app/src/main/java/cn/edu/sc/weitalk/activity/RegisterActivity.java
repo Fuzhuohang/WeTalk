@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.text.TextUtils;
@@ -25,7 +26,10 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -46,7 +50,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class RegisterActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
-    private String IPaddress="http://localhost:8083";
+    private String IPaddress="http://localhost:8081";
 
     private EditText edtName;
     private EditText edtPassword;
@@ -73,6 +77,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fresco.initialize(RegisterActivity.this);
         setContentView(R.layout.activity_register);
         btnDate=findViewById(R.id.btnDate);
         txtDate=findViewById(R.id.txtDate);
@@ -88,8 +93,8 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
         mCurrentPhotoPath="";
 
 
-//        SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
-//        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
+        SimpleDraweeView temp2 = findViewById(R.id.head);
+        temp2.setImageURI(mCurrentPhotoPath + R.drawable.dragon);
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,19 +106,19 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                 String email=edtEmail.getText().toString();
                 String location=edtlocation.getText().toString();
                 String birthday=txtDate.getText().toString();
-                if(name==null){
+                if(TextUtils.isEmpty(name)){
                     edtName.setError("不能为空");
-                }else if(password==null){
+                }else if(TextUtils.isEmpty(password)){
                     edtPassword.setError("不能为空");
-                }else if(password2==null){
+                }else if(TextUtils.isEmpty(password2)){
                     edtPassword2.setError("不能为空");
-                }else if(email==null){
+                }else if(TextUtils.isEmpty(email)){
                     edtEmail.setError("不能为空");
-                }else if(location==null){
+                }else if(TextUtils.isEmpty(location)){
                     edtlocation.setError("不能为空");
-                }else if(phone==null){
+                }else if(TextUtils.isEmpty(phone)){
                     edtPhone.setError("不能为空");
-                }else if(birthday==null) {
+                }else if(TextUtils.isEmpty(birthday)) {
                     txtDate.setError("不能为空");
                 }else if(!password.equals(password2)){
                     edtPassword2.setError("两次输入密码不同");
@@ -149,9 +154,13 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                                 intent.putExtra("userID",userID);
                                 startActivity(intent);
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                Looper.prepare();
+                                Toast.makeText(RegisterActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                Looper.prepare();
+                                Toast.makeText(RegisterActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                             }
                         }
                     }).start();

@@ -1,14 +1,16 @@
 package cn.edu.sc.weitalk.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 
@@ -25,7 +27,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class LoginActivity extends AppCompatActivity {
-    private String IPaddress="http://localhost:8083";
+    private String IPaddress="http://localhost:8081";
 
     private ImageButton btnLogin;
     private EditText edtUserID;
@@ -58,11 +60,12 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String userID=edtUserID.getText().toString();
                 String password=edtPassword.getText().toString();
-                if(userID==null){
+                if(TextUtils.isEmpty(userID)){
                     edtUserID.setError("不能为空");
-                }else if(password==null) {
+                }else if(password.equals("")) {
                     edtPassword.setError("不能为空");
                 }else{
+                    System.out.println("useriD:------------------"+userID);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -92,9 +95,13 @@ public class LoginActivity extends AppCompatActivity {
                                     Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                Looper.prepare();
+                                Toast.makeText(LoginActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                Looper.prepare();
+                                Toast.makeText(LoginActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                                Looper.loop();
                             }
                         }
                     }).start();

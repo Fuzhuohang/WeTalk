@@ -7,8 +7,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import butterknife.BindView;
@@ -22,6 +20,8 @@ public class FriendInfoActivity extends BaseActivity {
     private Friend friend;
     private boolean isYourself = false;
 
+    @BindView(R.id.btn_add_friend)
+    Button btnAddFriend;
     @BindView(R.id.head_ic_friend_info)
     SimpleDraweeView headIcFriendInfo;
     @BindView(R.id.iv_back_friend_info)
@@ -81,5 +81,10 @@ public class FriendInfoActivity extends BaseActivity {
 
                 break;
         }
+    }
+
+    @OnClick(R.id.btn_add_friend)
+    public void onViewClicked() {
+
     }
 }

@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -134,6 +135,10 @@ public class AddNewCommentActivity extends BaseActivity {
 //                    e.printStackTrace();
 //                }
                 selectedImage.setImageURI(imageUri);
+//                String filePath = getImageAbsolutePath(AddNewCommentActivity, imageUri);
+//                File file = new File(filePath);
+//                imageUri = Uri.fromFile(file);
+
                 //图像转为字节流
                 //image = MomentsMessage.img(bitmap);
 //

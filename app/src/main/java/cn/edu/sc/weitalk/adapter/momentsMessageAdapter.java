@@ -1,8 +1,11 @@
 package cn.edu.sc.weitalk.adapter;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -12,6 +15,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,9 +32,14 @@ import com.facebook.drawee.view.SimpleDraweeView;
 
 import org.litepal.crud.DataSupport;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import cn.edu.sc.weitalk.FileUtils;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
@@ -97,19 +108,24 @@ Context context;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
                 params.width = 300;
                 params.height = 300;
-//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+                params.leftMargin=50;
+//                Cursor result=context.getContentResolver().query(Uri.parse(temp.getMomentImage()),null,null,null,null);
+//                result.moveToNext();
+                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
                 holder.imageSelected.setLayoutParams(params);
             }
         //动态生成评论
         TextView comment=new TextView(context);
         holder.comments.addView(comment);
         holder.comments.setVisibility(View.VISIBLE);
-        holder.comments.setBackgroundResource(R.drawable.fillet);
+        //holder.comments.setBackgroundResource(R.drawable.fillet);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
         params.width =LinearLayout.LayoutParams.MATCH_PARENT;
         params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        params.leftMargin=20;
+        params.rightMargin=20;
         //评论内容显示，html转为字符串保留格式
-        String str1 = "<font color='#0997F7'>"+"平凡之路"+":</font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
+        String str1 = "<font color='#0997F7'>"+"平凡之路"+": </font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
         comment.setText(Html.fromHtml(str1));
         comment.setLayoutParams(params);
         comment.setTextSize(16);
@@ -118,7 +134,7 @@ Context context;
             holder.likeCounter.setText(temp.getLikeCounter()+"");
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
-
+        //点赞按钮
         holder.likebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,6 +142,37 @@ Context context;
                 holder.likebutton.setImageResource(R.drawable.dianzanle);
                 holder.likeCounter.setText((Integer.parseInt(holder.likeCounter.getText().toString())+1)+"");
 
+            }
+        });
+        //评论按钮
+        holder.commentbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                View view1 = LayoutInflater.from(context).inflate(R.layout.comments_dialog, null);//将布局文件转化为View
+                Button btn=view1.findViewById(R.id.cancelbtn);
+                EditText input=view1.findViewById(R.id.inputtext);
+                builder.setView(view1);
+                AlertDialog dialog = builder.create();  //AlertDialog create
+                dialog.show();                          //show
+                input.setFocusable(true);
+                input.requestFocus();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        InputMethodManager imm = (InputMethodManager) context
+                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+                    }
+                }, 200);//这里的时间大概是自己测试的
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        dialog.cancel();
+                    }
+                });
             }
         });
         return holder;
@@ -152,7 +199,7 @@ Context context;
         if(!(" ".equals(temp.getMomentImage()))){
             if(holder.imageSelected!=null) {
                 holder.imagesGroup.setVisibility(View.VISIBLE);
-//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
             }
             else {
                 holder.imageSelected = new ImageView(context);
@@ -161,7 +208,8 @@ Context context;
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
                 params.width = 300;
                 params.height = 300;
-//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+                params.leftMargin=50;
+                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
                 holder.imageSelected.setLayoutParams(params);
             }
 
@@ -173,7 +221,20 @@ Context context;
     public int getItemCount() {
         return moments.size();
     }
-
+    /**
+     * 加载本地图片
+     * @param url
+     * @return
+     */
+    public static Bitmap getLoacalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         SimpleDraweeView icon;

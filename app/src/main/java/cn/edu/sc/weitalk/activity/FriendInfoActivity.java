@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +30,7 @@ public class FriendInfoActivity extends BaseActivity {
     private Friend friend;
     private boolean isYourself = false;
     private String HeaderUrl;
+    private String MyID;
 
     @BindView(R.id.btn_add_friend)
     Button btnAddFriend;
@@ -72,6 +74,8 @@ public class FriendInfoActivity extends BaseActivity {
         setContentView(R.layout.activity_friend_info);
         ButterKnife.bind(this);
 
+        SharedPreferences editor = getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        MyID=editor.getString("userID",null);
         //从intent读取好友的id
         Intent intent = getIntent();
         String friendId = intent.getStringExtra("id");
@@ -102,6 +106,7 @@ public class FriendInfoActivity extends BaseActivity {
                         talks.setTalksName(tvNickFriendInfo.getText().toString());
                     }
                     talks.setFriendID(id);
+                    talks.setMyID(MyID);
                     talks.setFriendHeaderURL(HeaderUrl);
                     talks.setUnReadNum(0);
                     talks.save();

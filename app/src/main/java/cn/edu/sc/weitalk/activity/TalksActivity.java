@@ -172,7 +172,7 @@ public class TalksActivity extends AppCompatActivity {
                             if (status.equals("200")){
                                 tTalk.setLastMessage(message.getMsgText());
                                 tTalk.setLastMessageDate(message.getDate());
-                                tTalk.updateAll("FriendID=?",tTalk.getFriendID());
+                                tTalk.updateAll("FriendID=? and MyID=?",tTalk.getFriendID(),MyID);
                                 message.save();
                             }else {
                                 JSONObject data = jsonObject.getJSONObject("data");

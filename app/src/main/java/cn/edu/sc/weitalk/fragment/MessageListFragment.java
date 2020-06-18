@@ -1,6 +1,8 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -54,6 +56,7 @@ public class MessageListFragment extends Fragment {
     private List<Talks> list;
 
     private boolean isTwoPane;
+    private String MyID;
 
     private TalksListAdapter adapter;
 
@@ -104,6 +107,8 @@ public class MessageListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_message_list, container, false);
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        MyID=config.getString("userID","");
         initArrayList();
         Button btnSearch = view.findViewById(R.id.btnSearch);
         ListView messageList = view.findViewById(R.id.MessageList);
@@ -157,7 +162,7 @@ public class MessageListFragment extends Fragment {
 //            talks.save();
 //        }
 //        list = DataSupport.findAll(Talks.class);
-        list = DataSupport.select("*").order("LastMessageDate").find(Talks.class);
+        list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
     }
 
     public static void setListViewHeightBasedOnChildren(ListView listView){

@@ -92,6 +92,7 @@ public class MainService extends Service {
                                 }else {
                                     talks.setTalksName(jsonData.getString("sender"));
                                 }
+                                talks.setMyID(UserID);
                                 talks.setUnReadNum(0);
                                 talks.save();
                             }else {
@@ -100,7 +101,7 @@ public class MainService extends Service {
                             talks.setLastMessage(jsonData.getString("content"));
                             talks.setLastMessageDate(jsonData.getString("time"));
                             talks.setUnReadNum(talks.getUnReadNum()+1);
-                            talks.updateAll("FriendID=?",jsonData.getString("sender"));
+                            talks.updateAll("FriendID=? and MyID=?",jsonData.getString("sender"),UserID);
                         }
 
                     }else {

@@ -13,6 +13,7 @@ public class Talks extends DataSupport {
     public String TalksName;
     public String FriendID;
     public String FriendHeaderURL;
+    public String MyID;
     public String LastMessage;
     public String LastMessageDate;
     public int UnReadNum;
@@ -39,6 +40,14 @@ public class Talks extends DataSupport {
 
     public void setFriendHeaderURL(String FriendHeaderURL){
         this.FriendHeaderURL = FriendHeaderURL;
+    }
+
+    public void setMyID(String myID){
+        this.MyID = myID;
+    }
+
+    public String getMyID(){
+        return MyID;
     }
 
     public String getLastMessage(){

@@ -4,7 +4,7 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="?attr/colorPrimary"
+    android:background="@color/colorTheme"
     app:contentInsetStart="0dip">
 
     <RelativeLayout
@@ -20,7 +20,7 @@
             android:background="?attr/selectableItemBackground"
             android:padding="10dip"
             android:scaleType="centerCrop"
-            android:src="@drawable/btn_back" />
+            android:src="@drawable/abc_vector_test" />
 
         <TextView
             android:id="@+id/txt_title"

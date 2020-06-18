@@ -240,6 +240,7 @@ public class TalksActivity extends AppCompatActivity {
 //        }
 //        list = DataSupport.findAll(Message.class);
         list = DataSupport.select("*").where("sendID=? or receiveID=?",FriendsID,FriendsID).find(Message.class);
+        showlist = new ArrayList<>();
         Collections.reverse(list);
         if(list.size()<10){
             showlist.addAll(list.subList(count,list.size()));

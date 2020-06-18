@@ -187,7 +187,7 @@ public class TalksActivity extends AppCompatActivity {
                             Toast.makeText(TalksActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                         }
                     }
-                });
+                }).start();
             }
         });
 

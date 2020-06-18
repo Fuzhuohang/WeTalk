@@ -3,7 +3,7 @@
     <!--数据库名-->
     <dbname value="local_db" />
     <!--数据库版本号，升级数据库的时候只需要在此加1即可 -->
-    <version value="15" />
+    <version value="16" />
     <!--你需要创建的表，只需要在此设定映射模型即可。         当你的数据模型结构发生变化，需要数据库也跟着改变的时候，或者添加新的映射模型的时候，需要升级你的数据库版本-->
     <list>
         <mapping class= "cn.edu.sc.weitalk.javabean.MomentsMessage"/>

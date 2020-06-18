@@ -39,21 +39,13 @@
         <activity android:name=".activity.RegisterActivity"></activity>
 
         <activity android:name=".activity.AddNewCommentActivity" />
-        <activity android:name=".TestCircle">
+        <activity android:name=".activity.TalksActivity"  />
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="dvcvbfbfbd" />
 
                 <category android:name="vdvdbgfbgbvd" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".activity.TalksActivity"  />
-        <activity android:name=".activity.MainActivity">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
+            </intent-filter>        </activity>
     </application>
 
 </manifest>

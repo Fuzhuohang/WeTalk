@@ -1,5 +1,4 @@
-package cn.edu.sc.weitalk;
-
+package cn.edu.sc.weitalk.javabean;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -10,7 +9,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
-public final class FileUtils {
+public class FileUtils {
 
     public static String getFilePathByUri(Context context, Uri uri) {
         String path = null;
@@ -105,3 +104,4 @@ public final class FileUtils {
     }
 
 }
+

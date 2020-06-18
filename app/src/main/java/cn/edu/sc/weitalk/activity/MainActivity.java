@@ -59,9 +59,11 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 //        DataSupport.deleteAll(Talks.class);
 //        DataSupport.deleteAll(Message.class);
+        Connector.getDatabase();
+        //DataSupport.deleteAll(MomentsMessage.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
         bindService(intent,mainConn,BIND_AUTO_CREATE);
-        Connector.getDatabase();
+
         requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);
         bottomView.setItemIconTintList(null);

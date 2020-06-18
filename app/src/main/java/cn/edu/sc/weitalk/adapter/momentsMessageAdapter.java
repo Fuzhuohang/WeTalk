@@ -194,16 +194,19 @@ Context context;
         //加载评论
         List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);
         if(com.size()>0){
-            holder.comments.removeAllViewsInLayout();
+            //Toast.makeText(context, "com.size = " + com.size(), Toast.LENGTH_SHORT).show();
+            holder.comments.removeAllViews();
             holder.comments.setVisibility(View.VISIBLE);
             for(int i=0;i<com.size();i++){
                 TextView comment=new TextView(context);
+                //Toast.makeText(context, com.get(i).getContent(), Toast.LENGTH_SHORT).show();
                 holder.comments.addView(comment);
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
                 params.width =LinearLayout.LayoutParams.MATCH_PARENT;
                 params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 params.leftMargin=20;
                 params.rightMargin=20;
+                params.topMargin=5;
                 //评论内容显示，html转为字符串保留格式
                 String str1 = "<font color='#0997F7'>"+com.get(i).getCommentPerName()+": </font>"+com.get(i).getContent();
                 comment.setText(Html.fromHtml(str1));
@@ -212,7 +215,7 @@ Context context;
             }
         }
         else{
-            holder.comments.removeAllViewsInLayout();
+            holder.comments.removeAllViews();
             holder.comments.setVisibility(View.GONE);
         }
 

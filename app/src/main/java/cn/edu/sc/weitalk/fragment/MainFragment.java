@@ -46,6 +46,7 @@ import com.google.zxing.activity.CaptureActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -56,7 +57,11 @@ import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import cn.edu.sc.weitalk.util.Constant;
 import cn.edu.sc.weitalk.util.ZXingUtils;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -75,16 +80,16 @@ public class MainFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private AppBarConfiguration mAppBarConfiguration,bAppBarConfiguration;
+    private AppBarConfiguration mAppBarConfiguration, bAppBarConfiguration;
     private TextView pagename;
-    private String userID,userName,headURL;
+    private String userID, userName, headURL;
     private Toolbar toolbar;
     private String QRCodeMessage;
     MessageListFragment messageListFragment;
     FriendListFragment friendListFragment;
     CircleOfFriendsFragment circleOfFriendsFragment;
     //private LinearLayout btnVector;
-   private ImageView btn;
+    private ImageView btn;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -134,40 +139,39 @@ public class MainFragment extends Fragment {
         //Fresco.initialize(getContext());
 //        SimpleDraweeView temp=view.findViewById(R.id.drawee_img);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
-        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
-        userID=config.getString("userID","");
-        userName = config.getString("name","");
-        headURL = config.getString("headURL","");
-        Log.d("USER",userID);
+        SharedPreferences config = getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID = config.getString("userID", "");
+        userName = config.getString("name", "");
+        headURL = config.getString("headURL", "");
+        Log.d("USER", userID);
 
-        navigationView=view.findViewById(R.id.nav_view);
+        navigationView = view.findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
-        SimpleDraweeView temp=headerView.findViewById(R.id.icon);
+        SimpleDraweeView temp = headerView.findViewById(R.id.icon);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
         temp.setImageURI(headURL);
-        TextView name=headerView.findViewById(R.id.Username);
+        TextView name = headerView.findViewById(R.id.Username);
         name.setText(userName);
         TextView userid = headerView.findViewById(R.id.UserID);
-        userid.setText("ID: "+userID);
+        userid.setText("ID: " + userID);
         navigationView.setItemIconTintList(null);   //设置icon为原本图片的颜色
 
-        DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
+        DrawerLayout drawerLayout = view.findViewById(R.id.drawerlayout);
         toolbar = view.findViewById(R.id.toolbar);
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
 //        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
         temp2.setImageURI(headURL);
         pagename = view.findViewById(R.id.page_name);
         //btnVector=view.findViewById(R.id.btnVector);
-        btn=view.findViewById(R.id.buttonview);
+        btn = view.findViewById(R.id.buttonview);
         btn.setVisibility(View.GONE);
-        DrawerLayout drawerLayout1=view.findViewById(R.id.drawerlayout);
+        DrawerLayout drawerLayout1 = view.findViewById(R.id.drawerlayout);
         temp2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerLayout1.openDrawer(navigationView);
             }
         });
-
 
 
         return view;
@@ -187,10 +191,10 @@ public class MainFragment extends Fragment {
         viewList.add(messageListFragment);
         viewList.add(friendListFragment);
         viewList.add(circleOfFriendsFragment);
-        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(),viewList);
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getChildFragmentManager(), viewList);
         viewPager.setAdapter(viewPagerAdapter);
         viewPager.setOffscreenPageLimit(3);
-        switch (viewPager.getCurrentItem()){
+        switch (viewPager.getCurrentItem()) {
             case 0:
                 pagename.setText("消息");
                 break;
@@ -223,14 +227,14 @@ public class MainFragment extends Fragment {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.message_b:
-                        viewPager.setCurrentItem(0,true);
+                        viewPager.setCurrentItem(0, true);
                         pagename.setText("消息");
                         btn.setVisibility(View.GONE);
                         break;
                     case R.id.lxr_b:
-                        viewPager.setCurrentItem(1,true);
+                        viewPager.setCurrentItem(1, true);
                         pagename.setText("联系人");
                         btn.setVisibility(View.VISIBLE);
                         btn.setClickable(false);
@@ -239,12 +243,12 @@ public class MainFragment extends Fragment {
                         params.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
                         params.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
                         params.rightMargin = 15;
-                        params.topMargin=30;
-                        params.bottomMargin=30;
+                        params.topMargin = 30;
+                        params.bottomMargin = 30;
                         btn.setLayoutParams(params);
                         break;
                     case R.id.pyq_b:
-                        viewPager.setCurrentItem(2,true);
+                        viewPager.setCurrentItem(2, true);
                         pagename.setText("朋友圈");
                         btn.setVisibility(View.VISIBLE);
                         btn.setImageResource(R.drawable.tianjia);
@@ -252,14 +256,15 @@ public class MainFragment extends Fragment {
                         params1.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
                         params1.height = ConstraintLayout.LayoutParams.MATCH_PARENT;
                         params1.rightMargin = 15;
-                        params1.topMargin=30;
-                        params1.bottomMargin=30;
+                        params1.topMargin = 30;
+                        params1.bottomMargin = 30;
                         btn.setLayoutParams(params1);
+                        circleOfFriendsFragment.adapter.refreshData();
                         btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent=new Intent(getContext(), AddNewCommentActivity.class);
-                                startActivityForResult(intent,200);
+                                Intent intent = new Intent(getContext(), AddNewCommentActivity.class);
+                                startActivityForResult(intent, 200);
                             }
                         });
                         break;
@@ -270,7 +275,7 @@ public class MainFragment extends Fragment {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch(item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.myqrcode:
                         createMyQRCode();
                         break;
@@ -292,45 +297,45 @@ public class MainFragment extends Fragment {
     }
 
     //登出
-    public void loginOut(){
+    public void loginOut() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
-                OkHttpClient okHttpClient=new OkHttpClient();
-                String info="?userID="+userID;
-                Request request = new Request.Builder()
-                        .url(getString(R.string.IPAddress)+"/get-api/loginOut"+info)
-                        .build();
+                try {
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    String info = "?userID=" + userID;
+                    Request request = new Request.Builder()
+                            .url(getString(R.string.IPAddress) + "/get-api/loginOut" + info)
+                            .build();
 
-                Response response = okHttpClient.newCall(request).execute();
-                String responseData = response.body().string();
-                JSONObject jsonObject = new JSONObject(responseData);
-                String status = jsonObject.getString("status");
-                if (status.equals("200")){
-                    Toast.makeText(getContext(),"退出登录啦！",Toast.LENGTH_SHORT).show();
-                    getActivity().finish();
-                }else {
-                    JSONObject returnData = jsonObject.getJSONObject("data");
-                    String msg = returnData.getString("msg");
-                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    if (status.equals("200")) {
+                        Toast.makeText(getContext(), "退出登录啦！", Toast.LENGTH_SHORT).show();
+                        getActivity().finish();
+                    } else {
+                        JSONObject returnData = jsonObject.getJSONObject("data");
+                        String msg = returnData.getString("msg");
+                        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            }
             }
         }).start();
     }
 
     //生成我的二维码信息
-    private void createMyQRCode(){
-        String MyMessage = "userName: "+userName+" userID: "+userID;
-        Bitmap bitmap = ZXingUtils.createQRImage(MyMessage,400,400);
-        View QRCodeView = LayoutInflater.from(getContext()).inflate(R.layout.qrcode_display,null);
+    private void createMyQRCode() {
+        String MyMessage = "userName: " + userName + " userID: " + userID;
+        Bitmap bitmap = ZXingUtils.createQRImage(MyMessage, 400, 400);
+        View QRCodeView = LayoutInflater.from(getContext()).inflate(R.layout.qrcode_display, null);
         ImageView qrCodeView = QRCodeView.findViewById(R.id.QRCode);
         qrCodeView.setImageBitmap(bitmap);
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -341,13 +346,13 @@ public class MainFragment extends Fragment {
     }
 
     //扫描二维码
-    private void scanQRCode(){
-        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.CAMERA)){
-                Toast.makeText(getContext(),"请到权限中心打开相机访问权限",Toast.LENGTH_SHORT).show();
+    private void scanQRCode() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
+                Toast.makeText(getContext(), "请到权限中心打开相机访问权限", Toast.LENGTH_SHORT).show();
             }
 
-            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
             return;
         }
 
@@ -355,39 +360,104 @@ public class MainFragment extends Fragment {
         startActivityForResult(intent, Constant.REQ_PERM_CAMERA);
     }
 
-//新建朋友圈消息的本地存储与实时发送
+    //新建朋友圈消息的本地存储与实时发送
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==200&&resultCode==200){
+        if (requestCode == 200 && resultCode == 200) {
             //生成新的朋友圈消息，存入数据库中
-            MomentsMessage temp=new MomentsMessage();
+            MomentsMessage temp = new MomentsMessage();
             temp.setContent(data.getStringExtra("content"));
             temp.setDate(data.getStringExtra("time"));
-            if(data.getStringExtra("imagePath")!=null){
-                temp.setMomentImage(data.getStringExtra("imagePath"));
-            }
-            else
-                temp.setMomentImage(null);
+            temp.setMomentImage(data.getStringExtra("imagePath"));
+            temp.setMomentImage2(data.getStringExtra("imagePath2"));
+            temp.setMomentImage3(data.getStringExtra("imagePath3"));
 //            temp.setPublisherID("123456");
 //            temp.setPublisherName("小明");
-            temp.setPublisherID(data.getStringExtra("userID"));
+            temp.setPublisherID(userID);
             //temp.setMomentID(0+"");
             temp.setPublisherName(data.getStringExtra("name"));
             temp.setHeadshot("res://drawable/" + R.drawable.dragon);
             temp.setLikeCounter(0);
+            temp.setImageCounter(data.getIntExtra("imageNumber", 0));
+            File file = new File(temp.getMomentImage());
+            File file2 = new File(temp.getMomentImage2());
+            File file3 = new File(temp.getMomentImage3());
+            Log.i("FLLL",temp.getMomentImage());
+            Log.i("FLLL",temp.getMomentImage2());
+            Log.i("FLLL",temp.getMomentImage3());
+//            temp.save();
+//            circleOfFriendsFragment.adapter.refreshData();
             //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
             try{
                 OkHttpClient okHttpClient = new OkHttpClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("userID",temp.getPublisherID())
-                        .add("content",temp.getContent())
-                        .add("imgURL",null)
-                        .build();
+                RequestBody filebody=RequestBody.Companion.create(MediaType.parse("image/jpg"),file);
+                RequestBody filebody2=RequestBody.Companion.create(MediaType.parse("image/jpg"),file2);
+                RequestBody filebody3=RequestBody.Companion.create(MediaType.parse("image/jpg"),file3);
+                MultipartBody.Builder builder = new MultipartBody.Builder();
+                builder.setType(MultipartBody.FORM);
+                builder.addFormDataPart("userID",userID);
+                builder.addFormDataPart("content",temp.getContent());
+                builder.addFormDataPart("img1",file.getName(),filebody);
+                builder.addFormDataPart("img2",file2.getName(),filebody2);
+                builder.addFormDataPart("img3",file3.getName(),filebody3);
+                MultipartBody multipartBody=builder.build();
                 Request request = new Request.Builder()
-                        .url(R.string.IPAddress+"/post-api/sendShare")
-                        .post(requestBody)
+                        .addHeader("Content-Type", "application/json")
+                        .url(getString(R.string.IPAddress)+"/post-api/sendShare")
+                        .post(multipartBody)
                         .build();
+
+//                Call call = okHttpClient.newCall(request);
+//
+//                call.enqueue(new Callback() {
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+//
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//
+//                    }
+//                    @Override
+//                    public void onResponse(Call call, Response response) throws IOException {
+//                        String responseData = response.body().string();
+//                        JSONObject jsonObject = null;
+//                        try {
+//                            jsonObject = new JSONObject(responseData);
+//                            String status = jsonObject.getString("status");
+//                            if (status.equals("200")){
+//                                JSONObject returnData = jsonObject.getJSONObject("data");
+//                                temp.setMomentID(returnData.getString("shareID"));
+//                                Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
+//                            }else {
+//                                JSONObject returnData = jsonObject.getJSONObject("data");
+//                                String msg = returnData.getString("msg");
+//                                Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//
+//                    }
+//                });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 Response response = okHttpClient.newCall(request).execute();
                 String responseData = response.body().string();
@@ -396,8 +466,6 @@ public class MainFragment extends Fragment {
                 if (status.equals("200")){
                     JSONObject returnData = jsonObject.getJSONObject("data");
                     temp.setMomentID(returnData.getString("shareID"));
-                    temp.save();
-                    circleOfFriendsFragment.adapter.refreshData();
                     Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
                 }else {
                     JSONObject returnData = jsonObject.getJSONObject("data");
@@ -411,15 +479,13 @@ public class MainFragment extends Fragment {
                 e.printStackTrace();
                 Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
             }
-//            temp.save();
-//            circleOfFriendsFragment.adapter.refreshData();
         }else if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK){
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
             Log.i("SCANQRCODE","扫描结果是："+scanResult);
             QRCodeMessage = scanResult;
         }
-            //Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
-    }
+            Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
+        }
 
-}
+    }

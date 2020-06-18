@@ -164,7 +164,7 @@ public class AddNewCommentActivity extends BaseActivity {
                         selectedImage3.setImageURI(Uri.parse(imagePath3));
                         break;
                 }
-                selectedImage.setImageURI(imageUri);
+                //selectedImage.setImageURI(imageUri);
                 imageCounter++;
         }
 

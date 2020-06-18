@@ -294,7 +294,7 @@ public class MainFragment extends Fragment {
                 String responseData = response.body().string();
                 JSONObject jsonObject = new JSONObject(responseData);
                 String status = jsonObject.getString("status");
-                if (status=="200"){
+                if (status.equals("200")){
                     Toast.makeText(getContext(),"退出登录啦！",Toast.LENGTH_SHORT).show();
                     getActivity().finish();
                 }else {
@@ -345,11 +345,11 @@ public class MainFragment extends Fragment {
             }
             else
                 temp.setMomentImage(null);
-            temp.setPublisherID("123456");
-            temp.setPublisherName("小明");
-//            temp.setPublisherID(data.getStringExtra("userID"));
-//            temp.setMomentID(0+"");
-//            temp.setPublisherName(data.getStringExtra("name"));
+//            temp.setPublisherID("123456");
+//            temp.setPublisherName("小明");
+            temp.setPublisherID(data.getStringExtra("userID"));
+            //temp.setMomentID(0+"");
+            temp.setPublisherName(data.getStringExtra("name"));
             temp.setHeadshot("res://drawable/" + R.drawable.dragon);
             temp.setLikeCounter(0);
             //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
@@ -369,7 +369,7 @@ public class MainFragment extends Fragment {
                 String responseData = response.body().string();
                 JSONObject jsonObject = new JSONObject(responseData);
                 String status = jsonObject.getString("status");
-                if (status=="200"){
+                if (status.equals("200")){
                     JSONObject returnData = jsonObject.getJSONObject("data");
                     temp.setMomentID(returnData.getString("shareID"));
                     temp.save();

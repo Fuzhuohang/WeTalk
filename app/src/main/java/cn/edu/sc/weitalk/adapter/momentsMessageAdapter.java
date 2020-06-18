@@ -332,7 +332,7 @@ Context context;
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if (status=="200"){
+                    if (status.equals("200")){
                         temp.save();
                         refreshData();
                         Toast.makeText(context,"评论成功！",Toast.LENGTH_SHORT).show();

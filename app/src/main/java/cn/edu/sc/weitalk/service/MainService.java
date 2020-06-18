@@ -62,7 +62,7 @@ public class MainService extends Service {
                     Log.i("GETMESSAGE",responseData);
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if (status=="200"){
+                    if (status.equals("200")){
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for(int i=0;i<jsonArray.length();i++){
                             JSONObject jsonData = jsonArray.getJSONObject(i);
@@ -127,7 +127,7 @@ public class MainService extends Service {
             String time = LastDate;
             while (true){
                 try{
-                    Thread.sleep(5000);
+                    Thread.sleep(1000);
                     OkHttpClient okHttpClient = new OkHttpClient();
                     String info="?recipient="+UserID+"&time="+time;
                     Request request = new Request.Builder()
@@ -142,7 +142,7 @@ public class MainService extends Service {
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
                     //判断状态是否正常
-                    if (status=="200"){
+                    if (status.equals("200")){
                         //，写入两个json数组中
                         JSONArray jsonDataArray = jsonObject.getJSONArray("data");
                         for(int i=0;i<jsonDataArray.length();i++) {
@@ -204,8 +204,8 @@ public class MainService extends Service {
 //        throw new UnsupportedOperationException("Not yet implemented");
         SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
         UserID=config.getString("userID","");
-//        LastDate=config.getString("lastTime","");
-        LastDate = "2016-01-01 00:00:00";
+        //LastDate=config.getString("lastTime","");
+        LastDate="2016-01-01 01:01:01";
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread()).start();
         return new MainBinder();
@@ -230,5 +230,37 @@ public class MainService extends Service {
         editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         editor.commit();
         editor.clear();
+        loginOut();
     }
-}
+    //登出
+    public void loginOut(){
+                try{
+                    OkHttpClient okHttpClient=new OkHttpClient();
+                    String info="?userID="+UserID;
+                    Request request = new Request.Builder()
+                            .url(getString(R.string.IPAddress)+"/get-api/loginOut"+info)
+                            .build();
+
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    if (status=="200"){
+                        //Toast.makeText(getContext(),"退出登录啦！",Toast.LENGTH_SHORT).show();
+                        //getActivity().finish();
+                    }else {
+                        JSONObject returnData = jsonObject.getJSONObject("data");
+                        String msg = returnData.getString("msg");
+                        //Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    //Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+    }
+

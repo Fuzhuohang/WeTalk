@@ -168,7 +168,7 @@ public class CircleOfFriendsFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
                     //判断状态是否正常
-                    if (status=="200"){
+                    if (status.equals("200")){
                         //，写入两个json数组中
                         JSONArray jsonDataArray = jsonObject.getJSONArray("data");
                         for(int i=0;i<jsonDataArray.length();i++) {

@@ -57,8 +57,8 @@ public class MainActivity extends BaseActivity {
 
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
-        DataSupport.deleteAll(Talks.class);
-        DataSupport.deleteAll(Message.class);
+//        DataSupport.deleteAll(Talks.class);
+//        DataSupport.deleteAll(Message.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
         bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();

@@ -9,7 +9,7 @@
             android:icon="@drawable/mingpian"
             android:title="我的名片" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/myqrcode"
             android:icon="@drawable/erweima1"
             android:title="我的二维码" />
         <item

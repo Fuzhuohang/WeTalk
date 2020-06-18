@@ -1,6 +1,8 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -47,6 +49,7 @@ import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.util.ZXingUtils;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -66,7 +69,7 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private AppBarConfiguration mAppBarConfiguration,bAppBarConfiguration;
     private TextView pagename;
-    private String userID;
+    private String userID,userName,headURL;
     private Toolbar toolbar;
     MessageListFragment messageListFragment;
     FriendListFragment friendListFragment;
@@ -122,16 +125,23 @@ public class MainFragment extends Fragment {
         //Fresco.initialize(getContext());
 //        SimpleDraweeView temp=view.findViewById(R.id.drawee_img);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
+        userName = config.getString("name","");
+        headURL = config.getString("headURL","");
+        Log.d("USER",userID);
+
         navigationView=view.findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         SimpleDraweeView temp=headerView.findViewById(R.id.icon);
-        temp.setImageURI("res://drawable/" + R.drawable.dragon);
-//        TextView name=headerView.findViewById(R.id.Username);
-//        name.setText("111111");
+//        temp.setImageURI("res://drawable/" + R.drawable.dragon);
+        temp.setImageURI(headURL);
+        TextView name=headerView.findViewById(R.id.Username);
+        name.setText(userName);
+        TextView userid = headerView.findViewById(R.id.UserID);
+        userid.setText("ID: "+userID);
         navigationView.setItemIconTintList(null);   //设置icon为原本图片的颜色
-        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
-        userID=config.getString("userID","");
-        Log.d("USER",userID);
+
         DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
         toolbar = view.findViewById(R.id.toolbar);
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
@@ -251,6 +261,9 @@ public class MainFragment extends Fragment {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
+                    case R.id.myqrcode:
+                        createMyQRCode();
+                        break;
                     case R.id.exit:
                         //Toast.makeText(getContext(),"1111111",Toast.LENGTH_SHORT).show();
                         loginOut();
@@ -297,6 +310,25 @@ public class MainFragment extends Fragment {
             }
             }
         }).start();
+    }
+
+    //生成我的二维码信息
+    private void createMyQRCode(){
+        String MyMessage = "userName: "+userName+" userID: "+userID;
+        Bitmap bitmap = ZXingUtils.createQRImage(MyMessage,400,400);
+        View QRCodeView = LayoutInflater.from(getContext()).inflate(R.layout.qrcode_display,null);
+        ImageView qrCodeView = QRCodeView.findViewById(R.id.QRCode);
+        qrCodeView.setImageBitmap(bitmap);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setView(QRCodeView);
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 //新建朋友圈消息的本地存储与实时发送
     @Override

@@ -1,7 +1,9 @@
 package cn.edu.sc.weitalk.service;
 
 import android.app.DownloadManager;
+import android.app.IntentService;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -103,7 +105,8 @@ public class MainService extends Service {
                             talks.setUnReadNum(talks.getUnReadNum()+1);
                             talks.updateAll("FriendID=? and MyID=?",jsonData.getString("sender"),UserID);
                         }
-
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.message");
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.activity.talks");
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -181,7 +184,7 @@ public class MainService extends Service {
                                 }
                             }
                         }
-
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.moment");
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -199,6 +202,18 @@ public class MainService extends Service {
             }
         }
     }
+
+    private boolean BroadCastMethod(boolean st, String ReceiveAction){
+        Intent intentReceiver = new Intent();
+        intentReceiver.setAction(ReceiveAction);
+
+        intentReceiver.putExtra("ifrefresh",st);
+
+        MainService.this.sendBroadcast(intentReceiver);
+
+        return true;
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.

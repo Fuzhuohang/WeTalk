@@ -9,8 +9,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 
-public final class FileUtils {
+public class FileUtils {
 
     public static String getFilePathByUri(Context context, Uri uri) {
         String path = null;

@@ -1,7 +1,10 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +15,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.FriendInfoActivity;
 import cn.edu.sc.weitalk.adapter.FriendListAdapter;
+import cn.edu.sc.weitalk.adapter.FriendReqResAdapter;
 import cn.edu.sc.weitalk.javabean.Friend;
+import cn.edu.sc.weitalk.javabean.FriendReqRes;
 import cn.edu.sc.weitalk.widget.LetterIndexView;
 
 /**
@@ -28,18 +38,23 @@ import cn.edu.sc.weitalk.widget.LetterIndexView;
  * create an instance of this fragment.
  */
 public class FriendListFragment extends Fragment {
-
+    private final String TAG = "FriendListFragment";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private ArrayList<Friend> list;
+    private List<Friend> friendList = new ArrayList<Friend>();
+    private List<FriendReqRes> friendReqResList = new ArrayList<FriendReqRes>();
+    private String MyID;
     @BindView(R.id.btn_search_friend_list)
     Button btnSearch;
     @BindView(R.id.lv_fiend_list)
     ListView lvFiendList;
     LetterIndexView letterIndexView;
     TextView bigLetter;
+    RecyclerView rvFriendReqRes;
+    FriendListAdapter friendListAdapter;
+    FriendReqResAdapter friendReqResAdapter;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -76,11 +91,34 @@ public class FriendListFragment extends Fragment {
         }
 
         //test, 生产user数据
-        list = new ArrayList<>();
-        for(int i = 0;i < 50;i++){
-            Friend friend = new Friend("A", R.drawable.dragon,"long", "龙");
-            list.add(friend);
-        }
+//        list = new ArrayList<>();
+//        for(int i = 0;i < 50;i++){
+//            Friend friend = new Friend("A", R.drawable.dragon,"long", "龙");
+//            list.add(friend);
+//        }
+
+        //test
+//        friendReqResList = new ArrayList<>();
+//        FriendReqRes reqRes = new FriendReqRes();
+//        reqRes.setUsername("李可");
+//        reqRes.setType(0);
+//        friendReqResList.add(reqRes);
+//        reqRes = new FriendReqRes();
+//        reqRes.setUsername("范重阳");
+//        reqRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
+//        reqRes.setAgreed(false);
+//        friendReqResList.add(reqRes);
+//        reqRes = new FriendReqRes();
+//        reqRes.setUsername("付卓航");
+//        reqRes.setType(1);
+//        reqRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
+//        reqRes.setAgreed(true);
+//        friendReqResList.add(reqRes);
+//        reqRes = new FriendReqRes();
+//        reqRes.setUsername("何老实");
+//        reqRes.setType(FriendReqRes.DELETE_BY_FRIEND);
+//        friendReqResList.add(reqRes);
+
     }
 
     @Override
@@ -88,21 +126,24 @@ public class FriendListFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_friend_list, container, false);
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        MyID=config.getString("userID","");
         //给控件赋值
         lvFiendList = view.findViewById(R.id.lv_fiend_list);
         btnSearch = view.findViewById(R.id.btn_search_friend_list);
         letterIndexView = view.findViewById(R.id.letterIndexView);
         bigLetter = view.findViewById(R.id.tv_big_letter);
+        rvFriendReqRes = view.findViewById(R.id.rv_friend_req_res);
         //设置ListView
-        FriendListAdapter adapter = new FriendListAdapter(getContext(), list);
-        lvFiendList.setAdapter(adapter);
+        friendListAdapter = new FriendListAdapter(getContext(), friendList);
+        lvFiendList.setAdapter(friendListAdapter);
             //给list item添加点击事件，进入好友信息Activity
         lvFiendList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getContext(), FriendInfoActivity.class);
-                Friend friend = list.get(position);
-                intent.putExtra("id", friend.getUserId());
+                Friend friend = friendList.get(position);
+                intent.putExtra("id", friend.getUserID());
                 startActivity(intent);
             }
         });
@@ -112,7 +153,7 @@ public class FriendListFragment extends Fragment {
             }
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                int sectionForPosition = adapter.getSectionForPosition(firstVisibleItem);
+                int sectionForPosition = friendListAdapter.getSectionForPosition(firstVisibleItem);
                 letterIndexView.updateLetterIndexView(sectionForPosition);
             }
         });
@@ -121,10 +162,37 @@ public class FriendListFragment extends Fragment {
         letterIndexView.setOnLetterSelectedListener(new LetterIndexView.OnLetterSelectedListener() {
             @Override
             public void onLetterSelected(String currentChar) {
-                int positionForSection = adapter.getPositionForSection(currentChar.charAt(0));
+                int positionForSection = friendListAdapter.getPositionForSection(currentChar.charAt(0));
                 lvFiendList.setSelection(positionForSection);
             }
         });
+        //设置添加好友请求和回复的RecyclerView
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        friendReqResAdapter = new FriendReqResAdapter(getContext(), friendReqResList);
+        rvFriendReqRes.setAdapter(friendReqResAdapter);
+        rvFriendReqRes.setLayoutManager(layoutManager);
         return view;
+    }
+
+    public void initFriendList(){
+        friendList = DataSupport.select("*").where("MyID=?",MyID).find(Friend.class);
+        Log.i(TAG, "本地朋友列表大小：" + friendList.size());
+    }
+
+    private void initFriendReqRes(){
+        friendReqResList = DataSupport.select("*").where("MyID=?", MyID).find(FriendReqRes.class);
+    }
+
+    //每次恢复页面（页面可见时）重新从本地数据库获取好友列表，以及好友请求和回复等信息
+    @Override
+    public void onResume() {
+        super.onResume();
+        initFriendList();
+        friendListAdapter.setList(friendList);
+        friendListAdapter.notifyDataSetChanged();
+
+        initFriendReqRes();
+        friendReqResAdapter.setList(friendReqResList);
+        friendReqResAdapter.notifyDataSetChanged();
     }
 }

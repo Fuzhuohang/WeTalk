@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.Manifest;
+import android.content.Context;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -364,60 +365,55 @@ public class MainFragment extends Fragment {
             MomentsMessage temp=new MomentsMessage();
             temp.setContent(data.getStringExtra("content"));
             temp.setDate(data.getStringExtra("time"));
-            if(data.getStringExtra("imagePath")!=null){
-                temp.setMomentImage(data.getStringExtra("imagePath"));
-            }
-            else
-                temp.setMomentImage(null);
-//            temp.setPublisherID("123456");
-//            temp.setPublisherName("小明");
-            temp.setPublisherID(data.getStringExtra("userID"));
-            //temp.setMomentID(0+"");
-            temp.setPublisherName(data.getStringExtra("name"));
+            temp.setMomentImage(data.getStringExtra("imagePath"));
+            temp.setMomentImage2(data.getStringExtra("imagePath2"));
+            temp.setMomentImage3(data.getStringExtra("imagePath3"));
+            temp.setPublisherID("123456");
+            temp.setImageCounter(data.getIntExtra("imageNumber", 0));
+            temp.setPublisherName("小明");
+//            temp.setPublisherID(data.getStringExtra("userID"));
+//            temp.setMomentID(0+"");
+//            temp.setPublisherName(data.getStringExtra("name"));
             temp.setHeadshot("res://drawable/" + R.drawable.dragon);
             temp.setLikeCounter(0);
+            temp.save();
+            circleOfFriendsFragment.adapter.refreshData();
             //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
-            try{
-                OkHttpClient okHttpClient = new OkHttpClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("userID",temp.getPublisherID())
-                        .add("content",temp.getContent())
-                        .add("imgURL",null)
-                        .build();
-                Request request = new Request.Builder()
-                        .url(R.string.IPAddress+"/post-api/sendShare")
-                        .post(requestBody)
-                        .build();
+//            try{
+//                OkHttpClient okHttpClient = new OkHttpClient();
+//                RequestBody requestBody = new FormBody.Builder()
+//                        .add("userID",temp.getPublisherID())
+//                        .add("content",temp.getContent())
+//                        .add("imgURL",null)
+//                        .build();
+//                Request request = new Request.Builder()
+//                        .url(R.string.IPAddress+"/post-api/sendShare")
+//                        .post(requestBody)
+//                        .build();
+//
+//                Response response = okHttpClient.newCall(request).execute();
+//                String responseData = response.body().string();
+//                JSONObject jsonObject = new JSONObject(responseData);
+//                String status = jsonObject.getString("status");
+//                if (status=="200"){
+//                    JSONObject returnData = jsonObject.getJSONObject("data");
+//                    temp.setMomentID(returnData.getString("shareID"));
+//                    temp.save();
+//                    circleOfFriendsFragment.adapter.refreshData();
+//                    Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
+//                }else {
+//                    JSONObject returnData = jsonObject.getJSONObject("data");
+//                    String msg = returnData.getString("msg");
+//                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+//            }
 
-                Response response = okHttpClient.newCall(request).execute();
-                String responseData = response.body().string();
-                JSONObject jsonObject = new JSONObject(responseData);
-                String status = jsonObject.getString("status");
-                if (status.equals("200")){
-                    JSONObject returnData = jsonObject.getJSONObject("data");
-                    temp.setMomentID(returnData.getString("shareID"));
-                    temp.save();
-                    circleOfFriendsFragment.adapter.refreshData();
-                    Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
-                }else {
-                    JSONObject returnData = jsonObject.getJSONObject("data");
-                    String msg = returnData.getString("msg");
-                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            }
-//            temp.save();
-//            circleOfFriendsFragment.adapter.refreshData();
-        }else if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK){
-            Bundle bundle = data.getExtras();
-            String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
-            Log.i("SCANQRCODE","扫描结果是："+scanResult);
-            QRCodeMessage = scanResult;
         }
             //Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
     }

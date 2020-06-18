@@ -49,4 +49,5 @@ dependencies {
     compile 'cn.bingoogolapple:bga-qrcodecore:1.1.7@aar'
     compile 'cn.bingoogolapple:bga-zxing:1.1.7@aar'
     compile 'com.google.zxing:core:3.3.0'
+    debugCompile 'com.amitshekhar.android:debug-db:1.0.0'
 }

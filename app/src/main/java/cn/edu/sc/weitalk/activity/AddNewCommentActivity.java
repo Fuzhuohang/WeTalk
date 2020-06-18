@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.edu.sc.weitalk.FileUtils;
+import cn.edu.sc.weitalk.javabean.FileUtils;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
@@ -40,9 +40,15 @@ public class AddNewCommentActivity extends BaseActivity {
     private ImageView returnImage;
     private TextView btnCommit;
     private ImageView selectedImage;
+    private ImageView selectedImage2;
+    private ImageView selectedImage3;
     //private byte[] image;
     private Uri imageUri;
     private String imagePath = " ";
+    private String imagePath2 = " ";
+    private String imagePath3 = " ";
+
+    int imageCounter=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,11 +58,16 @@ public class AddNewCommentActivity extends BaseActivity {
         constraintLayout=findViewById(R.id.addimageinmoment);
         btnCommit=findViewById(R.id.buttoncommit);
         selectedImage=findViewById(R.id.selectedimage);
+        selectedImage2=findViewById(R.id.selectedimage2);
+        selectedImage3=findViewById(R.id.selectedimage3);
         context=AddNewCommentActivity.this;
         editView.setFocusable(true);
         editView.requestFocus();
         imageUri=null;
         imagePath = " ";
+        imagePath2 = " ";
+        imagePath3 = " ";
+        imageCounter=0;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -71,7 +82,10 @@ public class AddNewCommentActivity extends BaseActivity {
             public void onClick(View v) {
 //                Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(intent, 1);
-                showFileChooser();
+                if(imageCounter<3)
+                    showFileChooser();
+                else
+                    Toast.makeText(AddNewCommentActivity.this,"最多只能添加三张照片哦！",Toast.LENGTH_SHORT).show();
             }
         });
         returnImage.setOnClickListener(new View.OnClickListener() {
@@ -108,7 +122,9 @@ public class AddNewCommentActivity extends BaseActivity {
                             Intent intent=new Intent();
                             intent.putExtra("content",editView.getText().toString());
                             intent.putExtra("imagePath",imagePath);
-
+                            intent.putExtra("imagePath2",imagePath2);
+                            intent.putExtra("imagePath3",imagePath3);
+                            intent.putExtra("imageNumber",imageCounter);
                             Date time=new Date();
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             intent.putExtra("time",format.format(time));
@@ -134,8 +150,22 @@ public class AddNewCommentActivity extends BaseActivity {
         if (resultCode == Activity.RESULT_OK) {
 
                 imageUri = data.getData();
+                switch(imageCounter){
+                    case 0:
+                        imagePath = FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
+                        selectedImage.setImageURI(Uri.parse(imagePath));
+                    break;
+                    case 1:
+                        imagePath2 = FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
+                        selectedImage2.setImageURI(Uri.parse(imagePath2));
+                    break;
+                    case 2:
+                        imagePath3 = FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
+                        selectedImage3.setImageURI(Uri.parse(imagePath3));
+                        break;
+                }
                 selectedImage.setImageURI(imageUri);
-                imagePath = FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
+                imageCounter++;
         }
 
     }

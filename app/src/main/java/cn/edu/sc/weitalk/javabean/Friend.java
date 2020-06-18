@@ -1,20 +1,19 @@
 package cn.edu.sc.weitalk.javabean;
 
-import java.util.Date;
+import org.litepal.crud.DataSupport;
 
-public class Friend {
-    /**
-     * Created by wangsong on 2016/4/24.
-     */
-    private int img;
+public class Friend extends DataSupport {
+
+    private String img;
     private String username;
-    private String userId;
-    private String note;
+    private String userID;
+    private String note;        //没有给好友添加备注时，note = ""; 空串
     private String location;
     private String birthday;
     private String phoneNum;
     private String email;
     private boolean status;
+    private String MyID;
     //以下字段非映射字段
     public String pinyin;
     public String firstLetter;
@@ -23,7 +22,7 @@ public class Friend {
     public Friend() {
     }
 
-    public Friend(String firstLetter, int img, String pinyin, String username) {
+    public Friend(String firstLetter, String img, String pinyin, String username) {
         this.firstLetter = firstLetter;
         this.img = img;
         this.pinyin = pinyin;
@@ -38,11 +37,11 @@ public class Friend {
         this.firstLetter = firstLetter;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
     }
 
@@ -62,12 +61,12 @@ public class Friend {
         this.username = username;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserID() {
+        return userID;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getNote() {
@@ -116,5 +115,13 @@ public class Friend {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public String getMyID(){
+        return MyID;
+    }
+
+    public void setMyID(String myID){
+        this.MyID = myID;
     }
 }

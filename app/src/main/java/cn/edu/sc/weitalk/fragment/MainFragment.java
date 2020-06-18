@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.Manifest;
+import android.content.Context;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +48,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -172,6 +174,7 @@ public class MainFragment extends Fragment {
                 drawerLayout1.openDrawer(navigationView);
             }
         });
+
 
 
         return view;

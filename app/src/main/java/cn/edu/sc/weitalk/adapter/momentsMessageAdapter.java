@@ -186,13 +186,14 @@ Context context;
 
             }
         }
+        Toast.makeText(context, temp.getImageCounter()+"", Toast.LENGTH_SHORT).show();
         if(temp.getImageCounter()<=0)
             holder.imagesGroup.setVisibility(View.GONE);
         else
             holder.imagesGroup.setVisibility(View.VISIBLE);
-
+        String MomnetID="vfv";
         //加载评论
-        List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);
+        List<Comments> com=DataSupport.select("*").where("MomentID=?",MomnetID).find(Comments.class);
         if(com.size()>0){
             //Toast.makeText(context, "com.size = " + com.size(), Toast.LENGTH_SHORT).show();
             holder.comments.removeAllViews();

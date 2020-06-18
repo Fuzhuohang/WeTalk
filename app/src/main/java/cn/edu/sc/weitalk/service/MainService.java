@@ -1,7 +1,9 @@
 package cn.edu.sc.weitalk.service;
 
 import android.app.DownloadManager;
+import android.app.IntentService;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -11,6 +13,7 @@ import android.view.textclassifier.TextLinks;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +27,7 @@ import java.util.List;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.TalksActivity;
+import cn.edu.sc.weitalk.javabean.FriendReqRes;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.Message;
@@ -103,7 +107,8 @@ public class MainService extends Service {
                             talks.setUnReadNum(talks.getUnReadNum()+1);
                             talks.updateAll("FriendID=? and MyID=?",jsonData.getString("sender"),UserID);
                         }
-
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.message");
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.activity.talks");
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -189,7 +194,7 @@ public class MainService extends Service {
                             }
 
                         }
-
+                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.moment");
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -207,6 +212,114 @@ public class MainService extends Service {
             }
         }
     }
+
+    private boolean BroadCastMethod(boolean st, String ReceiveAction){
+        Intent intentReceiver = new Intent();
+        intentReceiver.setAction(ReceiveAction);
+
+        intentReceiver.putExtra("ifrefresh",st);
+
+        MainService.this.sendBroadcast(intentReceiver);
+
+        return true;
+    }
+
+
+    class FriendThread extends Thread{
+        public void run(){
+            while (true){
+                try {
+                    /******************************
+                     *  1. 收到对方想要添加好友的消息
+                     ******************************/
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    String arg = "?userID=" + UserID;
+//                    RequestBody requestBody = new FormBody.Builder()
+//                            .add("userId",UserID)
+//                            .build();
+                    Request request = new Request.Builder()
+                            .url(IPaddress + "/get-api/getRAddFriend" + arg)
+                            .build();
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    if(status.equals("200")){
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        for(int i = 0;i < jsonArray.length();i++){
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            FriendReqRes newFriendReq = new FriendReqRes();
+                            newFriendReq.setType(FriendReqRes.NEW_FRIEND_REQUEST);
+                            newFriendReq.setUserId(object.getString("userID"));
+                            newFriendReq.setUsername(object.getString("name"));
+                            newFriendReq.setHeadUrl(object.getString("headURL"));
+                            newFriendReq.setMyID(UserID);
+                            newFriendReq.save();
+                        }
+                    }
+                    /***********************************
+                     *  2. 收到想要添加对方为好友的回复消息
+                     ***********************************/
+                    okHttpClient = new OkHttpClient();
+                    request = new Request.Builder()
+                            .url(IPaddress + "/get-api/getSAddFriend" + arg)
+                            .build();
+                    response = okHttpClient.newCall(request).execute();
+                    responseData = response.body().string();
+                    gson = new Gson();
+                    jsonObject = new JSONObject(responseData);
+                    status = jsonObject.getString("status");
+                    if(status.equals("200")){
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        for(int i = 0;i < jsonArray.length();i++){
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            FriendReqRes friendRes = new FriendReqRes();
+                            friendRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
+                            friendRes.setUserId(object.getString("userID"));
+                            friendRes.setUsername(object.getString("name"));
+                            friendRes.setHeadUrl(object.getString("headURL"));
+                            friendRes.setAgreed(object.getBoolean("agree"));
+                            friendRes.setMyID(UserID);
+                            friendRes.save();
+                        }
+                    }
+
+                    /******************************
+                     *  3. 收到对方已删除你好友的消息
+                     ******************************/
+                    okHttpClient = new OkHttpClient();
+                    request = new Request.Builder()
+                            .url(IPaddress + "/get-api/getDelFriend" + arg)
+                            .build();
+                    response = okHttpClient.newCall(request).execute();
+                    responseData = response.body().string();
+                    gson = new Gson();
+                    jsonObject = new JSONObject(responseData);
+                    status = jsonObject.getString("status");
+                    if(status.equals("200")){
+                        JSONArray jsonArray = jsonObject.getJSONArray("data");
+                        for(int i = 0;i < jsonArray.length();i++){
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            FriendReqRes friendDel = new FriendReqRes();
+                            friendDel.setType(FriendReqRes.DELETE_BY_FRIEND);
+                            friendDel.setUserId(object.getString("userID"));
+                            friendDel.setUsername(object.getString("name"));
+                            friendDel.setHeadUrl(object.getString("headURL"));
+                            friendDel.setAgreed(object.getBoolean("agree"));
+                            friendDel.setMyID(UserID);
+                            friendDel.save();
+                        }
+                    }
+
+                    sleep(2000);
+                } catch (InterruptedException | IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.

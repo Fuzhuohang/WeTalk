@@ -257,7 +257,7 @@
             android:text="加为好友"
             android:textColor="@color/white"
             android:textSize="18sp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <Button
             android:id="@+id/btn_send_msg_friend_info"

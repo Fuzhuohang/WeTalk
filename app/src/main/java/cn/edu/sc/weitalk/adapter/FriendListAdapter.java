@@ -58,8 +58,13 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
             holder = (ViewHolder) convertView.getTag();
         }
         Friend friend = list.get(position);
-        holder.username.setText(friend.getUsername());
-        holder.headIcon.setImageURI("res://drawable/" + friend.getImg());
+        //给好友有备注，设置文字为备注，否则设置文字为username
+        if(friend.getNote() == null || friend.getNote().isEmpty())
+            holder.username.setText(friend.getUsername());
+        else
+            holder.username.setText(friend.getNote());
+        /********************************************************************************头像图片******************/
+        holder.headIcon.setImageURI(friend.getImg());//holder.headIcon.setImageURI("res://drawable/" + R.drawable.tu);
         //获得当前position是属于哪个分组
         int sectionForPosition = getSectionForPosition(position);
         //获得该分组第一项的position
@@ -83,6 +88,9 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
     //传入一个分组值[A....Z],获得该分组的第一项的position
     @Override
     public int getPositionForSection(int sectionIndex) {
+        //如果sectionIndex == -1，说明为空list；或者Friend中没有firstLetter的数据
+        if(sectionIndex == -1)
+            return -1;
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getFirstLetter().charAt(0) == sectionIndex) {
                 return i;
@@ -94,11 +102,20 @@ public class FriendListAdapter extends BaseAdapter implements SectionIndexer {
     //传入一个position，获得该position所在的分组
     @Override
     public int getSectionForPosition(int position) {
-        return list.get(position).getFirstLetter().charAt(0);
+        if(list.isEmpty())
+            return -1;
+        String firstLetter = list.get(position).getFirstLetter();
+        if(firstLetter == null || firstLetter.isEmpty())
+            return -1;
+        return firstLetter.charAt(0);
     }
 
     static class ViewHolder {
         TextView username, showLetter;
         SimpleDraweeView headIcon;
+    }
+
+    public void setList(List<Friend> list) {
+        this.list = list;
     }
 }

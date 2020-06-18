@@ -1,10 +1,15 @@
 package cn.edu.sc.weitalk.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +45,8 @@ import java.util.List;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.adapter.TalksAdapter;
+import cn.edu.sc.weitalk.adapter.TalksListAdapter;
+import cn.edu.sc.weitalk.fragment.MessageListFragment;
 import cn.edu.sc.weitalk.fragment.TalksFragment;
 import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.Message;
@@ -56,6 +63,7 @@ public class TalksActivity extends AppCompatActivity {
     private String talksName,FriendHeaderURL,FriendsID;
     private String MyHeaderURL,MyID,MyName;
     private TalksAdapter talksAdapter;
+    private ListView talks_list;
     private Talks tTalk;
     private int count=0;
 
@@ -97,7 +105,7 @@ public class TalksActivity extends AppCompatActivity {
         });
 
         initMessageList();
-        ListView talks_list = findViewById(R.id.talks_message_list);
+        talks_list = findViewById(R.id.talks_message_list);
         talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
         talks_list.setAdapter(talksAdapter);
         setListViewHeightBasedOnChildren(talks_list);
@@ -209,6 +217,10 @@ public class TalksActivity extends AppCompatActivity {
             }
         });
 
+        RefreshReceiver receiver = new RefreshReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("cn.edu.sc.weitalk.activity.talks");
+        registerReceiver(receiver,intentFilter);
     }
 
     private void initMessageList(){
@@ -285,4 +297,22 @@ public class TalksActivity extends AppCompatActivity {
         params.height = totalHeight+(listView.getDividerHeight()*(listAdapter.getCount()-1));
         listView.setLayoutParams(params);
     }
+
+    private class RefreshReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+            if(ifRefresh){
+                initMessageList();
+                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+                talks_list.setAdapter(talksAdapter);
+                setListViewHeightBasedOnChildren(talks_list);
+            }
+        }
+    }
+
+
+
+
 }

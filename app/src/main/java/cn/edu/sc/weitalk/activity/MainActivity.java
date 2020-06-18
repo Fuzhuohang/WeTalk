@@ -7,7 +7,6 @@ import androidx.navigation.ui.AppBarConfiguration;
 
 import android.Manifest;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -26,9 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.edu.sc.weitalk.R;
-import cn.edu.sc.weitalk.fragment.MainFragment;
 import cn.edu.sc.weitalk.javabean.Comments;
+import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.javabean.Talks;
 import cn.edu.sc.weitalk.service.MainService;
 
 public class MainActivity extends BaseActivity {
@@ -40,9 +40,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(this);
-        setContentView(R.layout.activity_main);
-        DataSupport.deleteAll(MomentsMessage.class);
 //        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
 //        SharedPreferences.Editor editor = config.edit();
 //        editor.putString("userID","testid");
@@ -54,16 +51,20 @@ public class MainActivity extends BaseActivity {
 //        editor.putString("phone","testphone");
 //        editor.putString("eMail","testemail");
 //        editor.putString("registerTime","testtime");
-////        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+//        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 //        editor.commit();
 //        editor.clear();
+
+        Fresco.initialize(this);
+        setContentView(R.layout.activity_main);
+        DataSupport.deleteAll(Talks.class);
+        DataSupport.deleteAll(Message.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
         bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();
         requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);
         bottomView.setItemIconTintList(null);
-//        MainFragment mainFragment = new MainFragment(config);
     }
 
     ServiceConnection mainConn = new ServiceConnection(){

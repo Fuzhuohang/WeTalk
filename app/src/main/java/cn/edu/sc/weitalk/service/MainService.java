@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.Friend;
@@ -50,13 +51,9 @@ public class MainService extends Service {
                 try{
                     Thread.sleep(1000);
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("recipient",UserID)
-                            .add("time",time)
-                            .build();
+                    String info="?recipient="+UserID+"&time="+time;
                     Request request = new Request.Builder()
-                            .url(IPaddress+"/get-api/getMessage")
-                            .post(requestBody)
+                            .url(getString(R.string.IPAddress)+"/get-api/getMessage"+info)
                             .build();
                     time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
                     Response response = okHttpClient.newCall(request).execute();
@@ -107,16 +104,16 @@ public class MainService extends Service {
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
-                        Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -130,13 +127,9 @@ public class MainService extends Service {
                 try{
                     Thread.sleep(1000);
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("recipient",UserID)
-                            .add("Time",time)
-                            .build();
+                    String info="?recipient="+UserID+"&time="+time;
                     Request request = new Request.Builder()
-                            .url(IPaddress+"/get-api/getShare")
-                            .post(requestBody)
+                            .url(getString(R.string.IPAddress)+"/get-api/getShare"+info)
                             .build();
                     time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     //等待回复
@@ -189,16 +182,16 @@ public class MainService extends Service {
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
-                        Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -209,7 +202,7 @@ public class MainService extends Service {
 //        throw new UnsupportedOperationException("Not yet implemented");
         SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
         UserID=config.getString("userID","");
-        LastDate=config.getString("lastDate","");
+        LastDate=config.getString("lastTime","");
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread());
         return new MainBinder();
@@ -231,7 +224,7 @@ public class MainService extends Service {
     public void onDestroy() {
         super.onDestroy();
         SharedPreferences.Editor editor=getSharedPreferences("USER_INFO",MODE_PRIVATE).edit();
-        editor.putString("lastDate",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         editor.commit();
         editor.clear();
     }

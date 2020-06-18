@@ -148,7 +148,7 @@ public class LoginActivity extends AppCompatActivity {
                                         .add("password",password)
                                         .build();
                                 Request request=new Request.Builder()
-                                        .url(IPaddress+"/post-api/login")
+                                        .url(getString(R.string.IPAddress)+"/post-api/login")
                                         .post(requestBody)
                                         .build();
 

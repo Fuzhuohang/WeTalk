@@ -277,12 +277,9 @@ Context context;
             public void run() {
                 try{
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("ShareID",MomentID)
-                            .build();
+                    String info="?ShareID="+MomentID;
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/get-api/like")
-                            .post(requestBody)
+                            .url(context.getString(R.string.IPAddress)+"/get-api/like"+info)
                             .build();
 
                     Response response = okHttpClient.newCall(request).execute();
@@ -327,7 +324,7 @@ Context context;
                             .add("Name",userName)
                             .build();
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/post-api/comment")
+                            .url(context.getString(R.string.IPAddress)+"/post-api/comment")
                             .post(requestBody)
                             .build();
 

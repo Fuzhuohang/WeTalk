@@ -138,7 +138,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                                         .add("location",location)
                                         .build();
                                 Request request=new Request.Builder()
-                                        .url(IPaddress+"/post-api/register")
+                                        .url(getString(R.string.IPAddress)+"/post-api/register")
                                         .post(requestBody)
                                         .build();
 
@@ -153,6 +153,7 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                                 Intent intent=new Intent(RegisterActivity.this,LoginActivity.class);
                                 intent.putExtra("userID",userID);
                                 startActivity(intent);
+                                finish();
                             } catch (JSONException e) {
                                 Looper.prepare();
                                 Toast.makeText(RegisterActivity.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();

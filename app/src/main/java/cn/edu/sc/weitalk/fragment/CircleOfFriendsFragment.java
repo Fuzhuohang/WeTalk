@@ -61,9 +61,8 @@ public class CircleOfFriendsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String userID;
-    private SharedPreferences config;
-    public CircleOfFriendsFragment(SharedPreferences config) {
-//         Required empty public constructor
+    public CircleOfFriendsFragment() {
+        // Required empty public constructor
 
     }
 
@@ -76,8 +75,8 @@ public class CircleOfFriendsFragment extends Fragment {
      * @return A new instance of fragment CircleOfFriendsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public CircleOfFriendsFragment newInstance(String param1, String param2) {
-        CircleOfFriendsFragment fragment = new CircleOfFriendsFragment(this.config);
+    public static CircleOfFriendsFragment newInstance(String param1, String param2) {
+        CircleOfFriendsFragment fragment = new CircleOfFriendsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -100,8 +99,6 @@ public class CircleOfFriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_circle_of_friends, container, false);
-        config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
-        userID=config.getString("userID","");
         SimpleDraweeView temp2 = view.findViewById(R.id.iconself);
         temp2.setImageURI("res://drawable/" + R.drawable.dragon);
         recyclerView=view.findViewById(R.id.messageRecy);
@@ -109,7 +106,8 @@ public class CircleOfFriendsFragment extends Fragment {
         adapter = new momentsMessageAdapter(getContext());
         LinearLayoutManager layout = new LinearLayoutManager(getActivity());
         layout.setOrientation(LinearLayoutManager.VERTICAL);
-
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layout);
         recyclerView.setNestedScrollingEnabled(false);
@@ -156,14 +154,10 @@ public class CircleOfFriendsFragment extends Fragment {
                 try{
                     Thread.sleep(1000);
                     String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                    String info="?recipient="+userID+"&time="+time;
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("recipient",userID)
-                            .add("Time",time)
-                            .build();
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/get-api/getShare")
-                            .post(requestBody)
+                            .url(getString(R.string.IPAddress)+"/get-api/getShare"+info)
                             .build();
 
                     //等待回复

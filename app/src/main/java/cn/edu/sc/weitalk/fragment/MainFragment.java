@@ -1,5 +1,6 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -18,6 +19,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.viewpager.widget.ViewPager;
 
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -64,6 +66,7 @@ public class MainFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private AppBarConfiguration mAppBarConfiguration,bAppBarConfiguration;
     private TextView pagename;
+    private String userID;
     private Toolbar toolbar;
     MessageListFragment messageListFragment;
     FriendListFragment friendListFragment;
@@ -74,6 +77,7 @@ public class MainFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private SharedPreferences config;
+    private NavigationView navigationView;
 
     public MainFragment() {
 //        config =
@@ -118,14 +122,16 @@ public class MainFragment extends Fragment {
         //Fresco.initialize(getContext());
 //        SimpleDraweeView temp=view.findViewById(R.id.drawee_img);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
-        NavigationView navigationView=view.findViewById(R.id.nav_view);
+        navigationView=view.findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
         SimpleDraweeView temp=headerView.findViewById(R.id.icon);
         temp.setImageURI("res://drawable/" + R.drawable.dragon);
 //        TextView name=headerView.findViewById(R.id.Username);
 //        name.setText("111111");
         navigationView.setItemIconTintList(null);   //设置icon为原本图片的颜色
-
+        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
+        Log.d("USER",userID);
         DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
         toolbar = view.findViewById(R.id.toolbar);
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
@@ -157,7 +163,7 @@ public class MainFragment extends Fragment {
 
         messageListFragment = new MessageListFragment();
         friendListFragment = new FriendListFragment();
-        circleOfFriendsFragment = new CircleOfFriendsFragment(this.config);
+        circleOfFriendsFragment = new CircleOfFriendsFragment();
         viewList.add(messageListFragment);
         viewList.add(friendListFragment);
         viewList.add(circleOfFriendsFragment);
@@ -241,7 +247,56 @@ public class MainFragment extends Fragment {
                 return true;
             }
         });
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch(item.getItemId()){
+                    case R.id.exit:
+                        //Toast.makeText(getContext(),"1111111",Toast.LENGTH_SHORT).show();
+                        loginOut();
+                        break;
+                    default:
+                        break;
+                }
+                return false;
+            }
+        });
 
+    }
+
+    //登出
+    public void loginOut(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                OkHttpClient okHttpClient=new OkHttpClient();
+                String info="?userID="+userID;
+                Request request = new Request.Builder()
+                        .url(getString(R.string.IPAddress)+"/get-api/loginOut"+info)
+                        .build();
+
+                Response response = okHttpClient.newCall(request).execute();
+                String responseData = response.body().string();
+                JSONObject jsonObject = new JSONObject(responseData);
+                String status = jsonObject.getString("status");
+                if (status=="200"){
+                    Toast.makeText(getContext(),"退出登录啦！",Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                }else {
+                    JSONObject returnData = jsonObject.getJSONObject("data");
+                    String msg = returnData.getString("msg");
+                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+            }
+            }
+        }).start();
     }
 //新建朋友圈消息的本地存储与实时发送
     @Override

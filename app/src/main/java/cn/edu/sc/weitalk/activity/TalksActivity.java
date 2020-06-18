@@ -160,7 +160,7 @@ public class TalksActivity extends AppCompatActivity {
                                     .add("content",msgContent)
                                     .build();
                             Request request = new Request.Builder()
-                                    .url(IPaddress+"/post-api/sendMessage")
+                                    .url(getString(R.string.IPAddress)+"/post-api/sendMessage")
                                     .post(requestBody)
                                     .build();
 

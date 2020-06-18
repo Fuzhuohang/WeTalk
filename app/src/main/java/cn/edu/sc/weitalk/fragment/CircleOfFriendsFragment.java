@@ -61,10 +61,10 @@ public class CircleOfFriendsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String userID;
-    public CircleOfFriendsFragment() {
-        // Required empty public constructor
-        SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
-        userID=config.getString("userID","");
+    private SharedPreferences config;
+    public CircleOfFriendsFragment(SharedPreferences config) {
+//         Required empty public constructor
+
     }
 
     /**
@@ -76,8 +76,8 @@ public class CircleOfFriendsFragment extends Fragment {
      * @return A new instance of fragment CircleOfFriendsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static CircleOfFriendsFragment newInstance(String param1, String param2) {
-        CircleOfFriendsFragment fragment = new CircleOfFriendsFragment();
+    public CircleOfFriendsFragment newInstance(String param1, String param2) {
+        CircleOfFriendsFragment fragment = new CircleOfFriendsFragment(this.config);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -100,6 +100,8 @@ public class CircleOfFriendsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_circle_of_friends, container, false);
+        config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
         SimpleDraweeView temp2 = view.findViewById(R.id.iconself);
         temp2.setImageURI("res://drawable/" + R.drawable.dragon);
         recyclerView=view.findViewById(R.id.messageRecy);

@@ -51,7 +51,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class TalksActivity extends AppCompatActivity {
-    private String IPaddress="http://localhost:8081";
+    private String IPaddress="http://10.133.30.160:8081";
     private List<Message> list,showlist;
     private String talksName,FriendHeaderURL,FriendsID;
     private String MyHeaderURL,MyID,MyName;

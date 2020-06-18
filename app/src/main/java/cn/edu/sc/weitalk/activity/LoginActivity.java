@@ -180,6 +180,7 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putString("phone",data.getString("phone"));
                                     editor.putString("eMail",data.getString("eMail"));
                                     editor.putString("registerTime",registerTimeDate.toString());
+                                    editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
                                     editor.commit();
                                     editor.clear();
 

@@ -73,9 +73,10 @@ public class MainFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private SharedPreferences config;
+
     public MainFragment() {
-
-
+//        config =
     }
 
     /**
@@ -87,7 +88,7 @@ public class MainFragment extends Fragment {
      * @return A new instance of fragment MainFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MainFragment newInstance(String param1, String param2) {
+    public MainFragment newInstance(String param1, String param2) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -156,7 +157,7 @@ public class MainFragment extends Fragment {
 
         messageListFragment = new MessageListFragment();
         friendListFragment = new FriendListFragment();
-        circleOfFriendsFragment = new CircleOfFriendsFragment();
+        circleOfFriendsFragment = new CircleOfFriendsFragment(this.config);
         viewList.add(messageListFragment);
         viewList.add(friendListFragment);
         viewList.add(circleOfFriendsFragment);

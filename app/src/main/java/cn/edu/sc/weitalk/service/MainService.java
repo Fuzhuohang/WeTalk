@@ -34,15 +34,13 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainService extends Service {
-    private String IPaddress="http://localhost:8081";
+    private String IPaddress="http://10.133.30.160:8081";
     private String UserID;
     private String LastDate;
 //服务构造函数，从sharedpreference获取用户基本信息（ID）和上次结束时的时间
 
     public MainService() {
-        SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
-        UserID=config.getString("userID","");
-        LastDate=config.getString("lastDate","");
+
     }
 
     class GetMessageThread extends Thread{
@@ -54,7 +52,7 @@ public class MainService extends Service {
                     OkHttpClient okHttpClient = new OkHttpClient();
                     RequestBody requestBody = new FormBody.Builder()
                             .add("recipient",UserID)
-                            .add("Time",time)
+                            .add("time",time)
                             .build();
                     Request request = new Request.Builder()
                             .url(IPaddress+"/get-api/getMessage")
@@ -71,20 +69,20 @@ public class MainService extends Service {
                             JSONObject jsonData = jsonArray.getJSONObject(i);
                             cn.edu.sc.weitalk.javabean.Message message = new Message();
                             message.setReceiveName(UserID);
-                            message.setSendName(jsonData.getString("Sender"));
+                            message.setSendName(jsonData.getString("sender"));
                             message.setDate(jsonData.getString("time"));
                             message.setMsgText(jsonData.getString("content"));
                             message.setMsgType(true);
                             message.setRead(false);
                             message.save();
                             Talks talks;
-                            List<Talks> list = DataSupport.select("*").where("FriendID=?",jsonData.getString("Sender")).find(Talks.class);
+                            List<Talks> list = DataSupport.select("*").where("FriendID=?",jsonData.getString("sender")).find(Talks.class);
                             if (list.size()==0){
                                 talks = new Talks();
 //                                talks.setTalksName(tvNickFriendInfo.getText().toString());
-                                talks.setFriendID(jsonData.getString("Sender"));
+                                talks.setFriendID(jsonData.getString("sender"));
 //                                talks.setFriendHeaderURL();
-                                List<Friend> fl = DataSupport.select("*").where("userId=?",jsonData.getString("Sender")).find(Friend.class);
+                                List<Friend> fl = DataSupport.select("*").where("userId=?",jsonData.getString("sender")).find(Friend.class);
                                 if(fl.size()!=0){
                                     Friend friend = fl.get(0);
                                     if(friend.getNote().length()!=0){
@@ -93,7 +91,7 @@ public class MainService extends Service {
                                         talks.setTalksName(friend.getUsername());
                                     }
                                 }else {
-                                    talks.setTalksName(jsonData.getString("Sender"));
+                                    talks.setTalksName(jsonData.getString("sender"));
                                 }
                                 talks.setUnReadNum(0);
                                 talks.save();
@@ -103,7 +101,7 @@ public class MainService extends Service {
                             talks.setLastMessage(jsonData.getString("content"));
                             talks.setLastMessageDate(jsonData.getString("time"));
                             talks.setUnReadNum(talks.getUnReadNum()+1);
-                            talks.updateAll("FriendID=?",jsonData.getString("Sender"));
+                            talks.updateAll("FriendID=?",jsonData.getString("sender"));
                         }
 
                     }else {
@@ -209,6 +207,9 @@ public class MainService extends Service {
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
 //        throw new UnsupportedOperationException("Not yet implemented");
+        SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
+        UserID=config.getString("userID","");
+        LastDate=config.getString("lastDate","");
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread());
         return new MainBinder();

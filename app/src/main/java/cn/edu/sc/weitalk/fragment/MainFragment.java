@@ -251,8 +251,8 @@ public class MainFragment extends Fragment {
             MomentsMessage temp=new MomentsMessage();
             temp.setContent(data.getStringExtra("content"));
             temp.setDate(data.getStringExtra("time"));
-            if(data.getStringExtra("uri")!=null){
-                temp.setMomentImage(data.getStringExtra("uri"));
+            if(data.getStringExtra("imagePath")!=null){
+                temp.setMomentImage(data.getStringExtra("imagePath"));
             }
             else
                 temp.setMomentImage(null);

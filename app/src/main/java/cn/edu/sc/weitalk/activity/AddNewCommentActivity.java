@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.edu.sc.weitalk.FileUtils;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
@@ -40,6 +41,7 @@ public class AddNewCommentActivity extends BaseActivity {
     private ImageView selectedImage;
     //private byte[] image;
     private Uri imageUri;
+    private String imagePath;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +55,7 @@ public class AddNewCommentActivity extends BaseActivity {
         editView.setFocusable(true);
         editView.requestFocus();
         imageUri=null;
+        imagePath=null;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -103,8 +106,8 @@ public class AddNewCommentActivity extends BaseActivity {
                         else{
                             Intent intent=new Intent();
                             intent.putExtra("content",editView.getText().toString());
-                            if(imageUri!=null) {
-                                intent.putExtra("uri",imageUri.toString());
+                            if(imagePath!=null) {
+                                intent.putExtra("imagePath",imagePath);
                             }
                             Date time=new Date();
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -132,7 +135,7 @@ public class AddNewCommentActivity extends BaseActivity {
 
                 imageUri = data.getData();
                 selectedImage.setImageURI(imageUri);
-
+                imagePath= FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
         }
 
     }

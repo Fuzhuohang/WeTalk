@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -30,10 +31,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -44,137 +48,98 @@ import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class momentsMessageAdapter extends RecyclerView.Adapter<momentsMessageAdapter.ViewHolder>{
 
 Context context;
-    public ArrayList<String> messageTextList;
     public ArrayList<Comments> comments;
     public ArrayList<MomentsMessage> moments;
-    public ArrayList<Bitmap> icons;
-    public ArrayList<Bitmap> contentImages;
+    public ArrayList<Boolean> isLikedList;
+    public String userID;
+    private String userName;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
     public momentsMessageAdapter(Context context){
-        messageTextList=new ArrayList<String>();
-        for(int i=0;i<100;i++){
-            messageTextList.add(i+"");
-        }
+
         this.context=context;
+        SharedPreferences config=context.getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
+        userID=config.getString("userID","");
+        userName=config.getString("name","");
         moments=null;
         comments=null;
         refreshData();
     }
 
     public  void refreshData(){//更新数据库
-        comments= (ArrayList<Comments>)DataSupport.findAll(Comments.class);
+        //comments= (ArrayList<Comments>)DataSupport.findAll(Comments.class);
         moments=(ArrayList<MomentsMessage>)DataSupport.findAll(MomentsMessage.class);
-//        if(moments.size()>0){
-//            icons=new ArrayList<Bitmap>();
-//            //加载图标到Bitmap列表中拿过去
-//            for(int i=0;i<moments.size();i++){
-//                MomentsMessage temp=moments.get(i);
-//                byte[] headshot=temp.getHeadshot();
-//                Bitmap bitmap= BitmapFactory.decodeByteArray(headshot,0,headshot.length);
-//                icons.add(bitmap);
-////                //如果消息中有图片，加载图片到bitmap列表
-////                if(temp.getMomentImage()!=null){
-////
-////                }
-//            }
-//        }
+        isLikedList=new ArrayList<Boolean>();
+        for(int i=0;i<moments.size();i++){
+            isLikedList.add(false);
+        }
+
         notifyDataSetChanged();
     }
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_moments_meaasge, parent, false);
         final ViewHolder holder = new ViewHolder(view);
-        MomentsMessage temp = moments.get(viewType);
-        //设置发表人名字
-        holder.name.setText(temp.getPublisherName());
-        //设置发起时间
-        holder.time.setText(temp.getDate());
-        //消息文本
-        holder.Text.setText(temp.getContent());
+//        MomentsMessage temp = moments.get(viewType);
+//        //设置发表人名字
+//        holder.name.setText(temp.getPublisherName());
+//        //设置发起时间
+//        holder.time.setText(temp.getDate());
+//        //消息文本
+//        holder.Text.setText(temp.getContent());
+//
+////        设置头像，bitmap转为URI，后显示为图片
+//        holder.icon.setImageURI(temp.getHeadshot());
+//        //消息图片
+//            if(temp.getMomentImage()!=null) {
+//                holder.imageSelected = new ImageView(context);
+//                holder.imagesGroup.setVisibility(View.VISIBLE);
+//                holder.imagesGroup.addView(holder.imageSelected);
+//                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
+//                params.width = 300;
+//                params.height = 300;
+//                params.leftMargin=50;
+////                Cursor result=context.getContentResolver().query(Uri.parse(temp.getMomentImage()),null,null,null,null);
+////                result.moveToNext();
+//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
+//                holder.imageSelected.setLayoutParams(params);
+//            }
+//        //动态生成评论
+//        TextView comment=new TextView(context);
+//        holder.comments.addView(comment);
+//        holder.comments.setVisibility(View.VISIBLE);
+//        //holder.comments.setBackgroundResource(R.drawable.fillet);
+//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
+//        params.width =LinearLayout.LayoutParams.MATCH_PARENT;
+//        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+//        params.leftMargin=20;
+//        params.rightMargin=20;
+//        //评论内容显示，html转为字符串保留格式
+//        String str1 = "<font color='#0997F7'>"+"平凡之路"+": </font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
+//        comment.setText(Html.fromHtml(str1));
+//        comment.setLayoutParams(params);
+//        comment.setTextSize(16);
+//
+//        if(isLikedList.get(viewType)==false)
+//            holder.likebutton.setImageResource(R.drawable.dianzan);
+//        else
+//            holder.likebutton.setImageResource(R.drawable.dianzanle);
+//        if(temp.getLikeCounter()>0){
+//            holder.likeCounter.setVisibility(View.VISIBLE);
+//            holder.likeCounter.setText(temp.getLikeCounter()+"");
+//        }else
+//            holder.likeCounter.setVisibility(View.INVISIBLE);
 
-//        设置头像，bitmap转为URI，后显示为图片
-        holder.icon.setImageURI(temp.getHeadshot());
-        //消息图片
-            if(temp.getMomentImage()!=null) {
-                holder.imageSelected = new ImageView(context);
-                holder.imagesGroup.setVisibility(View.VISIBLE);
-                holder.imagesGroup.addView(holder.imageSelected);
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
-                params.width = 300;
-                params.height = 300;
-                params.leftMargin=50;
-//                Cursor result=context.getContentResolver().query(Uri.parse(temp.getMomentImage()),null,null,null,null);
-//                result.moveToNext();
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
-                holder.imageSelected.setLayoutParams(params);
-            }
-        //动态生成评论
-        TextView comment=new TextView(context);
-        holder.comments.addView(comment);
-        holder.comments.setVisibility(View.VISIBLE);
-        //holder.comments.setBackgroundResource(R.drawable.fillet);
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
-        params.width =LinearLayout.LayoutParams.MATCH_PARENT;
-        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-        params.leftMargin=20;
-        params.rightMargin=20;
-        //评论内容显示，html转为字符串保留格式
-        String str1 = "<font color='#0997F7'>"+"平凡之路"+": </font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
-        comment.setText(Html.fromHtml(str1));
-        comment.setLayoutParams(params);
-        comment.setTextSize(16);
-        if(temp.getLikeCounter()>0){
-            holder.likeCounter.setVisibility(View.VISIBLE);
-            holder.likeCounter.setText(temp.getLikeCounter()+"");
-        }else
-            holder.likeCounter.setVisibility(View.INVISIBLE);
-        //点赞按钮
-        holder.likebutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.likeCounter.setVisibility(View.VISIBLE);
-                holder.likebutton.setImageResource(R.drawable.dianzanle);
-                holder.likeCounter.setText((Integer.parseInt(holder.likeCounter.getText().toString())+1)+"");
-
-            }
-        });
-        //评论按钮
-        holder.commentbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                View view1 = LayoutInflater.from(context).inflate(R.layout.comments_dialog, null);//将布局文件转化为View
-                Button btn=view1.findViewById(R.id.cancelbtn);
-                EditText input=view1.findViewById(R.id.inputtext);
-                builder.setView(view1);
-                AlertDialog dialog = builder.create();  //AlertDialog create
-                dialog.show();                          //show
-                input.setFocusable(true);
-                input.requestFocus();
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        InputMethodManager imm = (InputMethodManager) context
-                                .getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
-                    }
-                }, 200);//这里的时间大概是自己测试的
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        dialog.cancel();
-                    }
-                });
-            }
-        });
         return holder;
     }
 
@@ -215,26 +180,188 @@ Context context;
 
         }
 
+        //加载评论
+        List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);
+        if(com.size()>0){
+            holder.comments.removeAllViewsInLayout();
+            holder.comments.setVisibility(View.VISIBLE);
+            for(int i=0;i<com.size();i++){
+                TextView comment=new TextView(context);
+                holder.comments.addView(comment);
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
+                params.width =LinearLayout.LayoutParams.MATCH_PARENT;
+                params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                params.leftMargin=20;
+                params.rightMargin=20;
+                //评论内容显示，html转为字符串保留格式
+                String str1 = "<font color='#0997F7'>"+com.get(i).getCommentPerName()+": </font>"+com.get(i).getContent();
+                comment.setText(Html.fromHtml(str1));
+                comment.setLayoutParams(params);
+                comment.setTextSize(16);
+            }
+        }
+        else{
+            holder.comments.removeAllViewsInLayout();
+            holder.comments.setVisibility(View.GONE);
+        }
+
+
+        if(isLikedList.get(position)==false)
+            holder.likebutton.setImageResource(R.drawable.dianzan);
+        else
+            holder.likebutton.setImageResource(R.drawable.dianzanle);
+        if(temp.getLikeCounter()>0){
+            holder.likeCounter.setVisibility(View.VISIBLE);
+            holder.likeCounter.setText(temp.getLikeCounter()+"");
+        }else
+            holder.likeCounter.setVisibility(View.INVISIBLE);
+        //点赞按钮
+        holder.likebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isLikedList.get(position)==false) {
+                    holder.likebutton.setImageResource(R.drawable.dianzanle);
+                    isLikedList.set(position,true);
+                    temp.setLikeCounter(temp.getLikeCounter()+1);
+                    notifyDataSetChanged();
+                    temp.updateAll("MomentID=?",temp.getMomentID());
+                    like(temp.getMomentID());
+                }
+
+            }
+        });
+        //评论按钮
+        holder.commentbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                View view1 = LayoutInflater.from(context).inflate(R.layout.comments_dialog, null);//将布局文件转化为View
+                Button btn=view1.findViewById(R.id.cancelbtn);
+                Button btnCommit=view1.findViewById(R.id.buttoncommit);
+                EditText input=view1.findViewById(R.id.inputtext);
+                builder.setView(view1);
+                AlertDialog dialog = builder.create();  //AlertDialog create
+                dialog.show();                          //show
+                input.setFocusable(true);
+                input.requestFocus();
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        InputMethodManager imm = (InputMethodManager) context
+                                .getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.toggleSoftInput(0, InputMethodManager.SHOW_FORCED);
+                    }
+                }, 200);//这里的时间大概是自己测试的
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        dialog.cancel();
+                    }
+                });
+                btnCommit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String content=input.getText().toString();
+                        Comment(temp.getMomentID(),content);
+                    }
+                });
+            }
+        });
     }
+
+    public void like(String MomentID){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("ShareID",MomentID)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url(R.string.IPAddress+"/get-api/like")
+                            .post(requestBody)
+                            .build();
+
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    if (status=="200"){
+                        JSONObject returnData = jsonObject.getJSONObject("data");
+                        Toast.makeText(context,"点赞成功！",Toast.LENGTH_SHORT).show();
+                    }else {
+                        JSONObject returnData = jsonObject.getJSONObject("data");
+                        String msg = returnData.getString("msg");
+                        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).start();
+    }
+
+
+    public void Comment(String MomentID,String content){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Comments temp=new Comments();
+                temp.setCommentPerID(userID);
+                temp.setCommentPerName(userName);
+                temp.setContent(content);
+                temp.setMomentID(MomentID);
+                try{
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("ShareID",MomentID)
+                            .add("content",content)
+                            .add("UserID",userID)
+                            .add("Name",userName)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url(R.string.IPAddress+"/post-api/comment")
+                            .post(requestBody)
+                            .build();
+
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
+                    if (status=="200"){
+                        temp.save();
+                        refreshData();
+                        Toast.makeText(context,"评论成功！",Toast.LENGTH_SHORT).show();
+
+                    }else {
+                        JSONObject returnData = jsonObject.getJSONObject("data");
+                        String msg = returnData.getString("msg");
+                        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).start();
+    }
+
 
     @Override
     public int getItemCount() {
         return moments.size();
     }
-    /**
-     * 加载本地图片
-     * @param url
-     * @return
-     */
-    public static Bitmap getLoacalBitmap(String url) {
-        try {
-            FileInputStream fis = new FileInputStream(url);
-            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         SimpleDraweeView icon;

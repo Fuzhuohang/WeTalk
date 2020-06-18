@@ -145,7 +145,8 @@ public class MainFragment extends Fragment {
         DrawerLayout drawerLayout=view.findViewById(R.id.drawerlayout);
         toolbar = view.findViewById(R.id.toolbar);
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
-        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
+//        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
+        temp2.setImageURI(headURL);
         pagename = view.findViewById(R.id.page_name);
         //btnVector=view.findViewById(R.id.btnVector);
         btn=view.findViewById(R.id.buttonview);

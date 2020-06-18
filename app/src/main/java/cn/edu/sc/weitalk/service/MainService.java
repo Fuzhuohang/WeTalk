@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.textclassifier.TextLinks;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ public class MainService extends Service {
             String time = LastDate;
             while (true){
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                     OkHttpClient okHttpClient = new OkHttpClient();
                     String info="?recipient="+UserID+"&time="+time;
                     Request request = new Request.Builder()
@@ -58,6 +59,7 @@ public class MainService extends Service {
                     time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
+                    Log.i("GETMESSAGE",responseData);
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
                     if (status=="200"){
@@ -125,7 +127,7 @@ public class MainService extends Service {
             String time = LastDate;
             while (true){
                 try{
-                    Thread.sleep(1000);
+                    Thread.sleep(5000);
                     OkHttpClient okHttpClient = new OkHttpClient();
                     String info="?recipient="+UserID+"&time="+time;
                     Request request = new Request.Builder()
@@ -135,7 +137,7 @@ public class MainService extends Service {
                     //等待回复
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
-
+                    Log.i("GETMOMENTS",responseData);
                     //获取数据
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
@@ -202,9 +204,10 @@ public class MainService extends Service {
 //        throw new UnsupportedOperationException("Not yet implemented");
         SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
         UserID=config.getString("userID","");
-        LastDate=config.getString("lastTime","");
+//        LastDate=config.getString("lastTime","");
+        LastDate = "2016-01-01 00:00:00";
         new Thread(new GetMessageThread()).start();
-        new Thread(new GetMomentsThread());
+        new Thread(new GetMomentsThread()).start();
         return new MainBinder();
     }
 

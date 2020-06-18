@@ -1,10 +1,14 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -59,6 +63,7 @@ public class MessageListFragment extends Fragment {
     private String MyID;
 
     private TalksListAdapter adapter;
+    private ListView messageList;
 
     public MessageListFragment() {
         // Required empty public constructor
@@ -111,7 +116,7 @@ public class MessageListFragment extends Fragment {
         MyID=config.getString("userID","");
         initArrayList();
         Button btnSearch = view.findViewById(R.id.btnSearch);
-        ListView messageList = view.findViewById(R.id.MessageList);
+        messageList = view.findViewById(R.id.MessageList);
         adapter = new TalksListAdapter(list, getContext());
         messageList.setAdapter(adapter);
         setListViewHeightBasedOnChildren(messageList);
@@ -148,6 +153,9 @@ public class MessageListFragment extends Fragment {
             }
         });
 
+
+
+
         return view;
     }
 
@@ -181,5 +189,29 @@ public class MessageListFragment extends Fragment {
 
         params.height = totalHeight+(listView.getDividerHeight()*(listAdapter.getCount()-1));
         listView.setLayoutParams(params);
+    }
+
+    private class RefreshReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+            if(ifRefresh){
+                list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
+                adapter = new TalksListAdapter(list, getContext());
+                messageList.setAdapter(adapter);
+                setListViewHeightBasedOnChildren(messageList);
+            }
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Activity activity) {
+
+        RefreshReceiver receiver = new RefreshReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("package cn.edu.sc.weitalk.fragment.message");
+        activity.registerReceiver(receiver,filter);
+        super.onAttach(activity);
     }
 }

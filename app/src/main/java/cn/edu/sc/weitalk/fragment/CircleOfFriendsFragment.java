@@ -1,7 +1,11 @@
 package cn.edu.sc.weitalk.fragment;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -30,9 +34,11 @@ import java.util.Date;
 import java.util.List;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.adapter.TalksListAdapter;
 import cn.edu.sc.weitalk.adapter.momentsMessageAdapter;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.javabean.Talks;
 import cn.edu.sc.weitalk.service.MainService;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -225,5 +231,26 @@ public class CircleOfFriendsFragment extends Fragment {
             }
         }).start();
 
+    }
+
+    private class RefreshReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+            if(ifRefresh){
+
+            }
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Activity activity) {
+
+        RefreshReceiver receiver = new RefreshReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("package cn.edu.sc.weitalk.fragment.moment");
+        activity.registerReceiver(receiver,filter);
+        super.onAttach(activity);
     }
 }

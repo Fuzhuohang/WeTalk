@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.edu.sc.weitalk.FileUtils;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
@@ -160,25 +159,37 @@ Context context;
             holder.likeCounter.setText(temp.getLikeCounter()+"");
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
+        ArrayList<String> uriList=new ArrayList<String>();
+        ArrayList<ImageView> imageList=new ArrayList<ImageView>();
+        uriList.add(temp.getMomentImage());
+        uriList.add(temp.getMomentImage2());
+        uriList.add(temp.getMomentImage3());
+        imageList.add(holder.imageSelected);
+        imageList.add(holder.imageSelected2);
+        imageList.add(holder.imageSelected3);
         //消息图片
-        if(temp.getMomentImage()!=null){
-            if(holder.imageSelected!=null) {
-                holder.imagesGroup.setVisibility(View.VISIBLE);
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
-            }
-            else {
-                holder.imageSelected = new ImageView(context);
-                holder.imagesGroup.addView(holder.imageSelected);
-                holder.imagesGroup.setVisibility(View.VISIBLE);
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
-                params.width = 300;
-                params.height = 300;
-                params.leftMargin=50;
-                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
-                holder.imageSelected.setLayoutParams(params);
-            }
+        for(int i=0;i<temp.getImageCounter();i++) {
+            if (!uriList.get(i).equals(" ")) {
+                if (imageList.get(i) != null) {
+                    imageList.get(i).setImageURI(Uri.parse(uriList.get(i)));
+                } else {
+                    //Toast.makeText(context, "3423424", Toast.LENGTH_SHORT).show();
+                    imageList.set(i,new ImageView(context));
+                    holder.imagesGroup.addView(imageList.get(i));
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) imageList.get(i).getLayoutParams();
+                    params.width = 300;
+                    params.height = 300;
+                    params.leftMargin = 50;
+                    imageList.get(i).setImageURI(Uri.parse(uriList.get(i)));
+                    imageList.get(i).setLayoutParams(params);
+                }
 
+            }
         }
+        if(temp.getImageCounter()<=0)
+            holder.imagesGroup.setVisibility(View.GONE);
+        else
+            holder.imagesGroup.setVisibility(View.VISIBLE);
 
         //加载评论
         List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);
@@ -277,7 +288,7 @@ Context context;
             public void run() {
                 try{
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    String info="?ShareID="+MomentID;
+                    String info="?shareID="+MomentID;
                     Request request = new Request.Builder()
                             .url(context.getString(R.string.IPAddress)+"/get-api/like"+info)
                             .build();
@@ -318,10 +329,10 @@ Context context;
                 try{
                     OkHttpClient okHttpClient = new OkHttpClient();
                     RequestBody requestBody = new FormBody.Builder()
-                            .add("ShareID",MomentID)
+                            .add("shareID",MomentID)
                             .add("content",content)
-                            .add("UserID",userID)
-                            .add("Name",userName)
+                            .add("userID",userID)
+                            .add("name",userName)
                             .build();
                     Request request = new Request.Builder()
                             .url(context.getString(R.string.IPAddress)+"/post-api/comment")
@@ -367,6 +378,8 @@ Context context;
         TextView Text;
         TextView likeCounter;
         ImageView imageSelected;
+        ImageView imageSelected2;
+        ImageView imageSelected3;
         ImageView likebutton;
         ImageView commentbutton;
         LinearLayout imagesGroup;
@@ -383,6 +396,10 @@ Context context;
             comments=itemView.findViewById(R.id.commentsgroup);
             likeCounter=itemView.findViewById(R.id.textView);
             imageSelected=null;
+            imageSelected2=null;
+            imageSelected3=null;
+
+
 
         }
     }

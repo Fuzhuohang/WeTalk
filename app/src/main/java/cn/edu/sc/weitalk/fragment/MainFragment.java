@@ -1,10 +1,12 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -16,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -37,6 +41,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
+import com.google.zxing.activity.CaptureActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,12 +54,15 @@ import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.util.Constant;
 import cn.edu.sc.weitalk.util.ZXingUtils;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static android.app.Activity.RESULT_OK;
 
 /**kgjhkhjjkhbhfghfghghhfghfggfgrgr
  * A simple {@link Fragment} subclass.
@@ -71,6 +79,7 @@ public class MainFragment extends Fragment {
     private TextView pagename;
     private String userID,userName,headURL;
     private Toolbar toolbar;
+    private String QRCodeMessage;
     MessageListFragment messageListFragment;
     FriendListFragment friendListFragment;
     CircleOfFriendsFragment circleOfFriendsFragment;
@@ -265,6 +274,10 @@ public class MainFragment extends Fragment {
                     case R.id.myqrcode:
                         createMyQRCode();
                         break;
+                    case R.id.scanqrcode:
+                        scanQRCode();
+
+                        break;
                     case R.id.exit:
                         //Toast.makeText(getContext(),"1111111",Toast.LENGTH_SHORT).show();
                         loginOut();
@@ -331,6 +344,22 @@ public class MainFragment extends Fragment {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    //扫描二维码
+    private void scanQRCode(){
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.CAMERA)){
+                Toast.makeText(getContext(),"请到权限中心打开相机访问权限",Toast.LENGTH_SHORT).show();
+            }
+
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
+            return;
+        }
+
+        Intent intent = new Intent(getContext(), CaptureActivity.class);
+        startActivityForResult(intent, Constant.REQ_PERM_CAMERA);
+    }
+
 //新建朋友圈消息的本地存储与实时发送
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -389,6 +418,11 @@ public class MainFragment extends Fragment {
             }
 //            temp.save();
 //            circleOfFriendsFragment.adapter.refreshData();
+        }else if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK){
+            Bundle bundle = data.getExtras();
+            String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
+            Log.i("SCANQRCODE","扫描结果是："+scanResult);
+            QRCodeMessage = scanResult;
         }
             //Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
     }

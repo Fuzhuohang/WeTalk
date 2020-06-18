@@ -13,7 +13,7 @@
             android:icon="@drawable/erweima1"
             android:title="我的二维码" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/scanqrcode"
             android:icon="@drawable/ziyuan"
             android:title="扫一扫" />
         <item

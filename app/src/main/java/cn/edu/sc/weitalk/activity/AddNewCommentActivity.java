@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class AddNewCommentActivity extends BaseActivity {
     private ImageView selectedImage;
     //private byte[] image;
     private Uri imageUri;
-    private String imagePath;
+    private String imagePath = " ";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +56,7 @@ public class AddNewCommentActivity extends BaseActivity {
         editView.setFocusable(true);
         editView.requestFocus();
         imageUri=null;
-        imagePath=null;
+        imagePath = " ";
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -68,9 +69,9 @@ public class AddNewCommentActivity extends BaseActivity {
         constraintLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(intent, 1);
+//                Intent intent = new Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(intent, 1);
+                showFileChooser();
             }
         });
         returnImage.setOnClickListener(new View.OnClickListener() {
@@ -106,9 +107,8 @@ public class AddNewCommentActivity extends BaseActivity {
                         else{
                             Intent intent=new Intent();
                             intent.putExtra("content",editView.getText().toString());
-                            if(imagePath!=null) {
-                                intent.putExtra("imagePath",imagePath);
-                            }
+                            intent.putExtra("imagePath",imagePath);
+
                             Date time=new Date();
                             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             intent.putExtra("time",format.format(time));
@@ -135,9 +135,24 @@ public class AddNewCommentActivity extends BaseActivity {
 
                 imageUri = data.getData();
                 selectedImage.setImageURI(imageUri);
-                imagePath= FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
+                imagePath = FileUtils.getFilePathByUri(getApplicationContext(),imageUri);
         }
 
     }
+
+    private static final int FILE_SELECT_CODE = 200;
+    //文件选择器
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        try {
+            startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), FILE_SELECT_CODE);
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 }

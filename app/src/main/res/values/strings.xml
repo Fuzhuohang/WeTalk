@@ -3,6 +3,6 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_btn">搜索</string>
-    <string name="IPAddress">http://10.133.30.160:8081</string>
+    <string name="IPAddress">http://10.132.162.182:8081</string>
     <string name="MyQRCode">我的二维码</string>
 </resources>

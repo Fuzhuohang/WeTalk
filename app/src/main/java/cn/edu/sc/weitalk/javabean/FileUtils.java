@@ -1,5 +1,4 @@
-package cn.edu.sc.weitalk;
-
+package cn.edu.sc.weitalk.javabean;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import android.util.Log;
 
 public class FileUtils {
 
@@ -106,3 +104,4 @@ public class FileUtils {
     }
 
 }
+

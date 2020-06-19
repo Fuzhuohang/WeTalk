@@ -30,13 +30,13 @@ public class TalksAdapter extends BaseAdapter {
     }
 
     private static final String TAG = TalksAdapter.class.getSimpleName();
-    private List<Message> data;
+    public ArrayList<Message> data;
     private Context context;
     private LayoutInflater mInflater;
     private String Receive_Header;
     private String Send_Header;
 
-    public TalksAdapter(Context context, List<Message> data,String Receiver_Header,String Send_Header){
+    public TalksAdapter(Context context, ArrayList<Message> data,String Receiver_Header,String Send_Header){
         this.context= context;
         this.data = data;
         this.Receive_Header = Receiver_Header;

@@ -78,6 +78,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
         config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
         tv2FriendInfo.setText("姓    名：");
+        tv2FriendInfo.setVisibility(View.GONE);
         setUI();
 
     }
@@ -86,8 +87,9 @@ public class UserInfoActivity extends AppCompatActivity {
         headIcFriendInfo.setImageURI(config.getString("headURL",""));
         tvNickFriendInfo.setText(config.getString("name",""));
         tvIdNickFriendInfo.setText(config.getString("userID",""));
-        tvNicknameFriendInfo.setVisibility(View.GONE);
-        tvNoteFriendInfo.setText(config.getString("realName",""));
+        tvNicknameFriendInfo.setText(config.getString("name",""));
+        //tvNoteFriendInfo.setText(config.getString("realName",""));
+        tvNoteFriendInfo.setVisibility(View.GONE);
         tvLocationFriendInfo.setText(config.getString("location",""));
         tvBirthdayFriendInfo.setText(config.getString("birthday",""));
         tvPhoneFriendInfo.setText(config.getString("phone",""));

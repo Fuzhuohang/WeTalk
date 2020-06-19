@@ -30,7 +30,9 @@ import java.util.List;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.Friend;
+import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
+import cn.edu.sc.weitalk.javabean.Talks;
 import cn.edu.sc.weitalk.service.MainService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -64,7 +66,7 @@ public class MainActivity extends BaseActivity {
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
 //        DataSupport.deleteAll(Talks.class);
-//        DataSupport.deleteAll(Message.class);
+//       DataSupport.deleteAll(Message.class);
         DataSupport.deleteAll(MomentsMessage.class);
         DataSupport.deleteAll(Comments.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);

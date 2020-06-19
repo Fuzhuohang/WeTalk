@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,7 +63,7 @@ public class MainService extends Service {
                     Request request = new Request.Builder()
                             .url(getString(R.string.IPAddress) + "/get-api/getMessage" + info)
                             .build();
-                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
                     Log.i("GETMESSAGE", responseData);
@@ -71,45 +73,63 @@ public class MainService extends Service {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonData = jsonArray.getJSONObject(i);
-                            cn.edu.sc.weitalk.javabean.Message message = new Message();
-                            message.setReceiveName(UserID);
-                            message.setSendName(jsonData.getString("sender"));
-                            message.setDate(jsonData.getString("time"));
-                            message.setMsgText(jsonData.getString("content"));
-                            message.setMsgType(true);
-                            message.setRead(false);
-                            message.save();
-                            Talks talks;
-                            List<Talks> list = DataSupport.select("*").where("FriendID=?", jsonData.getString("sender")).find(Talks.class);
-                            if (list.size() == 0) {
-                                talks = new Talks();
+                            List<Message> ms = DataSupport.select("*").where("sendID=? and date=? and msgText=?",jsonData.getString("sender"),jsonData.getString("time"),jsonData.getString("content")).find(Message.class);
+                            Date timeDate;
+                            if(ms.size()==0){
+                                cn.edu.sc.weitalk.javabean.Message message = new Message();
+                                message.setReceiveName(UserID);
+                                message.setSendName(jsonData.getString("sender"));
+
+                                String Time=jsonData.getString("time");
+                                Time = Time.replace("Z", " UTC");//是空格+UTC
+                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                timeDate = df.parse(Time);
+                                Log.i("myTime",""+timeDate);
+
+                                message.setDate( timeDate.getTime());
+                                message.setMsgText(jsonData.getString("content"));
+                                message.setMsgType(true);
+                                message.setRead(false);
+                                Log.i("MS","savestart");
+                                message.save();
+                                Log.i("MS","saveend");
+                                Talks talks;
+                                List<Talks> list = DataSupport.select("*").where("FriendID=?", jsonData.getString("sender")).find(Talks.class);
+                                if (list.size() == 0) {
+                                    talks = new Talks();
 //                                talks.setTalksName(tvNickFriendInfo.getText().toString());
-                                talks.setFriendID(jsonData.getString("sender"));
+                                    talks.setFriendID(jsonData.getString("sender"));
 //                                talks.setFriendHeaderURL();
-                                List<Friend> fl = DataSupport.select("*").where("userId=?", jsonData.getString("sender")).find(Friend.class);
-                                if (fl.size() != 0) {
-                                    Friend friend = fl.get(0);
-                                    if (friend.getNote().length() != 0) {
-                                        talks.setTalksName(friend.getNote());
+                                    List<Friend> fl = DataSupport.select("*").where("userId=?", jsonData.getString("sender")).find(Friend.class);
+                                    if (fl.size() != 0) {
+                                        Friend friend = fl.get(0);
+                                        if (friend.getNote().length() != 0) {
+                                            talks.setTalksName(friend.getNote());
+                                        } else {
+                                            talks.setTalksName(friend.getUsername());
+                                        }
                                     } else {
-                                        talks.setTalksName(friend.getUsername());
+                                        talks.setTalksName(jsonData.getString("sender"));
                                     }
+                                    talks.setMyID(UserID);
+                                    talks.setUnReadNum(0);
+                                    talks.save();
                                 } else {
-                                    talks.setTalksName(jsonData.getString("sender"));
+                                    talks = list.get(0);
                                 }
-                                talks.setMyID(UserID);
-                                talks.setUnReadNum(0);
-                                talks.save();
-                            } else {
-                                talks = list.get(0);
+                                talks.setLastMessage(jsonData.getString("content"));
+                                Log.i("SAVEMASSAGE",talks.getLastMessage());
+                                talks.setLastMessageDate(timeDate.getTime());
+                                talks.setUnReadNum(talks.getUnReadNum() + 1);
+                                Log.i("SAVEMASSAGE",""+talks.getUnReadNum());
+                                talks.updateAll("FriendID=? and MyID=?", jsonData.getString("sender"), UserID);
                             }
-                            talks.setLastMessage(jsonData.getString("content"));
-                            talks.setLastMessageDate(jsonData.getString("time"));
-                            talks.setUnReadNum(talks.getUnReadNum() + 1);
-                            talks.updateAll("FriendID=? and MyID=?", jsonData.getString("sender"), UserID);
                         }
-                        BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.message");
-                        BroadCastMethod(true, "cn.edu.sc.weitalk.activity.talks");
+                        if (jsonArray.length()!=0){
+                            BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.message");
+                            BroadCastMethod(true, "cn.edu.sc.weitalk.activity.talks");
+                        }
+
                     } else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -123,10 +143,13 @@ public class MainService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         }
     }
+
 
     //监听朋友圈消息与评论
     class GetMomentsThread extends Thread {
@@ -140,8 +163,9 @@ public class MainService extends Service {
                     Request request = new Request.Builder()
                             .url(getString(R.string.IPAddress) + "/get-api/getShare" + info)
                             .build();
-                    //time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+//                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     //等待回复
+                    Log.i("FLY",  "这里");
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
                     Log.i("GETMOMENTS", responseData);
@@ -172,7 +196,7 @@ public class MainService extends Service {
                                 momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
                                 int imageCounter=0;
                                 for(int m=0;m<3;m++) {
-                                    if(jsonDataArray.getJSONObject(i).getString("imgURL"+(m+1)).length()!=0)
+                                    if(!jsonDataArray.getJSONObject(i).getString("imgURL"+(m+1)).equals("undefined"))
                                         imageCounter++;
                                 }
                                 momentsMessage.setImageCounter(imageCounter);
@@ -190,14 +214,16 @@ public class MainService extends Service {
                             Log.i("FLY", i + "middle");
                             if(commentCounter!=0) {
                                 JSONArray jsonCommentsArray = jsonDataArray.getJSONObject(i).getJSONArray("comment");
+                                Log.i("FLY", i + "middle11");
 
-                                for (int j = 0; j < jsonCommentsArray.length(); j++) {
+                                for (int j = 0; j < commentCounter; j++) {
                                     Log.i("FLY", j + "");
 
                                     JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
-                                    if (DataSupport.select("*").where("content=?", jsonComments.getString("content")).find(Comments.class).size() == 0) {
+                                    if (DataSupport.select("*").where("content=? and commentPerID=?", jsonComments.getString("content"),jsonComments.getString("senderID")).find(Comments.class).size() == 0) {
                                         Comments comments = new Comments();
                                         comments.setMomentID(sharedID);
+                                        comments.setCommentPerID(jsonComments.getString("senderID"));
                                         comments.setContent(jsonComments.getString("content"));
                                         comments.setCommentPerName(jsonComments.getString("sendername"));
                                         comments.saveThrows();

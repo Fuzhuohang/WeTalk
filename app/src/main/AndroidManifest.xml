@@ -29,6 +29,7 @@
             android:exported="true"
             ></service>
         <activity android:name="com.google.zxing.activity.CaptureActivity"/>
+        <activity android:name=".activity.UserInfoActivity"/>
         <activity android:name=".activity.FriendInfoActivity"/>
         <activity android:name=".activity.LoginActivity" >
             <intent-filter>

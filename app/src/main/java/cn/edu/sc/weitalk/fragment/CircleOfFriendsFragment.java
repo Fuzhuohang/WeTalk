@@ -15,13 +15,18 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.mbg.library.DefaultPositiveRefreshers.PositiveRefresherWithText;
+import com.mbg.library.ISingleRefreshListener;
+import com.mbg.library.RefreshRelativeLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,12 +66,15 @@ public class CircleOfFriendsFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private View view;
     public momentsMessageAdapter adapter;
-    private RecyclerView recyclerView;
+    public RecyclerView recyclerView;
     private NestedScrollView scrollView;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     private String userID;
+    private String headUrl;
+    private String lastTime;
+    private String name;
     public CircleOfFriendsFragment() {
         // Required empty public constructor
 
@@ -106,7 +114,7 @@ public class CircleOfFriendsFragment extends Fragment {
         // Inflate the layout for this fragment
         view=inflater.inflate(R.layout.fragment_circle_of_friends, container, false);
         SimpleDraweeView temp2 = view.findViewById(R.id.iconself);
-        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
+        TextView nameText=view.findViewById(R.id.nameView);
         recyclerView=view.findViewById(R.id.messageRecy);
         scrollView=view.findViewById(R.id.scrollview);
         adapter = new momentsMessageAdapter(getContext());
@@ -114,9 +122,17 @@ public class CircleOfFriendsFragment extends Fragment {
         layout.setOrientation(LinearLayoutManager.VERTICAL);
         SharedPreferences config=getContext().getSharedPreferences("USER_INFO", Context.MODE_PRIVATE);
         userID=config.getString("userID","");
+        headUrl=getString(R.string.IPAddress)+config.getString("headURL","");
+        name=config.getString("name","");
+        Log.i("TOU",headUrl);
+        temp2.setImageURI(headUrl);
+        nameText.setText(name);
+        lastTime="2016-01-01 01:01:01";
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layout);
         recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setItemViewCacheSize(10);
+
         new Thread(new Runnable() {//开线程，进行耗时操作，等到页面加载成功，才可以调用getTop方法，获得与顶部的距离，之后对ScrollView的滑动进行监听，若移动位置超过一定距离，可以滚动recyclerview
             @Override
             public void run() {
@@ -150,87 +166,117 @@ public class CircleOfFriendsFragment extends Fragment {
         }).start();
 
 
+        RefreshRelativeLayout refresh_message = (RefreshRelativeLayout)view.findViewById(R.id.refresh_Momentmessage);
+        refresh_message.setPositiveRefresher(new PositiveRefresherWithText(true));
+        refresh_message.setPositiveEnable(true);
+        refresh_message.setNegativeEnable(false);
+        refresh_message.setPositiveOverlayUsed(true);
+        refresh_message.setPositiveDragEnable(true);
+
+        refresh_message.addPositiveRefreshListener(new ISingleRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Toast.makeText(getContext(),"朋友圈刷新成功！",Toast.LENGTH_LONG).show();
+                updateMoments();
+                refresh_message.positiveRefreshComplete();
+            }
+        });
         return view;
     }
 
-    public void updateMoments(){
+    public void updateMoments() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try{
-                    Thread.sleep(1000);
-                    String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                    String info="?recipient="+userID+"&time="+time;
-                    OkHttpClient okHttpClient = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .url(getString(R.string.IPAddress)+"/get-api/getShare"+info)
-                            .build();
+                String time = "2016-01-01 01:01:01";
+                while (true) {
+                    try {
+                        OkHttpClient okHttpClient = new OkHttpClient();
+                        String info = "?recipient=" + userID + "&time=" + time;
+                        Request request = new Request.Builder()
+                                .url(getString(R.string.IPAddress) + "/get-api/getShare" + info)
+                                .build();
+//                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                        //等待回复
+                        Response response = okHttpClient.newCall(request).execute();
+                        final String responseData = response.body().string();
+                        //获取数据
+                        JSONObject jsonObject = new JSONObject(responseData);
+                        String status = jsonObject.getString("status");
+                        //判断状态是否正常
+                        if (status.equals("200")) {
+                            //，写入两个json数组中
+                            JSONArray jsonDataArray = jsonObject.getJSONArray("data");
+                            JSONObject jsonData;
+                            for (int i = 0; i < jsonDataArray.length(); i++) {
+                                String sharedID = jsonDataArray.getJSONObject(i).getString("shareID");
+                                MomentsMessage momentsMessage = new MomentsMessage();
+                                int commentCounter = Integer.parseInt(jsonDataArray.getJSONObject(i).getString("commentNum"));
+                                List<MomentsMessage> list = DataSupport.select("*").where("MomentID=?", sharedID).find(MomentsMessage.class);
 
-                    //等待回复
-                    Response response = okHttpClient.newCall(request).execute();
-                    final String responseData = response.body().string();
+                                if (list.size() == 0) {
+                                    momentsMessage.setMomentID(sharedID);
+                                    momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
+                                    momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
+                                    momentsMessage.setDate(jsonDataArray.getJSONObject(i).getString("time"));
+                                    momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
+                                    momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
+                                    int imageCounter = 0;
+                                    for (int m = 0; m < 3; m++) {
+                                        if (jsonDataArray.getJSONObject(i).getString("imgURL" + (m + 1)).length() != 0)
+                                            imageCounter++;
+                                    }
+                                    momentsMessage.setImageCounter(imageCounter);
+                                    momentsMessage.setMomentImage(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL1"));
+                                    momentsMessage.setMomentImage2(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL2"));
+                                    momentsMessage.setMomentImage3(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL3"));
+                                    momentsMessage.saveThrows();
 
-                    //获取数据
-                    JSONObject jsonObject = new JSONObject(responseData);
-                    String status = jsonObject.getString("status");
-                    //判断状态是否正常
-                    if (status.equals("200")){
-                        //，写入两个json数组中
-                        JSONArray jsonDataArray = jsonObject.getJSONArray("data");
-                        for(int i=0;i<jsonDataArray.length();i++) {
-                            JSONObject jsonData = jsonDataArray.getJSONObject(i);
-                            String sharedID=jsonData.getString("shareID");
-                            cn.edu.sc.weitalk.javabean.MomentsMessage momentsMessage = new MomentsMessage();
-                            List<MomentsMessage> list= DataSupport.select("*").where("MomentID=?",sharedID).find(MomentsMessage.class);
-                            if(list.isEmpty()) {
-                                momentsMessage.setMomentID(sharedID);
-                                momentsMessage.setPublisherID(jsonData.getString("senderID"));
-                                //momentsMessage.setPublisherName(jsonData.getString("time"));
-                                momentsMessage.setContent(jsonData.getString("content"));
-                                momentsMessage.setDate(jsonData.getString("time"));
-                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
-                                momentsMessage.setPublisherName(jsonData.getString("sendername"));
-                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
-                                momentsMessage.save();
-                            }
-                            else{
-                                momentsMessage=list.get(0);
-                                momentsMessage.setLikeCounter(jsonData.getInt("likeNum"));
-                                momentsMessage.setMomentImage(jsonData.getString("imgURL"));
-                                momentsMessage.updateAll("MomentID=?",sharedID);
-                            }
-                            JSONArray jsonCommentsArray = jsonData.getJSONArray("comment");
-                            for(int j=0;j<jsonCommentsArray.length();j++) {
-                                JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
-                                if(DataSupport.select("*").where("senderID=? and content=?",jsonComments.getString("senderID"),jsonComments.getString("content")).find(Comments.class).size()==0) {
-                                    Comments comments = new Comments();
-                                    comments.setMomentID(sharedID);
-                                    comments.setContent(jsonComments.getString("content"));
-                                    comments.setCommentPerName(jsonComments.getString("sendername"));
-                                    comments.setCommentPerID(jsonComments.getString("senderID"));
-                                    comments.save();
+                                } else {
+                                    momentsMessage = list.get(0);
+                                    momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
+                                    //momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL"));
+                                    momentsMessage.updateAll("MomentID=?", sharedID);
+                                }
+                                if (commentCounter != 0) {
+                                    JSONArray jsonCommentsArray = jsonDataArray.getJSONObject(i).getJSONArray("comment");
+
+                                    for (int j = 0; j < jsonCommentsArray.length(); j++) {
+                                        JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
+                                        if (DataSupport.select("*").where("content=? and commentPerID=?", jsonComments.getString("content"),jsonComments.getString("senderID")).find(Comments.class).size() == 0) {
+                                            Comments comments = new Comments();
+                                            comments.setMomentID(sharedID);
+                                            comments.setCommentPerID(jsonComments.getString("senderID"));
+                                            comments.setContent(jsonComments.getString("content"));
+                                            comments.setCommentPerName(jsonComments.getString("sendername"));
+                                            comments.saveThrows();
+                                        }
+                                    }
                                 }
                             }
+                            //BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.moment");
+                        } else {
+                            JSONObject data = jsonObject.getJSONObject("data");
+                            String msg = data.getString("msg");
+                            //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
                         }
-                        adapter.refreshData();
-
-                    }else {
-                        JSONObject data = jsonObject.getJSONObject("data");
-                        String msg = data.getString("msg");
-                        Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                        recyclerView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.refreshData();
+                            }
+                        });
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
             }
-        }).start();
 
+        }).start();
     }
 
     private class RefreshReceiver extends BroadcastReceiver {

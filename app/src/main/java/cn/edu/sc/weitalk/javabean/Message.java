@@ -5,7 +5,7 @@ import org.litepal.crud.DataSupport;
 public class Message extends DataSupport {
     public String msgText;
     public boolean msgType;
-    public String date;
+    public long date;
     public String sendID;
     public String receiveID;
     public boolean isRead;
@@ -26,11 +26,11 @@ public class Message extends DataSupport {
         return msgType;
     }
 
-    public void setDate(String date){
+    public void setDate(long date){
         this.date=date;
     }
 
-    public String getDate(){
+    public long getDate(){
         return date;
     }
 

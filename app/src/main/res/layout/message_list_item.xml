@@ -3,7 +3,7 @@
     xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:baselineAligned="false">
 
     <com.facebook.drawee.view.SimpleDraweeView
@@ -12,7 +12,9 @@
         android:layout_height="50dp"
         android:layout_gravity="center|center_vertical"
         android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginRight="8dp"
+        android:layout_marginBottom="10dp"
         android:src="@drawable/dragon"
         fresco:roundAsCircle="true"
         fresco:roundedCornerRadius="20dp"

@@ -14,6 +14,8 @@ import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.util.Log;
@@ -33,11 +35,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.common.util.UriUtil;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.squareup.picasso.Picasso;
 
@@ -53,6 +57,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -67,7 +72,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import uk.co.senab.photoview.PhotoView;
-
+import java.util.Collections;
 public class momentsMessageAdapter extends RecyclerView.Adapter<momentsMessageAdapter.ViewHolder>{
 
 Context context;
@@ -94,6 +99,7 @@ Context context;
     public  void refreshData(){//更新数据库
         //comments= (ArrayList<Comments>)DataSupport.findAll(Comments.class);
         moments=(ArrayList<MomentsMessage>)DataSupport.findAll(MomentsMessage.class);
+        Collections.reverse(moments);
         isLikedList=new ArrayList<Boolean>();
         for(int i=0;i<moments.size();i++){
             isLikedList.add(false);
@@ -159,7 +165,15 @@ Context context;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+//    public void onViewRecycled(@NonNull ViewHolder holder) {
+//        super.onViewRecycled(holder);
+//        AsyncTask temp=(AsyncTask)holder.imagesGroup.getTag();
+//        temp.cancel(true);
+//    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         MomentsMessage temp = moments.get(position);
         holder.name.setText(temp.getPublisherName());
         //设置发起时间
@@ -169,12 +183,13 @@ Context context;
         //设置头像，bitmap转为URI，后显示为图片
         //Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), icons.get(position), null, null));
         //holder.icon.setImageURI(uri);
-        holder.icon.setImageURI(temp.getHeadshot());
+        holder.icon.setImageURI("res://drawable/" + R.drawable.dragon);
         if(temp.getLikeCounter()>0){
             holder.likeCounter.setVisibility(View.VISIBLE);
             holder.likeCounter.setText(temp.getLikeCounter()+"");
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
+
         ArrayList<String> uriList=new ArrayList<String>();
         ArrayList<SimpleDraweeView> imageList=new ArrayList<SimpleDraweeView>();
         uriList.add(temp.getMomentImage());
@@ -184,25 +199,49 @@ Context context;
         imageList.add(holder.imageSelected2);
         imageList.add(holder.imageSelected3);
         //消息图片
-        for(int i=0;i<temp.getImageCounter();i++) {
-            if (!(uriList.get(i).equals(" ")||uriList.get(i).equals(context.getString(R.string.IPAddress)))) {
-                if (imageList.get(i) != null) {
-                    imageList.get(i).setImageURI(uriList.get(i));
-                } else {
-                    //Toast.makeText(context, "3423424", Toast.LENGTH_SHORT).show();
-                    imageList.set(i,new SimpleDraweeView(context));
-                    holder.imagesGroup.addView(imageList.get(i));
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300,300);
-                    params.leftMargin = 50;
-
-                    imageList.get(i).setLayoutParams(params);
-                    imageList.get(i).setImageURI(uriList.get(i));
-
-                    //Glide.with(context).load(uriList.get(i)).into(imageList.get(i));
+        for(int i=0;i<3;i++) {
+            if(i<temp.getImageCounter()) {
+                if (!(uriList.get(i).equals(" ") || uriList.get(i).equals(context.getString(R.string.IPAddress)))) {
+                    Log.i("MSB",uriList.get(i));
+                    if (imageList.get(i) != null) {
+                        imageList.get(i).setImageDrawable(context.getDrawable(R.mipmap.ic_launcher));
+                        imageList.get(i).setVisibility(View.VISIBLE);
+                        if(temp.getPublisherID().equals(userID)){
+                            String uri="file://"+uriList.get(i);
+                            imageList.get(i).setImageURI(uri);
+                        }
+                        else
+                            imageList.get(i).setImageURI(uriList.get(i));
+                        imageList.get(i).setTag(uriList.get(i));
+                    } else {
+                        //Toast.makeText(context, "3423424", Toast.LENGTH_SHORT).show();
+                        imageList.set(i, new SimpleDraweeView(context));
+                        holder.imagesGroup.addView(imageList.get(i));
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 300);
+                        params.leftMargin = 50;
+                        imageList.get(i).setImageDrawable(context.getDrawable(R.mipmap.ic_launcher));
+                        imageList.get(i).setLayoutParams(params);
+                        if(temp.getPublisherID().equals(userID)){
+                            String uri="file://"+uriList.get(i);
+                            imageList.get(i).setImageURI(uri);
+                        }
+                        else
+                            imageList.get(i).setImageURI(uriList.get(i));
+                        imageList.get(i).setTag(uriList.get(i));
+                        //Glide.with(context).load(uriList.get(i)).into(imageList.get(i));
+                    }
+                    //notifyDataSetChanged();
                 }
-
             }
-        }
+            else {
+                if (imageList.get(i) != null) {
+                    imageList.get(i).setVisibility(View.INVISIBLE);
+
+                }
+            }
+            }
+
+
         //Toast.makeText(context, temp.getImageCounter()+"", Toast.LENGTH_SHORT).show();
         if(temp.getImageCounter()<=0)
             holder.imagesGroup.setVisibility(View.GONE);
@@ -349,6 +388,7 @@ Context context;
                 temp.setCommentPerName(userName);
                 temp.setContent(content);
                 temp.setMomentID(MomentID);
+                temp.save();
                 try{
                     OkHttpClient okHttpClient = new OkHttpClient();
                     RequestBody requestBody = new FormBody.Builder()
@@ -367,7 +407,7 @@ Context context;
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
                     if (status.equals("200")){
-                        temp.save();
+
                         //refreshData();
                         //Toast.makeText(context,"评论成功！",Toast.LENGTH_SHORT).show();
 

@@ -1,37 +1,28 @@
 package cn.edu.sc.weitalk.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.edu.sc.weitalk.javabean.FileUtils;
+import cn.edu.sc.weitalk.util.FileUtils;
 import cn.edu.sc.weitalk.R;
-import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
 public class AddNewCommentActivity extends BaseActivity {
     private EditText editView;
@@ -164,7 +155,7 @@ public class AddNewCommentActivity extends BaseActivity {
                         selectedImage3.setImageURI(Uri.parse(imagePath3));
                         break;
                 }
-                selectedImage.setImageURI(imageUri);
+                //selectedImage.setImageURI(imageUri);
                 imageCounter++;
         }
 

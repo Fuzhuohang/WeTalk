@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -66,6 +67,8 @@ public class TalksActivity extends AppCompatActivity {
     private ListView talks_list;
     private Talks tTalk;
     private int count=0;
+    private LocalBroadcastManager broadcastManager;
+    private BroadcastReceiver broadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,10 +220,28 @@ public class TalksActivity extends AppCompatActivity {
             }
         });
 
-        RefreshReceiver receiver = new RefreshReceiver();
+        broadcastManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("cn.edu.sc.weitalk.activity.talks");
-        registerReceiver(receiver,intentFilter);
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+                if(ifRefresh){
+                    initMessageList();
+                    talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+                    talks_list.setAdapter(talksAdapter);
+                    setListViewHeightBasedOnChildren(talks_list);
+                }
+            }
+        };
+        broadcastManager.registerReceiver(broadcastReceiver,intentFilter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
     private void initMessageList(){
@@ -298,21 +319,17 @@ public class TalksActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-    private class RefreshReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
-            if(ifRefresh){
-                initMessageList();
-                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
-                talks_list.setAdapter(talksAdapter);
-                setListViewHeightBasedOnChildren(talks_list);
-            }
-        }
-    }
-
-
-
-
+//    private class RefreshReceiver extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+//            if(ifRefresh){
+//                initMessageList();
+//                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+//                talks_list.setAdapter(talksAdapter);
+//                setListViewHeightBasedOnChildren(talks_list);
+//            }
+//        }
+//    }
 }

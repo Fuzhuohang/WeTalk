@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import cn.edu.sc.weitalk.service.MainService;
@@ -45,7 +46,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
+//        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
 //        SharedPreferences.Editor editor = config.edit();
 //        editor.putString("userID","100000");
 //        editor.putString("password","testpasssword");
@@ -65,15 +66,16 @@ public class MainActivity extends BaseActivity {
 //        DataSupport.deleteAll(Talks.class);
 //        DataSupport.deleteAll(Message.class);
         DataSupport.deleteAll(MomentsMessage.class);
+        DataSupport.deleteAll(Comments.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
-        //bindService(intent,mainConn,BIND_AUTO_CREATE);
+        bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();
         requestMyPermissions();
         bottomView = findViewById(R.id.bottom_view);
         bottomView.setItemIconTintList(null);
 
         //获取userId，让后获取服务器的好友列表，存入本地数据库
-        /*SharedPreferences*/ config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        SharedPreferences config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
         userId = config.getString("userID", "");
         if(!userId.isEmpty()){
             Log.i(TAG, userId);

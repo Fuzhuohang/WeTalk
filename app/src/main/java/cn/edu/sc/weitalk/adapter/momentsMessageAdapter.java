@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.adapter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,18 +10,25 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.provider.MediaStore;
 import android.text.Html;
 import android.util.Log;
+import android.view.Display;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +37,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +48,10 @@ import org.litepal.crud.DataSupport;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -52,6 +66,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import uk.co.senab.photoview.PhotoView;
 
 public class momentsMessageAdapter extends RecyclerView.Adapter<momentsMessageAdapter.ViewHolder>{
 
@@ -61,6 +76,7 @@ Context context;
     public ArrayList<Boolean> isLikedList;
     public String userID;
     private String userName;
+    private Activity activity;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -160,7 +176,7 @@ Context context;
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
         ArrayList<String> uriList=new ArrayList<String>();
-        ArrayList<ImageView> imageList=new ArrayList<ImageView>();
+        ArrayList<SimpleDraweeView> imageList=new ArrayList<SimpleDraweeView>();
         uriList.add(temp.getMomentImage());
         uriList.add(temp.getMomentImage2());
         uriList.add(temp.getMomentImage3());
@@ -169,31 +185,32 @@ Context context;
         imageList.add(holder.imageSelected3);
         //消息图片
         for(int i=0;i<temp.getImageCounter();i++) {
-            if (!uriList.get(i).equals(" ")) {
+            if (!(uriList.get(i).equals(" ")||uriList.get(i).equals(context.getString(R.string.IPAddress)))) {
                 if (imageList.get(i) != null) {
-                    imageList.get(i).setImageURI(Uri.parse(uriList.get(i)));
+                    imageList.get(i).setImageURI(uriList.get(i));
                 } else {
                     //Toast.makeText(context, "3423424", Toast.LENGTH_SHORT).show();
-                    imageList.set(i,new ImageView(context));
+                    imageList.set(i,new SimpleDraweeView(context));
                     holder.imagesGroup.addView(imageList.get(i));
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) imageList.get(i).getLayoutParams();
-                    params.width = 300;
-                    params.height = 300;
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300,300);
                     params.leftMargin = 50;
-                    imageList.get(i).setImageURI(Uri.parse(uriList.get(i)));
+
                     imageList.get(i).setLayoutParams(params);
+                    imageList.get(i).setImageURI(uriList.get(i));
+
+                    //Glide.with(context).load(uriList.get(i)).into(imageList.get(i));
                 }
 
             }
         }
-        Toast.makeText(context, temp.getImageCounter()+"", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(context, temp.getImageCounter()+"", Toast.LENGTH_SHORT).show();
         if(temp.getImageCounter()<=0)
             holder.imagesGroup.setVisibility(View.GONE);
         else
             holder.imagesGroup.setVisibility(View.VISIBLE);
-        String MomnetID="vfv";
+
         //加载评论
-        List<Comments> com=DataSupport.select("*").where("MomentID=?",MomnetID).find(Comments.class);
+        List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);
         if(com.size()>0){
             //Toast.makeText(context, "com.size = " + com.size(), Toast.LENGTH_SHORT).show();
             holder.comments.removeAllViews();
@@ -252,7 +269,7 @@ Context context;
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 View view1 = LayoutInflater.from(context).inflate(R.layout.comments_dialog, null);//将布局文件转化为View
                 Button btn=view1.findViewById(R.id.cancelbtn);
-                Button btnCommit=view1.findViewById(R.id.buttoncommit);
+                Button btnCommit=view1.findViewById(R.id.send_comment_btn);
                 EditText input=view1.findViewById(R.id.inputtext);
                 builder.setView(view1);
                 AlertDialog dialog = builder.create();  //AlertDialog create
@@ -280,6 +297,8 @@ Context context;
                     public void onClick(View v) {
                         String content=input.getText().toString();
                         Comment(temp.getMomentID(),content);
+                        refreshData();
+                        dialog.cancel();
                     }
                 });
             }
@@ -301,20 +320,20 @@ Context context;
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if (status=="200"){
+                    if (status.equals("200")){
                         JSONObject returnData = jsonObject.getJSONObject("data");
-                        Toast.makeText(context,"点赞成功！",Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context,"点赞成功！",Toast.LENGTH_SHORT).show();
                     }else {
                         JSONObject returnData = jsonObject.getJSONObject("data");
                         String msg = returnData.getString("msg");
-                        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
             }
         }).start();
@@ -349,25 +368,24 @@ Context context;
                     String status = jsonObject.getString("status");
                     if (status.equals("200")){
                         temp.save();
-                        refreshData();
-                        Toast.makeText(context,"评论成功！",Toast.LENGTH_SHORT).show();
+                        //refreshData();
+                        //Toast.makeText(context,"评论成功！",Toast.LENGTH_SHORT).show();
 
                     }else {
                         JSONObject returnData = jsonObject.getJSONObject("data");
                         String msg = returnData.getString("msg");
-                        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
                 }
             }
         }).start();
     }
-
 
     @Override
     public int getItemCount() {
@@ -381,9 +399,9 @@ Context context;
         TextView time;
         TextView Text;
         TextView likeCounter;
-        ImageView imageSelected;
-        ImageView imageSelected2;
-        ImageView imageSelected3;
+        SimpleDraweeView imageSelected;
+        SimpleDraweeView imageSelected2;
+        SimpleDraweeView imageSelected3;
         ImageView likebutton;
         ImageView commentbutton;
         LinearLayout imagesGroup;
@@ -406,5 +424,82 @@ Context context;
 
 
         }
+    }
+
+    private void initImageView(int imageID) {
+        final WindowManager windowManager = activity.getWindowManager();
+        final RelativeLayout relativeLayout = new RelativeLayout(context);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        Display display= windowManager.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x;
+        int height = size.y;
+        layoutParams.width = width;
+        layoutParams.height = height;
+        //FLAG_LAYOUT_IN_SCREEN
+        layoutParams.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        layoutParams.format = PixelFormat.RGBA_8888;//让背景透明，放大过程可以看到当前界面
+        layoutParams.verticalMargin = 0;
+        windowManager.addView(relativeLayout,layoutParams);
+
+        final PhotoView animationIV = new PhotoView(context);
+        animationIV.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        relativeLayout.addView(animationIV,params);
+        relativeLayout.setFocusableInTouchMode(true);
+        Picasso.with(context).load(imageID).into(animationIV);
+
+        animationIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                windowManager.removeView(relativeLayout);
+            }
+        });
+
+        relativeLayout.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (null != windowManager && null != relativeLayout) {
+                        windowManager.removeView(relativeLayout);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    public void returnBitMap(String url,ViewHolder holder,int i,ArrayList<ImageView> imageList) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                URL myFileUrl = null;
+                try {
+                    myFileUrl = new URL(url);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+                    conn.setDoInput(true);
+                    conn.connect();
+                    InputStream is = conn.getInputStream();
+                    final Bitmap bitmap = BitmapFactory.decodeStream(is);
+                    imageList.get(i).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageList.get(i).setImageBitmap(bitmap);
+                        }
+                    });
+
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
     }
 }

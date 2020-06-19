@@ -22,6 +22,7 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,26 +50,26 @@ public class MainService extends Service {
 
     }
 
-    class GetMessageThread extends Thread{
-        public void run(){
+    class GetMessageThread extends Thread {
+        public void run() {
             String time = LastDate;
-            while (true){
-                try{
+            while (true) {
+                try {
                     Thread.sleep(5000);
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    String info="?recipient="+UserID+"&time="+time;
+                    String info = "?recipient=" + UserID + "&time=" + time;
                     Request request = new Request.Builder()
-                            .url(getString(R.string.IPAddress)+"/get-api/getMessage"+info)
+                            .url(getString(R.string.IPAddress) + "/get-api/getMessage" + info)
                             .build();
-                    //time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
+                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
-                    Log.i("GETMESSAGE",responseData);
+                    Log.i("GETMESSAGE", responseData);
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if (status.equals("200")){
+                    if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        for(int i=0;i<jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonData = jsonArray.getJSONObject(i);
                             cn.edu.sc.weitalk.javabean.Message message = new Message();
                             message.setReceiveName(UserID);
@@ -79,40 +80,40 @@ public class MainService extends Service {
                             message.setRead(false);
                             message.save();
                             Talks talks;
-                            List<Talks> list = DataSupport.select("*").where("FriendID=?",jsonData.getString("sender")).find(Talks.class);
-                            if (list.size()==0){
+                            List<Talks> list = DataSupport.select("*").where("FriendID=?", jsonData.getString("sender")).find(Talks.class);
+                            if (list.size() == 0) {
                                 talks = new Talks();
 //                                talks.setTalksName(tvNickFriendInfo.getText().toString());
                                 talks.setFriendID(jsonData.getString("sender"));
 //                                talks.setFriendHeaderURL();
-                                List<Friend> fl = DataSupport.select("*").where("userId=?",jsonData.getString("sender")).find(Friend.class);
-                                if(fl.size()!=0){
+                                List<Friend> fl = DataSupport.select("*").where("userId=?", jsonData.getString("sender")).find(Friend.class);
+                                if (fl.size() != 0) {
                                     Friend friend = fl.get(0);
-                                    if(friend.getNote().length()!=0){
+                                    if (friend.getNote().length() != 0) {
                                         talks.setTalksName(friend.getNote());
-                                    }else {
+                                    } else {
                                         talks.setTalksName(friend.getUsername());
                                     }
-                                }else {
+                                } else {
                                     talks.setTalksName(jsonData.getString("sender"));
                                 }
                                 talks.setMyID(UserID);
                                 talks.setUnReadNum(0);
                                 talks.save();
-                            }else {
+                            } else {
                                 talks = list.get(0);
                             }
                             talks.setLastMessage(jsonData.getString("content"));
                             talks.setLastMessageDate(jsonData.getString("time"));
-                            talks.setUnReadNum(talks.getUnReadNum()+1);
-                            talks.updateAll("FriendID=? and MyID=?",jsonData.getString("sender"),UserID);
+                            talks.setUnReadNum(talks.getUnReadNum() + 1);
+                            talks.updateAll("FriendID=? and MyID=?", jsonData.getString("sender"), UserID);
                         }
-                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.message");
-                        BroadCastMethod(true,"cn.edu.sc.weitalk.activity.talks");
-                    }else {
+                        BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.message");
+                        BroadCastMethod(true, "cn.edu.sc.weitalk.activity.talks");
+                    } else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
-                        //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
+                        Log.e("GETMESSAGE",msg);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -127,75 +128,86 @@ public class MainService extends Service {
         }
     }
 
-//监听朋友圈消息与评论
-    class GetMomentsThread extends Thread{
-        public void run(){
+    //监听朋友圈消息与评论
+    class GetMomentsThread extends Thread {
+        public void run() {
             String time = LastDate;
-            while (true){
-                try{
+            while (true) {
+                try {
                     Thread.sleep(5000);
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    String info="?recipient="+UserID+"&time="+time;
+                    String info = "?recipient=" + UserID + "&time=" + time;
                     Request request = new Request.Builder()
-                            .url(getString(R.string.IPAddress)+"/get-api/getShare"+info)
+                            .url(getString(R.string.IPAddress) + "/get-api/getShare" + info)
                             .build();
                     //time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     //等待回复
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
-                    Log.i("GETMOMENTS",responseData);
+                    Log.i("GETMOMENTS", responseData);
                     //获取数据
                     JSONObject jsonObject = new JSONObject(responseData);
-                    Log.i("FLY",jsonObject.toString()+"");
+                    Log.i("FLY", jsonObject.toString() + "");
                     String status = jsonObject.getString("status");
                     //判断状态是否正常
-                    if (status.equals("200")){
+                    if (status.equals("200")) {
                         //，写入两个json数组中
                         JSONArray jsonDataArray = jsonObject.getJSONArray("data");
-                        Log.i("FLY",jsonDataArray.length()+"");
+                        Log.i("FLY", jsonDataArray.length() + "");
                         JSONObject jsonData;
-                        for(int i=0;i<jsonDataArray.length();i++) {
-                            String sharedID=jsonDataArray.getJSONObject(i).getString("shareID");
+                        for (int i = 0; i < jsonDataArray.length(); i++) {
+                            Log.i("FLY", i + "start");
+                            String sharedID = jsonDataArray.getJSONObject(i).getString("shareID");
                             MomentsMessage momentsMessage = new MomentsMessage();
+                            int commentCounter=Integer.parseInt( jsonDataArray.getJSONObject(i).getString("commentNum"));
+                            Log.i("FLY", commentCounter + "   commentCounter");
+                            List<MomentsMessage> list = DataSupport.select("*").where("MomentID=?", sharedID).find(MomentsMessage.class);
 
-                            List<MomentsMessage> list=DataSupport.select("*").where("MomentID=?",sharedID).find(MomentsMessage.class);
-
-                            if(list.size()==0) {
+                            if (list.size() == 0) {
                                 momentsMessage.setMomentID(sharedID);
                                 momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
                                 momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
                                 momentsMessage.setDate(jsonDataArray.getJSONObject(i).getString("time"));
                                 momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
                                 momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
-                                //momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL1"));
-//                                momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL1"));
-//                                momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL1"));
+                                int imageCounter=0;
+                                for(int m=0;m<3;m++) {
+                                    if(jsonDataArray.getJSONObject(i).getString("imgURL"+(m+1)).length()!=0)
+                                        imageCounter++;
+                                }
+                                momentsMessage.setImageCounter(imageCounter);
+                                momentsMessage.setMomentImage(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL1"));
+                                momentsMessage.setMomentImage2(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL2"));
+                                momentsMessage.setMomentImage3(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL3"));
                                 momentsMessage.saveThrows();
-                            }
-                            else{
-                                momentsMessage=list.get(0);
+
+                            } else {
+                                momentsMessage = list.get(0);
                                 momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
                                 //momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL"));
-                                momentsMessage.updateAll("MomentID=?",sharedID);
+                                momentsMessage.updateAll("MomentID=?", sharedID);
                             }
-                            Log.i("FLY",i+"");
-                            JSONArray jsonCommentsArray = jsonDataArray.getJSONObject(i).getJSONArray("comment");
+                            Log.i("FLY", i + "middle");
+                            if(commentCounter!=0) {
+                                JSONArray jsonCommentsArray = jsonDataArray.getJSONObject(i).getJSONArray("comment");
 
-                            for(int j=0;j<jsonCommentsArray.length();j++) {
+                                for (int j = 0; j < jsonCommentsArray.length(); j++) {
+                                    Log.i("FLY", j + "");
 
-                                JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
-                                if(DataSupport.select("*").where("content=?",jsonComments.getString("content")).find(Comments.class).size()==0) {
-                                    Comments comments = new Comments();
-                                    comments.setMomentID(sharedID);
-                                    comments.setContent(jsonComments.getString("content"));
-                                    comments.setCommentPerName(jsonComments.getString("sendername"));
-                                    comments.saveThrows();
+                                    JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
+                                    if (DataSupport.select("*").where("content=?", jsonComments.getString("content")).find(Comments.class).size() == 0) {
+                                        Comments comments = new Comments();
+                                        comments.setMomentID(sharedID);
+                                        comments.setContent(jsonComments.getString("content"));
+                                        comments.setCommentPerName(jsonComments.getString("sendername"));
+                                        comments.saveThrows();
+                                    }
                                 }
                             }
-
+                            Log.i("FLY", i + "end");
                         }
-                        BroadCastMethod(true,"cn.edu.sc.weitalk.fragment.moment");
-                    }else {
+                        //BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.moment");
+                    } else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
                         //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
@@ -213,11 +225,11 @@ public class MainService extends Service {
         }
     }
 
-    private boolean BroadCastMethod(boolean st, String ReceiveAction){
+    private boolean BroadCastMethod(boolean st, String ReceiveAction) {
         Intent intentReceiver = new Intent();
         intentReceiver.setAction(ReceiveAction);
 
-        intentReceiver.putExtra("ifrefresh",st);
+        intentReceiver.putExtra("ifrefresh", st);
 
         MainService.this.sendBroadcast(intentReceiver);
 
@@ -225,9 +237,9 @@ public class MainService extends Service {
     }
 
 
-    class FriendThread extends Thread{
-        public void run(){
-            while (true){
+    class FriendThread extends Thread {
+        public void run() {
+            while (true) {
                 try {
                     /******************************
                      *  1. 收到对方想要添加好友的消息
@@ -245,9 +257,9 @@ public class MainService extends Service {
                     Gson gson = new Gson();
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if(status.equals("200")){
+                    if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        for(int i = 0;i < jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             FriendReqRes newFriendReq = new FriendReqRes();
                             newFriendReq.setType(FriendReqRes.NEW_FRIEND_REQUEST);
@@ -270,9 +282,9 @@ public class MainService extends Service {
                     gson = new Gson();
                     jsonObject = new JSONObject(responseData);
                     status = jsonObject.getString("status");
-                    if(status.equals("200")){
+                    if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        for(int i = 0;i < jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             FriendReqRes friendRes = new FriendReqRes();
                             friendRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
@@ -297,9 +309,9 @@ public class MainService extends Service {
                     gson = new Gson();
                     jsonObject = new JSONObject(responseData);
                     status = jsonObject.getString("status");
-                    if(status.equals("200")){
+                    if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
-                        for(int i = 0;i < jsonArray.length();i++){
+                        for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
                             FriendReqRes friendDel = new FriendReqRes();
                             friendDel.setType(FriendReqRes.DELETE_BY_FRIEND);
@@ -324,10 +336,10 @@ public class MainService extends Service {
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
 //        throw new UnsupportedOperationException("Not yet implemented");
-        SharedPreferences config=getSharedPreferences("USER_INFO",MODE_PRIVATE);
-        UserID=config.getString("userID","");
+        SharedPreferences config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        UserID = config.getString("userID", "");
         //LastDate=config.getString("lastTime","");
-        LastDate="2016-01-01 01:01:01";
+        LastDate = "2016-01-01 01:01:01";
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread()).start();
         return new MainBinder();
@@ -338,8 +350,8 @@ public class MainService extends Service {
         return super.onUnbind(intent);
     }
 
-    public class MainBinder extends Binder{
-        public MainService getService(){
+    public class MainBinder extends Binder {
+        public MainService getService() {
             return MainService.this;
         }
     }
@@ -348,29 +360,33 @@ public class MainService extends Service {
     //服务结束前，保留最后请求消息时间于config 的preference中
     public void onDestroy() {
         super.onDestroy();
-        SharedPreferences.Editor editor=getSharedPreferences("USER_INFO",MODE_PRIVATE).edit();
-        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        SharedPreferences.Editor editor = getSharedPreferences("USER_INFO", MODE_PRIVATE).edit();
+        editor.putString("lastTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         editor.commit();
         editor.clear();
         loginOut();
     }
+
     //登出
-    public void loginOut(){
-                try{
-                    OkHttpClient okHttpClient=new OkHttpClient();
-                    String info="?userID="+UserID;
+    public void loginOut() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    String info = "?userID=" + UserID;
                     Request request = new Request.Builder()
-                            .url(getString(R.string.IPAddress)+"/get-api/loginOut"+info)
+                            .url(getString(R.string.IPAddress) + "/get-api/loginOut" + info)
                             .build();
 
                     Response response = okHttpClient.newCall(request).execute();
                     String responseData = response.body().string();
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-                    if (status.equals("200")){
+                    if (status.equals("200")) {
                         //Toast.makeText(getContext(),"退出登录啦！",Toast.LENGTH_SHORT).show();
                         //getActivity().finish();
-                    }else {
+                    } else {
                         JSONObject returnData = jsonObject.getJSONObject("data");
                         String msg = returnData.getString("msg");
                         //Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
@@ -384,5 +400,8 @@ public class MainService extends Service {
                 }
             }
 
+        }).start();
+
     }
+}
 

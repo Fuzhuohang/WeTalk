@@ -320,7 +320,7 @@ public class MainFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
                     if (status.equals("200")) {
-                        Toast.makeText(getContext(), "退出登录啦！", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "退出登录啦！", Toast.LENGTH_SHORT).show();
                         getActivity().finish();
                     } else {
                         JSONObject returnData = jsonObject.getJSONObject("data");
@@ -390,30 +390,41 @@ public class MainFragment extends Fragment {
             File file = new File(temp.getMomentImage());
             File file2 = new File(temp.getMomentImage2());
             File file3 = new File(temp.getMomentImage3());
-            Log.i("FLLL",temp.getMomentImage());
-            Log.i("FLLL",temp.getMomentImage2());
-            Log.i("FLLL",temp.getMomentImage3());
+//            Log.i("FLLL", file.length()+"");
+//            Log.i("FLLL", temp.getMomentImage2());
+//            Log.i("FLLL", temp.getMomentImage3());
 //            temp.save();
 //            circleOfFriendsFragment.adapter.refreshData();
-            //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
-            try{
-                OkHttpClient okHttpClient = new OkHttpClient();
-                RequestBody filebody=RequestBody.Companion.create(MediaType.parse("image/jpg"),file);
-                RequestBody filebody2=RequestBody.Companion.create(MediaType.parse("image/jpg"),file2);
-                RequestBody filebody3=RequestBody.Companion.create(MediaType.parse("image/jpg"),file3);
-                MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.setType(MultipartBody.FORM);
-                builder.addFormDataPart("userID",userID);
-                builder.addFormDataPart("content",temp.getContent());
-                builder.addFormDataPart("img1",file.getName(),filebody);
-                builder.addFormDataPart("img2",file2.getName(),filebody2);
-                builder.addFormDataPart("img3",file3.getName(),filebody3);
-                MultipartBody multipartBody=builder.build();
-                Request request = new Request.Builder()
-                        .addHeader("Content-Type", "application/json")
-                        .url(getString(R.string.IPAddress)+"/post-api/sendShare")
-                        .post(multipartBody)
-                        .build();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
+                    try {
+                        OkHttpClient okHttpClient = new OkHttpClient();
+                        RequestBody filebody = RequestBody.create(MediaType.parse("image/jpg"),file);
+                        RequestBody filebody2 = RequestBody.create( file2,MediaType.parse("image/jpg"));
+                        RequestBody filebody3 = RequestBody.create(file3,MediaType.parse("image/jpg"));
+                        MultipartBody.Builder builder = new MultipartBody.Builder();
+                        builder.setType(MultipartBody.FORM);
+                        builder.addFormDataPart("userID", userID);
+                        //builder.addFormDataPart("userName",userName);
+                        builder.addFormDataPart("content", temp.getContent());
+                        ArrayList<RequestBody> list=new ArrayList<RequestBody>();
+                        list.add(filebody);
+                        list.add(filebody2);
+                        list.add(filebody3);
+                        ArrayList<File> a=new ArrayList<File>();
+                        a.add(file);
+                        a.add(file2);
+                        a.add(file3);
+                        for(int i=0;i<temp.getImageCounter();i++){
+                                builder.addFormDataPart("img"+(i+1), a.get(i).getName(), list.get(i));
+                        }
+                        RequestBody multipartBody = builder.build();
+                        Request request = new Request.Builder()
+                                .url(getString(R.string.IPAddress) + "/post-api/sendShare")
+                                .post(multipartBody)
+                                .build();
 
 //                Call call = okHttpClient.newCall(request);
 //
@@ -453,39 +464,28 @@ public class MainFragment extends Fragment {
 //                    }
 //                });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-                Response response = okHttpClient.newCall(request).execute();
-                String responseData = response.body().string();
-                JSONObject jsonObject = new JSONObject(responseData);
-                String status = jsonObject.getString("status");
-                if (status.equals("200")){
-                    JSONObject returnData = jsonObject.getJSONObject("data");
-                    temp.setMomentID(returnData.getString("shareID"));
-                    Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
-                }else {
-                    JSONObject returnData = jsonObject.getJSONObject("data");
-                    String msg = returnData.getString("msg");
-                    Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                        Response response = okHttpClient.newCall(request).execute();
+                        String responseData = response.body().string();
+                        JSONObject jsonObject = new JSONObject(responseData);
+                        String status = jsonObject.getString("status");
+                        if (status.equals("200")) {
+                            JSONObject returnData = jsonObject.getJSONObject("data");
+                            temp.setMomentID(returnData.getString("shareID"));
+                            //Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
+                        } else {
+                            JSONObject returnData = jsonObject.getJSONObject("data");
+                            String msg = returnData.getString("msg");
+                            //Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        //Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        //Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(getContext(), "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
-            }
+        }).start();
         }else if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK){
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);

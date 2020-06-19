@@ -44,6 +44,8 @@ import java.util.Date;
 
 import cn.edu.sc.weitalk.R;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -127,22 +129,25 @@ public class RegisterActivity extends AppCompatActivity implements DatePickerDia
                         @Override
                         public void run() {
                             try{
-                                OkHttpClient client=new OkHttpClient();
-                                RequestBody requestBody=new FormBody.Builder()
-                                        .add("password",password)
-                                        .add("name",name)
-                                        .add("headURL",mCurrentPhotoPath)
-                                        .add("birthday",txtDate.getText().toString())
-                                        .add("phone",phone)
-                                        .add("eMail",email)
-                                        .add("location",location)
-                                        .build();
-                                Request request=new Request.Builder()
-                                        .url(getString(R.string.IPAddress)+"/post-api/register")
-                                        .post(requestBody)
+                                OkHttpClient okHttpClient = new OkHttpClient();
+                                File file = new File(mCurrentPhotoPath);
+                                RequestBody filebody = RequestBody.create(MediaType.parse("image/jpg"),file);
+                                MultipartBody.Builder builder = new MultipartBody.Builder();
+                                builder.setType(MultipartBody.FORM);
+                                builder.addFormDataPart("password",password);
+                                builder.addFormDataPart("name",name);
+                                builder.addFormDataPart("headImg",file.getName(),filebody);
+                                builder.addFormDataPart("birthday",txtDate.getText().toString());
+                                builder.addFormDataPart("phone",phone);
+                                builder.addFormDataPart("eMail",email);
+                                builder.addFormDataPart("location",location);
+                                RequestBody multipartBody = builder.build();
+                                Request request = new Request.Builder()
+                                        .url(getString(R.string.IPAddress) + "/post-api/register")
+                                        .post(multipartBody)
                                         .build();
 
-                                Response response=client.newCall(request).execute();
+                                Response response = okHttpClient.newCall(request).execute();
                                 final String responseData=response.body().string();
                                 Gson gson=new Gson();
                                 JSONObject jsonObject=new JSONObject(responseData);

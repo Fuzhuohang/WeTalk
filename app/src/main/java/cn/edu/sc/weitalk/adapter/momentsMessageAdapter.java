@@ -111,56 +111,17 @@ Context context;
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_moments_meaasge, parent, false);
         final ViewHolder holder = new ViewHolder(view);
-//        MomentsMessage temp = moments.get(viewType);
-//        //设置发表人名字
-//        holder.name.setText(temp.getPublisherName());
-//        //设置发起时间
-//        holder.time.setText(temp.getDate());
-//        //消息文本
-//        holder.Text.setText(temp.getContent());
-//
-////        设置头像，bitmap转为URI，后显示为图片
-//        holder.icon.setImageURI(temp.getHeadshot());
-//        //消息图片
-//            if(temp.getMomentImage()!=null) {
-//                holder.imageSelected = new ImageView(context);
-//                holder.imagesGroup.setVisibility(View.VISIBLE);
-//                holder.imagesGroup.addView(holder.imageSelected);
-//                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.imageSelected.getLayoutParams();
-//                params.width = 300;
-//                params.height = 300;
-//                params.leftMargin=50;
-////                Cursor result=context.getContentResolver().query(Uri.parse(temp.getMomentImage()),null,null,null,null);
-////                result.moveToNext();
-//                holder.imageSelected.setImageURI(Uri.parse(temp.getMomentImage()));
-//                holder.imageSelected.setLayoutParams(params);
-//            }
-//        //动态生成评论
-//        TextView comment=new TextView(context);
-//        holder.comments.addView(comment);
-//        holder.comments.setVisibility(View.VISIBLE);
-//        //holder.comments.setBackgroundResource(R.drawable.fillet);
-//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) comment.getLayoutParams();
-//        params.width =LinearLayout.LayoutParams.MATCH_PARENT;
-//        params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
-//        params.leftMargin=20;
-//        params.rightMargin=20;
-//        //评论内容显示，html转为字符串保留格式
-//        String str1 = "<font color='#0997F7'>"+"平凡之路"+": </font>"+"绝望着，也渴望着，也哭也笑，平凡着。";
-//        comment.setText(Html.fromHtml(str1));
-//        comment.setLayoutParams(params);
-//        comment.setTextSize(16);
-//
-//        if(isLikedList.get(viewType)==false)
-//            holder.likebutton.setImageResource(R.drawable.dianzan);
-//        else
-//            holder.likebutton.setImageResource(R.drawable.dianzanle);
-//        if(temp.getLikeCounter()>0){
-//            holder.likeCounter.setVisibility(View.VISIBLE);
-//            holder.likeCounter.setText(temp.getLikeCounter()+"");
-//        }else
-//            holder.likeCounter.setVisibility(View.INVISIBLE);
-
+        holder.imageSelected=new SimpleDraweeView(context);
+        holder.imageSelected2=new SimpleDraweeView(context);
+        holder.imageSelected3=new SimpleDraweeView(context);
+        holder.imagesGroup.addView(holder.imageSelected);
+        holder.imagesGroup.addView(holder.imageSelected2);
+        holder.imagesGroup.addView(holder.imageSelected3);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 300);
+        params.leftMargin = 50;
+        holder.imageSelected.setLayoutParams(params);
+        holder.imageSelected2.setLayoutParams(params);
+        holder.imageSelected3.setLayoutParams(params);
         return holder;
     }
 
@@ -190,6 +151,10 @@ Context context;
         }else
             holder.likeCounter.setVisibility(View.INVISIBLE);
 
+        if(temp.getImageCounter()<=0)
+            holder.imagesGroup.setVisibility(View.GONE);
+        else
+            holder.imagesGroup.setVisibility(View.VISIBLE);
         ArrayList<String> uriList=new ArrayList<String>();
         ArrayList<SimpleDraweeView> imageList=new ArrayList<SimpleDraweeView>();
         uriList.add(temp.getMomentImage());
@@ -201,52 +166,22 @@ Context context;
         //消息图片
         for(int i=0;i<3;i++) {
             if(i<temp.getImageCounter()) {
-                if (!(uriList.get(i).equals(" ") || uriList.get(i).equals(context.getString(R.string.IPAddress)))) {
-                    Log.i("MSB",uriList.get(i));
-                    if (imageList.get(i) != null) {
-                        imageList.get(i).setImageDrawable(context.getDrawable(R.mipmap.ic_launcher));
-                        imageList.get(i).setVisibility(View.VISIBLE);
-                        if(temp.getPublisherID().equals(userID)){
-                            String uri="file://"+uriList.get(i);
-                            imageList.get(i).setImageURI(uri);
-                        }
-                        else
-                            imageList.get(i).setImageURI(uriList.get(i));
-                        imageList.get(i).setTag(uriList.get(i));
-                    } else {
-                        //Toast.makeText(context, "3423424", Toast.LENGTH_SHORT).show();
-                        imageList.set(i, new SimpleDraweeView(context));
-                        holder.imagesGroup.addView(imageList.get(i));
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 300);
-                        params.leftMargin = 50;
-                        imageList.get(i).setImageDrawable(context.getDrawable(R.mipmap.ic_launcher));
-                        imageList.get(i).setLayoutParams(params);
-                        if(temp.getPublisherID().equals(userID)){
-                            String uri="file://"+uriList.get(i);
-                            imageList.get(i).setImageURI(uri);
-                        }
-                        else
-                            imageList.get(i).setImageURI(uriList.get(i));
-                        imageList.get(i).setTag(uriList.get(i));
-                        //Glide.with(context).load(uriList.get(i)).into(imageList.get(i));
+
+                imageList.get(i).setVisibility(View.VISIBLE);
+                if(temp.getPublisherID().equals(userID)){
+                    String uri="file://"+uriList.get(i);
+                    imageList.get(i).setImageURI(uri);
+                }
+                else
+                    imageList.get(i).setImageURI(uriList.get(i));
+
                     }
-                    //notifyDataSetChanged();
-                }
-            }
             else {
-                if (imageList.get(i) != null) {
-                    imageList.get(i).setVisibility(View.INVISIBLE);
-
+                imageList.get(i).setVisibility(View.INVISIBLE);
                 }
             }
-            }
-
-
         //Toast.makeText(context, temp.getImageCounter()+"", Toast.LENGTH_SHORT).show();
-        if(temp.getImageCounter()<=0)
-            holder.imagesGroup.setVisibility(View.GONE);
-        else
-            holder.imagesGroup.setVisibility(View.VISIBLE);
+
 
         //加载评论
         List<Comments> com=DataSupport.select("*").where("MomentID=?",temp.getMomentID()).find(Comments.class);

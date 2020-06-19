@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
+import cn.edu.sc.weitalk.activity.UserInfoActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import cn.edu.sc.weitalk.util.Constant;
@@ -279,12 +280,15 @@ public class MainFragment extends Fragment {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
+                    case R.id.myinfo:
+                        Intent intent=new Intent(getActivity(), UserInfoActivity.class);
+                        startActivity(intent);
+                        break;
                     case R.id.myqrcode:
                         createMyQRCode();
                         break;
                     case R.id.scanqrcode:
                         scanQRCode();
-
                         break;
                     case R.id.exit:
                         //Toast.makeText(getContext(),"1111111",Toast.LENGTH_SHORT).show();
@@ -488,7 +492,7 @@ public class MainFragment extends Fragment {
             Log.i("SCANQRCODE","扫描结果是："+scanResult);
             QRCodeMessage = scanResult;
         }
-            Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
         }
 
     }

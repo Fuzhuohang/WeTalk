@@ -40,7 +40,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainService extends Service {
-    private String IPaddress="http://10.133.30.160:8081";
+    private final String IPaddress="http://10.132.162.182:8081";
     private String UserID;
     private String LastDate;
 //服务构造函数，从sharedpreference获取用户基本信息（ID）和上次结束时的时间

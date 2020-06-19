@@ -26,6 +26,7 @@ import java.util.List;
 import butterknife.BindView;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.FriendInfoActivity;
+import cn.edu.sc.weitalk.activity.SearchFriendActivity;
 import cn.edu.sc.weitalk.adapter.FriendListAdapter;
 import cn.edu.sc.weitalk.adapter.FriendReqResAdapter;
 import cn.edu.sc.weitalk.javabean.Friend;
@@ -157,6 +158,7 @@ public class FriendListFragment extends Fragment {
                 letterIndexView.updateLetterIndexView(sectionForPosition);
             }
         });
+
         //设置LetterIndexView
         letterIndexView.setTextViewDialog(bigLetter);
         letterIndexView.setOnLetterSelectedListener(new LetterIndexView.OnLetterSelectedListener() {
@@ -166,11 +168,21 @@ public class FriendListFragment extends Fragment {
                 lvFiendList.setSelection(positionForSection);
             }
         });
+
         //设置添加好友请求和回复的RecyclerView
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         friendReqResAdapter = new FriendReqResAdapter(getContext(), friendReqResList);
         rvFriendReqRes.setAdapter(friendReqResAdapter);
         rvFriendReqRes.setLayoutManager(layoutManager);
+
+        //设置搜索按钮的点击事件，跳转到搜索好友页面
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchFriendActivity.class);
+                startActivity(intent);
+            }
+        });
         return view;
     }
 

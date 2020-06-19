@@ -38,6 +38,7 @@ import java.util.List;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.MainActivity;
+import cn.edu.sc.weitalk.activity.SearchFriendActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.adapter.TalksListAdapter;
 import cn.edu.sc.weitalk.javabean.Talks;
@@ -153,8 +154,14 @@ public class MessageListFragment extends Fragment {
             }
         });
 
-
-
+        //设置搜索按钮的点击事件，跳转到搜索好友的页面
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchFriendActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,6 +65,8 @@ public class MessageListFragment extends Fragment {
 
     private TalksListAdapter adapter;
     private ListView messageList;
+    private LocalBroadcastManager broadcastManager;
+    private BroadcastReceiver broadcastReceiver;
 
     public MessageListFragment() {
         // Required empty public constructor
@@ -105,6 +108,23 @@ public class MessageListFragment extends Fragment {
 //            isTwoPane=false;
 //        }
         isTwoPane=false;
+
+        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("package cn.edu.sc.weitalk.fragment.message");
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+                if(ifRefresh){
+                    list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
+                    adapter = new TalksListAdapter(list, getContext());
+                    messageList.setAdapter(adapter);
+                    setListViewHeightBasedOnChildren(messageList);
+                }
+            }
+        };
+        broadcastManager.registerReceiver(broadcastReceiver,filter);
     }
 
     @Override
@@ -134,6 +154,7 @@ public class MessageListFragment extends Fragment {
                     intent.putExtra("FriendsID",list.get(position).getFriendID());
                     intent.putExtra("FriendHeaderURL",list.get(position).getFriendHeaderURL());
                     startActivity(intent);
+                    broadcastManager.unregisterReceiver(broadcastReceiver);
                 }
             }
         });
@@ -189,29 +210,5 @@ public class MessageListFragment extends Fragment {
 
         params.height = totalHeight+(listView.getDividerHeight()*(listAdapter.getCount()-1));
         listView.setLayoutParams(params);
-    }
-
-    private class RefreshReceiver extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
-            if(ifRefresh){
-                list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
-                adapter = new TalksListAdapter(list, getContext());
-                messageList.setAdapter(adapter);
-                setListViewHeightBasedOnChildren(messageList);
-            }
-        }
-    }
-
-    @Override
-    public void onAttach(@NonNull Activity activity) {
-
-        RefreshReceiver receiver = new RefreshReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("package cn.edu.sc.weitalk.fragment.message");
-        activity.registerReceiver(receiver,filter);
-        super.onAttach(activity);
     }
 }

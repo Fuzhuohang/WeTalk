@@ -60,7 +60,7 @@ public class MainService extends Service {
                     Request request = new Request.Builder()
                             .url(getString(R.string.IPAddress)+"/get-api/getMessage"+info)
                             .build();
-                    //time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());;
+                    time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
                     Response response = okHttpClient.newCall(request).execute();
                     final String responseData = response.body().string();
                     Log.i("GETMESSAGE",responseData);
@@ -112,7 +112,7 @@ public class MainService extends Service {
                     }else {
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
-                        //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
+                        Log.e("GETMESSAGE",msg);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

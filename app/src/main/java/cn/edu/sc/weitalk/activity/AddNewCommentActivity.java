@@ -29,7 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import cn.edu.sc.weitalk.FileUtils;
+import cn.edu.sc.weitalk.javabean.FileUtils;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 
@@ -164,7 +164,7 @@ public class AddNewCommentActivity extends BaseActivity {
                         selectedImage3.setImageURI(Uri.parse(imagePath3));
                         break;
                 }
-                //selectedImage.setImageURI(imageUri);
+                selectedImage.setImageURI(imageUri);
                 imageCounter++;
         }
 

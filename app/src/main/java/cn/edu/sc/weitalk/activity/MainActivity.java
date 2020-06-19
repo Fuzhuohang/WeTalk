@@ -46,8 +46,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        SharedPreferences.Editor editor = config.edit();
-        editor.putString("userID","100000");
+//        SharedPreferences.Editor editor = config.edit();
+//        editor.putString("userID","100000");
 //        editor.putString("password","testpasssword");
 //        editor.putString("name","testname");
 //        editor.putString("headURL","res://drawable/" + R.drawable.dragon);
@@ -57,8 +57,8 @@ public class MainActivity extends BaseActivity {
 //        editor.putString("eMail","testemail");
 //        editor.putString("registerTime","testtime");
 //        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        editor.commit();
-        editor.clear();
+//        editor.commit();
+//        editor.clear();
 
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);

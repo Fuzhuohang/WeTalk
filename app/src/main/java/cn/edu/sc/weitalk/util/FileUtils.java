@@ -1,4 +1,4 @@
-package cn.edu.sc.weitalk.javabean;
+package cn.edu.sc.weitalk.util;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;

@@ -5,14 +5,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -193,12 +196,27 @@ public class FriendListFragment extends Fragment {
 
     private void initFriendReqRes(){
         friendReqResList = DataSupport.select("*").where("MyID=?", MyID).find(FriendReqRes.class);
+        Log.i(TAG, "好友ReqRes数目：" + friendReqResList.size());
+        LinearLayout.LayoutParams linearParams =(LinearLayout.LayoutParams) rvFriendReqRes.getLayoutParams();
+        rvFriendReqRes.setLayoutParams(linearParams);
+        if(friendReqResList.size() <= 2){
+            linearParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            rvFriendReqRes.setLayoutParams(linearParams);
+        }else{
+            linearParams.height=((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
+            rvFriendReqRes.setLayoutParams(linearParams);
+        }
     }
 
     //每次恢复页面（页面可见时）重新从本地数据库获取好友列表，以及好友请求和回复等信息
     @Override
     public void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume invoked");
+        updateListData();
+    }
+
+    public void updateListData(){
         initFriendList();
         friendListAdapter.setList(friendList);
         friendListAdapter.notifyDataSetChanged();

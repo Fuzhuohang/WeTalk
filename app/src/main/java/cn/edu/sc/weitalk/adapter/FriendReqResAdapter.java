@@ -15,9 +15,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
+import java.io.IOException;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,6 +31,9 @@ import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.FriendReqRes;
 import cn.edu.sc.weitalk.widget.MyDialog;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapter.ViewHolder> {
 
@@ -79,7 +87,7 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                 switch(reqRes.getType()){
                     //回复好友请求，打开对话框，可设置备注，拒绝or同意
                     case FriendReqRes.NEW_FRIEND_REQUEST:
-                        MyDialog dialog = new MyDialog(context, 900, 600);
+                        MyDialog dialog = new MyDialog(context, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                         View view = LayoutInflater.from(context).inflate(R.layout.dialog_response_req, null);
                         dialog.setContentView(view);
 //                        final WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
@@ -94,7 +102,7 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                         Button btnAccept = view.findViewById(R.id.btn_accept_friend);
                         Button btnReject = view.findViewById(R.id.btn_reject_friend);
                         ImageView btnCancel = view.findViewById(R.id.btn_cancel_res_add_friend);
-                        //headIc.setImageURI(Uri.parse(reqRes.getHeadUrl()));
+                        headIc.setImageURI(context.getString(R.string.IPAddress) + reqRes.getHeadUrl());
                         tvUsername.setText(reqRes.getUsername());
                         tvId.setText(reqRes.getUserId());
                         //取消，关闭dialog
@@ -110,18 +118,43 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                             public void onClick(View v) {
                                 //添加数据到Friend数据库
                                 Friend friend = new Friend();
-                                /**
-                                 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                 * friend.setImg();
-                                 */
+                                friend.setImg(reqRes.getHeadUrl());
                                 friend.setUserID(reqRes.getUserId());
                                 friend.setUsername(reqRes.getUsername());
                                 friend.setNote(edtNote.getText().toString());
+                                friend.setMyID(reqRes.getMyID());
                                 friend.save();
                                 /**
                                  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                  * 向服务器发送同意好友申请的请求
                                  */
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        OkHttpClient okHttpClient = new OkHttpClient();
+                                        String arg = "?recipient=" + friend.getUserID() + "&sender=" + friend.getMyID() + "&agree=1&note=" + friend.getNote();
+                                        Request request = new Request.Builder()
+                                                .url(context.getResources().getString(R.string.IPAddress) + "/get-api/sendDelFriend" + arg)
+                                                .build();
+                                        Response response = null;
+                                        try {
+                                            response = okHttpClient.newCall(request).execute();
+                                            String responseData = response.body().string();
+                                            Gson gson = new Gson();
+                                            JSONObject jsonObject = new JSONObject(responseData);
+                                            String status = jsonObject.getString("status");
+                                            if(status.equals("200")){
+                                                JSONObject jsonData = jsonObject.getJSONObject("data");
+                                                Log.i(TAG, jsonData.getString("msg"));
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }).start();
+                                /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
                                 //将数据从FriendReqRes中删除
                                 if(reqRes.isSaved())
                                     reqRes.delete();
@@ -143,6 +176,33 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                                  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                  * 向服务器发送拒绝好友申请的请求
                                  */
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        OkHttpClient okHttpClient = new OkHttpClient();
+                                        String arg = "?recipient=" + reqRes.getUserId() + "&sender=" + reqRes.getMyID() + "&agree=0";
+                                        Request request = new Request.Builder()
+                                                .url(context.getResources().getString(R.string.IPAddress) + "/get-api/sendDelFriend" + arg)
+                                                .build();
+                                        Response response = null;
+                                        try {
+                                            response = okHttpClient.newCall(request).execute();
+                                            String responseData = response.body().string();
+                                            Gson gson = new Gson();
+                                            JSONObject jsonObject = new JSONObject(responseData);
+                                            String status = jsonObject.getString("status");
+                                            if(status.equals("200")){
+                                                JSONObject jsonData = jsonObject.getJSONObject("data");
+                                                Log.i(TAG, jsonData.getString("msg"));
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }).start();
+                                /** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
                                 //将数据从FriendReqRes中删除
                                 if(reqRes.isSaved())
                                     reqRes.delete();
@@ -160,12 +220,11 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                     case FriendReqRes.NEW_FRIEND_RESPONSE:
                         if(reqRes.isAgreed()) {
                             Friend friend = new Friend();
+                            friend.setMyID(reqRes.getMyID());
                             friend.setUsername(reqRes.getUsername());
                             friend.setUserID(reqRes.getUserId());
-                            /**
-                             * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                             * friend.setImg();
-                             */
+                            friend.setStatus(true);
+                            friend.setImg(reqRes.getHeadUrl());
                             friend.save();
                         }
                         else {
@@ -183,7 +242,7 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                     //收到被对方删除好友的消息
                     case FriendReqRes.DELETE_BY_FRIEND:
                         //删除Friend数据库中数据
-                        DataSupport.deleteAll(Friend.class, "userId=?", reqRes.getUserId());
+                        DataSupport.deleteAll(Friend.class, "userID=? and MyID=?", reqRes.getUserId(), reqRes.getMyID());
                         //将数据从FriendReqRes中删除
                         if(reqRes.isSaved())
                             reqRes.delete();

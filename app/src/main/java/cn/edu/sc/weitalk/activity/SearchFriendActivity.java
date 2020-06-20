@@ -65,7 +65,7 @@ public class SearchFriendActivity extends BaseActivity {
         MyID = config.getString("userID", "");
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(SearchFriendActivity.this);
-        adapter = new FriendFoundListAdapter(friendFoundList, MyID);
+        adapter = new FriendFoundListAdapter(this, friendFoundList, MyID);
         rvFriendsFoundList.setLayoutManager(layoutManager);
         rvFriendsFoundList.setAdapter(adapter);
 
@@ -85,13 +85,11 @@ public class SearchFriendActivity extends BaseActivity {
             }
 
             public void afterTextChanged(Editable s) {
+                friendFoundList.clear();
+                personNotFriendList.clear();
                 findFriendLocally();
-                searchFriendOnServer();
-                //合并查找到的本地好友列表，和服务器查找到的列表
-                if (personNotFriendList.size() != 0)
-                    friendFoundList.add(personNotFriendList.get(0));
-                adapter.setList(friendFoundList);
-                adapter.notifyDataSetChanged();
+                if(friendFoundList.size() == 0)
+                    searchFriendOnServer();
                 //如果friendFoundList大小为0，设置提示信息可见
                 if(friendFoundList.size() == 0)
                     tvTipSearchFriend.setVisibility(View.VISIBLE);
@@ -107,7 +105,10 @@ public class SearchFriendActivity extends BaseActivity {
      */
     private void findFriendLocally() {
         String txt = edtSearchFriend.getText().toString();
-        friendFoundList = DataSupport.select("*").where("MyID=? and (note like '%?%' or username like '%?%' or userID like '?%')", MyID, txt, txt, txt).find(Friend.class);
+        if (txt.length() != 0)
+            friendFoundList = DataSupport.select("*").where("MyID=? and (note like ? or username like ? or userID like ?)", MyID, txt + "%", txt + "%", txt + "%").find(Friend.class);
+        adapter.setList(friendFoundList);
+        adapter.notifyDataSetChanged();
     }
 
     /**
@@ -119,7 +120,7 @@ public class SearchFriendActivity extends BaseActivity {
             @Override
             public void run() {
                 OkHttpClient okHttpClient = new OkHttpClient();
-                String arg = "?";
+                String arg = "?userID=" + edtSearchFriend.getText().toString();
                 Request request = new Request.Builder()
                         .url(IPaddress + "/get-api/searchFriend" + arg)
                         .build();
@@ -142,6 +143,28 @@ public class SearchFriendActivity extends BaseActivity {
                             friend.setPhoneNum(object.getString("phone"));
                             friend.setLocation(object.getString("location"));
                             personNotFriendList.add(friend);
+                            //合并查找到的本地好友列表，和服务器查找到的列表
+                            if (personNotFriendList.size() != 0) {
+                                friendFoundList.add(personNotFriendList.get(0));
+                                Log.i(TAG, "服务器查找到了" + personNotFriendList.size() +"个好友");
+                                rvFriendsFoundList.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.setList(friendFoundList);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+                            }
+                            //如果friendFoundList大小为0，设置提示信息可见
+                            tvTipSearchFriend.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(friendFoundList.size() == 0)
+                                        tvTipSearchFriend.setVisibility(View.VISIBLE);
+                                    else
+                                        tvTipSearchFriend.setVisibility(View.GONE);
+                                }
+                            });
                         }
                     } else if (status.equals("404")) {
                         Log.i(TAG, "查询用户404");
@@ -161,6 +184,7 @@ public class SearchFriendActivity extends BaseActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_back_search_friend:
+                finish();
                 break;
             case R.id.iv_scan_search_friend:
                 break;

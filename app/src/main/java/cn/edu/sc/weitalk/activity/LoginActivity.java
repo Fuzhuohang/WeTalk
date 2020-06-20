@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -172,6 +173,7 @@ public class LoginActivity extends AppCompatActivity {
                                     //个人信息写入配置文件
                                     SharedPreferences.Editor editor = getSharedPreferences("USER_INFO", MODE_PRIVATE).edit();
                                     editor.putString("userID",data.getString("userID"));
+                                    Log.i("LoginActivity", data.getString("userID"));
                                     editor.putString("password",data.getString("password"));
                                     editor.putString("name",data.getString("name"));
                                     editor.putString("headURL",data.getString("headURL"));

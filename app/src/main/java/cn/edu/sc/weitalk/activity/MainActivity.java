@@ -25,6 +25,7 @@ import org.litepal.crud.DataSupport;
 import org.litepal.tablemanager.Connector;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.edu.sc.weitalk.R;
@@ -48,9 +49,9 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = config.edit();
-//        editor.putString("userID","100000");
+        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        SharedPreferences.Editor editor = config.edit();
+        editor.putString("userID","100000");
 //        editor.putString("password","testpasssword");
 //        editor.putString("name","testname");
 //        editor.putString("headURL","res://drawable/" + R.drawable.dragon);
@@ -60,8 +61,8 @@ public class MainActivity extends BaseActivity {
 //        editor.putString("eMail","testemail");
 //        editor.putString("registerTime","testtime");
 //        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-//        editor.commit();
-//        editor.clear();
+        editor.commit();
+        editor.clear();
 
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
@@ -77,7 +78,7 @@ public class MainActivity extends BaseActivity {
         bottomView.setItemIconTintList(null);
 
         //获取userId，让后获取服务器的好友列表，存入本地数据库
-        SharedPreferences config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
+        /*SharedPreferences*/ config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
         userId = config.getString("userID", "");
         if(!userId.isEmpty()){
             Log.i(TAG, userId);
@@ -153,21 +154,23 @@ public class MainActivity extends BaseActivity {
                             friend.setMyID(userId);
                             friend.setUserID(object.getString("userID"));
                             //先查找是否有这位好友，如果有，update；如果没有，存新建的friend
-                            List<Friend> friend1 = DataSupport.select("*", "MyID=? and userID=?", userId, object.getString("userID")).find(Friend.class);
-                            Log.i(TAG, "friend1.size = " + friend1.size());
+                            List<Friend> friend1 = DataSupport.select("*").where("MyID=? and userID=?", userId, object.getString("userID")).find(Friend.class);
                             if( friend1.size() != 0){
+                                Log.i(TAG, " MyID: " + userId + "userID: " + object.getString("userID"));
+                                Log.i(TAG, " friend.size = " + friend1.get(0).getUserID());
                                 ContentValues values = new ContentValues();
-                                values.put("img", IPaddress + object.getString("headURL"));
+                                values.put("img", object.getString("headURL"));
                                 values.put("note", object.getString("note"));
                                 values.put("username", object.getString("name"));
                                 values.put("status", Boolean.parseBoolean(object.getString("status")));
                                 DataSupport.updateAll(Friend.class, values, "MyID=? and userID=?", userId, object.getString("userID"));
                             }
                             else {
-                                friend.setImg(IPaddress + object.getString("headURL"));
+                                friend.setImg(object.getString("headURL"));
                                 friend.setNote(object.getString("note"));
                                 friend.setUsername(object.getString("name"));
                                 friend.setStatus(Boolean.parseBoolean(object.getString("status")));
+                                Log.i(TAG, " i = "+i);
                                 friend.save();
                                 Log.i(TAG, friend.isSaved()?"friend saved":"friend not saved");
                             }

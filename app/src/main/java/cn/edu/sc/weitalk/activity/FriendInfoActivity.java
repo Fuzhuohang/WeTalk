@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +46,7 @@ import okhttp3.Response;
 
 public class FriendInfoActivity extends BaseActivity {
 
+    private final String TAG = "FriendInfoActivity";
     private Friend friend;
     private boolean isYourself = false;
     private String HeaderUrl;
@@ -89,7 +91,7 @@ public class FriendInfoActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Fresco.initialize(FriendInfoActivity.this);
+        //Fresco.initialize(FriendInfoActivity.this);
         setContentView(R.layout.activity_friend_info);
         ButterKnife.bind(this);
 
@@ -99,50 +101,60 @@ public class FriendInfoActivity extends BaseActivity {
         Intent intent = getIntent();
         friendId = intent.getStringExtra("id");
 
-        List<Friend> list = DataSupport.select("*").where("UserID=? and MyID=?",friendId,MyID).find(Friend.class);
+        //从本地数据库中读取好友信息，如果没找到，说明不是好友
+        List<Friend> list = DataSupport.select("*").where("userID=? and MyID=?",friendId,MyID).find(Friend.class);
         if(list.size()==0){
-            Toast.makeText(FriendInfoActivity.this,"该好友不存在！！！",Toast.LENGTH_SHORT).show();
-            finish();
+            //Toast.makeText(FriendInfoActivity.this,"该好友不存在！！！",Toast.LENGTH_SHORT).show();
+            btnAddFriend.setVisibility(View.VISIBLE);
+            btnSendMsgFriendInfo.setVisibility(View.GONE);
+            tvModifyFriendInfo.setVisibility(View.GONE);
+            friend = new Friend();
+            getFriendInfo(0);
         }else {
             friend = list.get(0);
+            btnAddFriend.setVisibility(View.GONE);
+            btnSendMsgFriendInfo.setVisibility(View.VISIBLE);
+            tvModifyFriendInfo.setVisibility(View.VISIBLE);
+            if(friend.getLocation()==null||friend.getLocation().length()==0
+                    ||friend.getPhoneNum()==null||friend.getPhoneNum().length()==0
+                    ||friend.getBirthday()==null||friend.getBirthday().length()==0
+                    ||friend.getEmail()==null||friend.getEmail().length()==0){
+                getFriendInfo(1);
+            }
+            SetUI();
         }
-       if(friend.getLocation().length()==0||friend.getLocation()==null
-                ||friend.getPhoneNum().length()==0||friend.getPhoneNum()==null
-                ||friend.getBirthday().length()==0||friend.getBirthday()==null
-                ||friend.getEmail().length()==0||friend.getEmail()==null){
-            getFriendInfo();
-        }
 
-        SetUI();
-
-
-        HeaderUrl="res://drawable/" + R.drawable.tu;
-
-        headIcFriendInfo.setImageURI(HeaderUrl);
     }
 
     private void SetUI(){
-        headIcFriendInfo.setImageURI(friend.getImg());
-        if(friend.getNote()!=null||friend.getNote().length()!=0){
-            tvNickFriendInfo.setText(friend.getNote());
-        }else {
-            tvNickFriendInfo.setText(friend.getUsername());
-        }
-        tvIdNickFriendInfo.setText(friend.getUserID());
-        tvNicknameFriendInfo.setText(friend.getUsername());
-        tvNoteFriendInfo.setText(friend.getNote());
-        tvLocationFriendInfo.setText(friend.getLocation());
-        tvBirthdayFriendInfo.setText(friend.getBirthday());
-        tvPhoneFriendInfo.setText(friend.getPhoneNum());
-        tvEmailFriendInfo.setText(friend.getEmail());
-        if (friend.isStatus()){
-            ivStatusFriendInfo.setImageDrawable(getResources().getDrawable(R.drawable.green_point));
-        }else {
-            ivStatusFriendInfo.setImageDrawable(getResources().getDrawable(R.drawable.search_btn));
-        }
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                headIcFriendInfo.setImageURI(getString(R.string.IPAddress) + friend.getImg());
+                if(friend.getNote().length()!=0){
+                    tvNickFriendInfo.setText(friend.getNote());
+                }else {
+                    tvNickFriendInfo.setText(friend.getUsername());
+                }
+                tvIdNickFriendInfo.setText(friend.getUserID());
+                tvNicknameFriendInfo.setText(friend.getUsername());
+                tvNoteFriendInfo.setText(friend.getNote());
+                tvLocationFriendInfo.setText(friend.getLocation());
+                tvBirthdayFriendInfo.setText(friend.getBirthday());
+                tvPhoneFriendInfo.setText(friend.getPhoneNum());
+                tvEmailFriendInfo.setText(friend.getEmail());
+                if (friend.isStatus()){
+                    ivStatusFriendInfo.setImageDrawable(getResources().getDrawable(R.drawable.green_point));
+                }else {
+                    ivStatusFriendInfo.setImageDrawable(getResources().getDrawable(R.drawable.search_btn));
+                }
+            }
+        });
+
     }
 
-    private void getFriendInfo(){
+    private void getFriendInfo(int i){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -150,7 +162,7 @@ public class FriendInfoActivity extends BaseActivity {
                     OkHttpClient okHttpClient = new OkHttpClient();
                     String info = "?userID="+friendId;
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/get-api/SearchFriend"+info)
+                            .url(getString(R.string.IPAddress)+"/get-api/searchFriend"+info)
                             .build();
                     Response response = null;
                     response = okHttpClient.newCall(request).execute();
@@ -158,21 +170,33 @@ public class FriendInfoActivity extends BaseActivity {
 
                     JSONObject jsonObject = new JSONObject(responseData);
                     String status = jsonObject.getString("status");
-
+                    JSONArray jsonData = jsonObject.getJSONArray("data");
                     if (status.equals("200")){
-                        JSONObject jsonData = jsonObject.getJSONObject("data");
-
-                        friend.setPhoneNum(jsonData.getString("phone"));
-                        friend.setLocation(jsonData.getString("location"));
-                        friend.setEmail(jsonData.getString("eMail"));
-                        friend.setBirthday(jsonData.getString("birthday"));
-                        friend.updateAll("userid=? and MyID=?",friendId,MyID);
+                        if(i==1) {
+                            friend.setPhoneNum(jsonData.getJSONObject(0).getString("phone"));
+                            friend.setLocation(jsonData.getJSONObject(0).getString("location"));
+                            friend.setEmail(jsonData.getJSONObject(0).getString("eMail"));
+                            friend.setBirthday(jsonData.getJSONObject(0).getString("birthday"));
+                            friend.updateAll("userID=? and MyID=?", friendId, MyID);
+                        }else if(i==0){
+                            friend.setUserID(jsonData.getJSONObject(0).getString("userID"));
+                            friend.setUsername(jsonData.getJSONObject(0).getString("name"));
+                            friend.setNote("");
+                            friend.setImg(jsonData.getJSONObject(0).getString("headURL"));
+                            friend.setPhoneNum(jsonData.getJSONObject(0).getString("phone"));
+                            friend.setLocation(jsonData.getJSONObject(0).getString("location"));
+                            friend.setBirthday(jsonData.getJSONObject(0).getString("birthday"));
+                            friend.setEmail(jsonData.getJSONObject(0).getString("eMail"));
+                        }
+                        SetUI();
                     }else {
-                        JSONObject data = jsonObject.getJSONObject("data");
-                        String msg = data.getString("msg");
+                        String msg = jsonData.getJSONObject(0).getString("msg");
                         Log.e("GETFRIEND",msg);
                     }
-                } catch (IOException | JSONException e) {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }catch(JSONException e){
+                    Log.i(TAG, "Json error");
                     e.printStackTrace();
                 }
 
@@ -277,13 +301,9 @@ public class FriendInfoActivity extends BaseActivity {
             public void run() {
                 try {
                     OkHttpClient okHttpClient = new OkHttpClient();
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("senderID",senderID)
-                            .add("friendID",friendID)
-                            .build();
+                    String info = "?senderID=" + senderID + "&friendID=" + friendID;
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/post-api/delFriend")
-                            .post(requestBody)
+                            .url(getString(R.string.IPAddress)+"/get-api/delFriend" + info)
                             .build();
 
                     Response response = okHttpClient.newCall(request).execute();
@@ -292,12 +312,24 @@ public class FriendInfoActivity extends BaseActivity {
                     String status = jsonObject.getString("status");
                     if (status.equals("200")){
                         DataSupport.deleteAll(Friend.class,"userID=? and MyID=?",friendID,senderID);
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(FriendInfoActivity.this, "删除好友成功", Toast.LENGTH_SHORT).show();
+                                FriendInfoActivity.this.finish();
+                            }
+                        });
+                        Log.i(TAG, "删除好友成功");
                     }else{
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
-                        Log.e("DELFRIEND",msg);
+                        Log.i("DELFRIEND",msg);
                     }
-                } catch (IOException | JSONException e) {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }catch (JSONException e){
+                    Log.i(TAG, "删除好友，json error");
                     e.printStackTrace();
                 }
             }
@@ -316,7 +348,7 @@ public class FriendInfoActivity extends BaseActivity {
                             .add("note",note)
                             .build();
                     Request request = new Request.Builder()
-                            .url(R.string.IPAddress+"/post-api/changeNote")
+                            .url(getString(R.string.IPAddress)+"/post-api/changeNote")
                             .post(requestBody)
                             .build();
 
@@ -326,8 +358,15 @@ public class FriendInfoActivity extends BaseActivity {
                     String status = jsonObject.getString("status");
                     if (status.equals("200")){
                         friend.setNote(note);
-                        friend.updateAll("userid=? and MyID=?",friendId,MyID);
-                        tvNoteFriendInfo.setText(note);
+                        friend.updateAll("userID=? and MyID=?",friendId,MyID);
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                             @Override
+                             public void run() {
+                                 tvNoteFriendInfo.setText(note);
+                                 tvNickFriendInfo.setText(note);
+                             }
+                         });
                     }else{
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
@@ -342,6 +381,36 @@ public class FriendInfoActivity extends BaseActivity {
 
     @OnClick(R.id.btn_add_friend)
     public void onViewClicked() {
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    OkHttpClient client = new OkHttpClient();
+                    String info = "?userID=" + MyID + "&recipient=" + friendId;
+                    Request request = new Request.Builder()
+                            .url(getString(R.string.IPAddress)+"/get-api/addFriend" + info)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    final String responseData = response.body().string();
+                    Log.i(TAG, " 111 " + responseData);
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    Log.i(TAG, "1");
+                    String status = jsonObject.getString("status");
+                    JSONObject jsonData = jsonObject.getJSONObject("data");
+                    if (status.equals("200")){
+                        String msg = jsonData.getString("msg");
+                        Log.i(TAG, msg);
+                    }else{
+                        Log.e("ADDFRIEND", "添加好友请求发送失败");
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.i(TAG,"json error");
+                }catch (IOException e){
+                    e.printStackTrace();
+                    Log.i(TAG,"io error");
+                }
+            }
+        }).start();
     }
 }

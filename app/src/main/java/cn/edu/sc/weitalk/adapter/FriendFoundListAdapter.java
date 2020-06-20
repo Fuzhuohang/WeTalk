@@ -1,5 +1,7 @@
 package cn.edu.sc.weitalk.adapter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +17,17 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.edu.sc.weitalk.R;
+import cn.edu.sc.weitalk.activity.FriendInfoActivity;
 import cn.edu.sc.weitalk.javabean.Friend;
 
 public class FriendFoundListAdapter extends RecyclerView.Adapter<FriendFoundListAdapter.ViewHolder> {
 
+    Context context;
     List<Friend> list;
     String MyID;
 
-    public FriendFoundListAdapter(List<Friend> list, String MyID) {
+    public FriendFoundListAdapter(Context context,  List<Friend> list, String MyID) {
+        this.context = context;
         this.list = list;
         this.MyID = MyID;
     }
@@ -48,6 +53,15 @@ public class FriendFoundListAdapter extends RecyclerView.Adapter<FriendFoundList
             holder.tvAddFriendTipFoundFiend.setVisibility(View.VISIBLE);
         else
             holder.tvAddFriendTipFoundFiend.setVisibility(View.GONE);
+        //设置item的点击事件，进入好友信息页面
+        holder.tvUsernameFoundFriend.getRootView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, FriendInfoActivity.class);
+                intent.putExtra("id", friend.getUserID());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

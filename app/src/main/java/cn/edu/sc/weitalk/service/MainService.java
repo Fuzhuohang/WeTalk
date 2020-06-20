@@ -44,6 +44,7 @@ import okhttp3.Response;
 
 public class MainService extends Service {
     private final String IPaddress="http://10.132.162.182:8081";
+    private final String TAG = "MainService";
     private String UserID;
     private String LastDate;
 //服务构造函数，从sharedpreference获取用户基本信息（ID）和上次结束时的时间
@@ -285,7 +286,7 @@ public class MainService extends Service {
 //                            .add("userId",UserID)
 //                            .build();
                     Request request = new Request.Builder()
-                            .url(IPaddress + "/get-api/getRAddFriend" + arg)
+                            .url(getResources().getString(R.string.IPAddress) + "/get-api/getRAddFriend" + arg)
                             .build();
                     Response response = okHttpClient.newCall(request).execute();
                     String responseData = response.body().string();
@@ -303,6 +304,7 @@ public class MainService extends Service {
                             newFriendReq.setHeadUrl(object.getString("headURL"));
                             newFriendReq.setMyID(UserID);
                             newFriendReq.save();
+                            Log.i(TAG, "收到来自对方好友请求的信息[ " + (i + 1) + " ]");
                         }
                     }
                     /***********************************
@@ -310,7 +312,7 @@ public class MainService extends Service {
                      ***********************************/
                     okHttpClient = new OkHttpClient();
                     request = new Request.Builder()
-                            .url(IPaddress + "/get-api/getSAddFriend" + arg)
+                            .url(getResources().getString(R.string.IPAddress) + "/get-api/getSAddFriend" + arg)
                             .build();
                     response = okHttpClient.newCall(request).execute();
                     responseData = response.body().string();
@@ -329,6 +331,7 @@ public class MainService extends Service {
                             friendRes.setAgreed(object.getBoolean("agree"));
                             friendRes.setMyID(UserID);
                             friendRes.save();
+                            Log.i(TAG, "收到你想添加对方为好友的回复[ " + (i + 1) + " ]");
                         }
                     }
 
@@ -337,7 +340,7 @@ public class MainService extends Service {
                      ******************************/
                     okHttpClient = new OkHttpClient();
                     request = new Request.Builder()
-                            .url(IPaddress + "/get-api/getDelFriend" + arg)
+                            .url(getResources().getString(R.string.IPAddress) + "/get-api/getDelFriend" + arg)
                             .build();
                     response = okHttpClient.newCall(request).execute();
                     responseData = response.body().string();
@@ -356,11 +359,18 @@ public class MainService extends Service {
                             friendDel.setAgreed(object.getBoolean("agree"));
                             friendDel.setMyID(UserID);
                             friendDel.save();
+                            Log.i(TAG, "收到对方将你从好友列表中移除的消息[ " + (i + 1) + " ]");
                         }
                     }
 
                     sleep(2000);
-                } catch (InterruptedException | IOException | JSONException e) {
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }catch (IOException e){
+                    Log.i(TAG, "其他问题");
+                    e.printStackTrace();
+                }catch(JSONException e){
+                    Log.i(TAG, "Json error");
                     e.printStackTrace();
                 }
             }
@@ -377,6 +387,7 @@ public class MainService extends Service {
         LastDate = "2016-01-01 01:01:01";
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread()).start();
+        new Thread(new FriendThread()).start();
         return new MainBinder();
     }
 

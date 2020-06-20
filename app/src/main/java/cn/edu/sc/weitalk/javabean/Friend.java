@@ -62,7 +62,7 @@ public class Friend extends DataSupport {
     }
 
     public String getUserID() {
-        return userID;
+        return this.userID;
     }
 
     public void setUserID(String userID) {

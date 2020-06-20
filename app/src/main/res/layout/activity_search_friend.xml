@@ -11,7 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="76dp"
-        android:background="@color/colorTheme">
+        android:background="@drawable/top_bar_background">
 
         <ImageView
             android:id="@+id/btn_back_search_friend"
@@ -43,7 +43,7 @@
             android:layout_marginRight="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ziyuan" />
+            app:srcCompat="@drawable/ic_scan_qrcode" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
@@ -55,11 +55,11 @@
         <EditText
             android:id="@+id/edt_search_friend"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/search_btn"
             android:ems="10"
             android:gravity="center"
@@ -72,11 +72,14 @@
     <TextView
         android:id="@+id/tv_tip_search_friend"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="20dp"
         android:gravity="center"
         android:text="没有查找到本地好友，添加好友请输入好友ID，或扫一扫添加"
         android:textColor="@color/colorGrayText"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_friends_found_list"

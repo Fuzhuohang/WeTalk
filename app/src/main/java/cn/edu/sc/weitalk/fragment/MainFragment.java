@@ -219,6 +219,9 @@ public class MainFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 bottomNavigationView.setSelectedItemId(bottomNavigationView.getMenu().getItem(position).getItemId());
+                //滑动到好友列表界面时，从本地数据库跟新好友数据，读取是否有FriendReqRes信息
+                if(position == 1)
+                    friendListFragment.updateListData();
             }
 
             @Override

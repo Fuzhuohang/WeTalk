@@ -303,7 +303,11 @@ public class MainService extends Service {
                             newFriendReq.setUsername(object.getString("name"));
                             newFriendReq.setHeadUrl(object.getString("headURL"));
                             newFriendReq.setMyID(UserID);
-                            newFriendReq.save();
+                            if( !newFriendReq.isSaved()) {
+                                newFriendReq.save();
+                                Intent intent = new Intent("Friend.ReqRes.change");
+                                MainService.this.sendBroadcast(intent);
+                            }
                             Log.i(TAG, "收到来自对方好友请求的信息[ " + (i + 1) + " ]");
                         }
                     }
@@ -330,7 +334,11 @@ public class MainService extends Service {
                             friendRes.setHeadUrl(object.getString("headURL"));
                             friendRes.setAgreed(object.getBoolean("agree"));
                             friendRes.setMyID(UserID);
-                            friendRes.save();
+                            if( !friendRes.isSaved()){
+                                friendRes.save();
+                                Intent intent = new Intent("Friend.ReqRes.change");
+                                MainService.this.sendBroadcast(intent);
+                            }
                             Log.i(TAG, "收到你想添加对方为好友的回复[ " + (i + 1) + " ]");
                         }
                     }

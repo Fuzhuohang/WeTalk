@@ -168,11 +168,11 @@ Context context;
             if(i<temp.getImageCounter()) {
 
                 imageList.get(i).setVisibility(View.VISIBLE);
-                if(temp.getPublisherID().equals(userID)){
-                    String uri="file://"+uriList.get(i);
-                    imageList.get(i).setImageURI(uri);
-                }
-                else
+//                if(temp.getPublisherID().equals(userID)){
+//                    String uri="file://"+uriList.get(i);
+//                    imageList.get(i).setImageURI(uri);
+//                }
+//                else
                     imageList.get(i).setImageURI(uriList.get(i));
 
                     }
@@ -212,8 +212,10 @@ Context context;
         }
 
 
-        if(isLikedList.get(position)==false)
+        if(isLikedList.get(position)==false) {
             holder.likebutton.setImageResource(R.drawable.dianzan);
+            //Log.i("EEEE",)
+        }
         else
             holder.likebutton.setImageResource(R.drawable.dianzanle);
         if(temp.getLikeCounter()>0){
@@ -232,6 +234,9 @@ Context context;
                     notifyDataSetChanged();
                     temp.updateAll("MomentID=?",temp.getMomentID());
                     like(temp.getMomentID());
+                }
+                else{
+                    holder.likebutton.setImageResource(R.drawable.dianzanle);
                 }
 
             }

@@ -88,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             if(autoLogin_xml&&!userID.equals("")){
                 startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                finish();
             }
         }
 

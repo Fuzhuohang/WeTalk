@@ -50,7 +50,9 @@ import org.json.JSONObject;
 import java.io.File;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
@@ -378,7 +380,9 @@ public class MainFragment extends Fragment {
             //生成新的朋友圈消息，存入数据库中
             MomentsMessage temp = new MomentsMessage();
             temp.setContent(data.getStringExtra("content"));
-            temp.setDate(data.getStringExtra("time"));
+            Date time=new Date();
+            temp.setTimeStamp(time.getTime());
+            temp.setDate((new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(time));
             temp.setMomentImage(data.getStringExtra("imagePath"));
             temp.setMomentImage2(data.getStringExtra("imagePath2"));
             temp.setMomentImage3(data.getStringExtra("imagePath3"));

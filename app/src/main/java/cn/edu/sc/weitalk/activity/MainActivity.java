@@ -49,27 +49,14 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences config=getSharedPreferences("USER_INFO", MODE_PRIVATE);
-        SharedPreferences.Editor editor = config.edit();
-        editor.putString("userID","100000");
-//        editor.putString("password","testpasssword");
-//        editor.putString("name","testname");
-//        editor.putString("headURL","res://drawable/" + R.drawable.dragon);
-//        editor.putString("birthday","testbirth");
-//        editor.putString("location","testlocat");
-//        editor.putString("phone","testphone");
-//        editor.putString("eMail","testemail");
-//        editor.putString("registerTime","testtime");
-//        editor.putString("lastTime",new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        editor.commit();
-        editor.clear();
+        SharedPreferences config;
 
         Fresco.initialize(this);
         setContentView(R.layout.activity_main);
 //        DataSupport.deleteAll(Talks.class);
 //       DataSupport.deleteAll(Message.class);
-        //DataSupport.deleteAll(MomentsMessage.class);
-        //DataSupport.deleteAll(Comments.class);
+        DataSupport.deleteAll(MomentsMessage.class);
+        DataSupport.deleteAll(Comments.class);
         Intent intent = new Intent(MainActivity.this, MainService.class);
         bindService(intent,mainConn,BIND_AUTO_CREATE);
         Connector.getDatabase();
@@ -136,7 +123,7 @@ public class MainActivity extends BaseActivity {
                 OkHttpClient okHttpClient = new OkHttpClient();
                 String a = "?userID=" + userId;
                 Request request = new Request.Builder()
-                        .url(IPaddress + "/get-api/getFriendList" + a)
+                        .url(getString(R.string.IPAddress) + "/get-api/getFriendList" + a)
                         .build();
                 Response response = null;
                 try {

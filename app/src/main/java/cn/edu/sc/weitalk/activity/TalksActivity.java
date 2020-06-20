@@ -223,28 +223,29 @@ public class TalksActivity extends AppCompatActivity {
             }
         });
 
-        broadcastManager = LocalBroadcastManager.getInstance(this);
+        RefreshReceiver receiver = new RefreshReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("cn.edu.sc.weitalk.activity.talks");
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
-                if(ifRefresh){
-                    initMessageList();
-                    talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
-                    talks_list.setAdapter(talksAdapter);
-                    setListViewHeightBasedOnChildren(talks_list);
-                }
-            }
-        };
-        broadcastManager.registerReceiver(broadcastReceiver,intentFilter);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        broadcastManager.unregisterReceiver(broadcastReceiver);
+        registerReceiver(receiver,intentFilter);
+//        broadcastReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+//                if(ifRefresh){
+//                    initMessageList();
+//                    talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+//                    talks_list.setAdapter(talksAdapter);
+//                    setListViewHeightBasedOnChildren(talks_list);
+//                }
+//            }
+//        };
+//        broadcastManager.registerReceiver(broadcastReceiver,intentFilter);
+//    }
+//
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
     private void initMessageList(){
@@ -275,7 +276,7 @@ public class TalksActivity extends AppCompatActivity {
 //            message.save();
 //        }
 //        list = DataSupport.findAll(Message.class);
-        list = (ArrayList<Message>)DataSupport.select("*").where("sendID=? or receiveID=?",FriendsID,FriendsID).order("date").find(Message.class);
+        list = (ArrayList<Message>)DataSupport.select("*").where("(sendID=? and receiveID=?) or (receiveID=? and sendID=?)",FriendsID,MyID,FriendsID,MyID).order("date").find(Message.class);
 //        showlist = new ArrayList<>();
 //        Collections.reverse(list);
 //        if(list.size()<10){

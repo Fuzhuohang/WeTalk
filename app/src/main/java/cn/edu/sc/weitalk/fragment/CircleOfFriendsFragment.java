@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -189,7 +190,6 @@ public class CircleOfFriendsFragment extends Fragment {
             @Override
             public void run() {
                 String time = "2016-01-01 01:01:01";
-                while (true) {
                     try {
                         OkHttpClient okHttpClient = new OkHttpClient();
                         String info = "?recipient=" + userID + "&time=" + time;
@@ -218,7 +218,14 @@ public class CircleOfFriendsFragment extends Fragment {
                                     momentsMessage.setMomentID(sharedID);
                                     momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
                                     momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
-                                    momentsMessage.setDate(jsonDataArray.getJSONObject(i).getString("time"));
+                                    String Time=jsonDataArray.getJSONObject(i).getString("time");
+                                    Log.i("MYTIME","time: "+Time);
+                                    Time = Time.replace("Z", " UTC");//是空格+UTC
+                                    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
+                                    Date timeDate = df.parse(Time);
+                                    Log.i("FLY", timeDate.toString());
+                                    momentsMessage.setDate(timeDate.toString());
+                                    momentsMessage.setTimeStamp(timeDate.getTime());
                                     momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
                                     momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
                                     int imageCounter = 0;
@@ -281,9 +288,11 @@ public class CircleOfFriendsFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                         //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
                 }
-            }
+
 
         }).start();
     }

@@ -37,6 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.javabean.Friend;
+import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.Talks;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -312,6 +313,8 @@ public class FriendInfoActivity extends BaseActivity {
                     String status = jsonObject.getString("status");
                     if (status.equals("200")){
                         DataSupport.deleteAll(Friend.class,"userID=? and MyID=?",friendID,senderID);
+                        DataSupport.deleteAll(Message.class,"(sendID=? and receiveID=?) or (receiveID=? and sendID=?)",friendID,senderID,friendID,senderID);
+                        DataSupport.deleteAll(Talks.class,"FriendID=? and MyID = ?",friendID,senderID);
                         Handler handler = new Handler(Looper.getMainLooper());
                         handler.post(new Runnable() {
                             @Override
@@ -324,6 +327,14 @@ public class FriendInfoActivity extends BaseActivity {
                     }else{
                         JSONObject data = jsonObject.getJSONObject("data");
                         String msg = data.getString("msg");
+                        //删除好友不成功，提示
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(FriendInfoActivity.this, "删除好友失败", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         Log.i("DELFRIEND",msg);
                     }
                 } catch (IOException e) {
@@ -400,8 +411,24 @@ public class FriendInfoActivity extends BaseActivity {
                     if (status.equals("200")){
                         String msg = jsonData.getString("msg");
                         Log.i(TAG, msg);
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(FriendInfoActivity.this, "好友请求发送成功", Toast.LENGTH_SHORT).show();
+                                FriendInfoActivity.this.finish();
+                            }
+                        });
                     }else{
                         Log.e("ADDFRIEND", "添加好友请求发送失败");
+                        //好友请求发送失败，提示
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(FriendInfoActivity.this, "好友请求发送失败", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

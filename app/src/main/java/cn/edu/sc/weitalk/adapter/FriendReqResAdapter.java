@@ -219,13 +219,7 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                     //对方的回复
                     case FriendReqRes.NEW_FRIEND_RESPONSE:
                         if(reqRes.isAgreed()) {
-                            Friend friend = new Friend();
-                            friend.setMyID(reqRes.getMyID());
-                            friend.setUsername(reqRes.getUsername());
-                            friend.setUserID(reqRes.getUserId());
-                            friend.setStatus(true);
-                            friend.setImg(reqRes.getHeadUrl());
-                            friend.save();
+                            Toast.makeText(context, "快去和TA开启对话吧", Toast.LENGTH_SHORT).show();
                         }
                         else {
                             //do nothing
@@ -241,8 +235,8 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                         break;
                     //收到被对方删除好友的消息
                     case FriendReqRes.DELETE_BY_FRIEND:
-                        //删除Friend数据库中数据
-                        DataSupport.deleteAll(Friend.class, "userID=? and MyID=?", reqRes.getUserId(), reqRes.getMyID());
+                        //提示
+                        Toast.makeText(context, "你已被" + reqRes.getUsername() + "（ID: " + reqRes.getUserId() + "）" + "从好友列表中移除", Toast.LENGTH_LONG).show();
                         //将数据从FriendReqRes中删除
                         if(reqRes.isSaved())
                             reqRes.delete();

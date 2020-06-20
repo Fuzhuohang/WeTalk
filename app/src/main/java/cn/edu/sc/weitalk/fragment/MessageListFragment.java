@@ -113,21 +113,28 @@ public class MessageListFragment extends Fragment {
         isTwoPane=false;
 
         broadcastManager = LocalBroadcastManager.getInstance(getActivity());
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("package cn.edu.sc.weitalk.fragment.message");
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
-                if(ifRefresh){
-                    list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
-                    adapter = new TalksListAdapter(list, getContext());
-                    messageList.setAdapter(adapter);
-                    setListViewHeightBasedOnChildren(messageList);
-                }
-            }
-        };
-        broadcastManager.registerReceiver(broadcastReceiver,filter);
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction("package cn.edu.sc.weitalk.fragment.message");
+//        broadcastReceiver = new BroadcastReceiver() {
+//            @Override
+//            public void onReceive(Context context, Intent intent) {
+//                boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+//                if(ifRefresh){
+//                    Log.i("MYBROADCAST","Talkslistrefresh");
+//                    list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
+//                    adapter = new TalksListAdapter(list, getContext());
+//                    messageList.setAdapter(adapter);
+//                    setListViewHeightBasedOnChildren(messageList);
+//                }
+//            }
+//        };
+//        broadcastManager.registerReceiver(broadcastReceiver,filter);
+//        broadcastManager = LocalBroadcastManager.getInstance(getActivity());
+        RefreshReceiver receiver = new RefreshReceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("cn.edu.sc.weitalk.activity.talks");
+        getActivity().registerReceiver(receiver,intentFilter);
+//        broadcastManager.registerReceiver(receiver,intentFilter);
     }
 
     @Override
@@ -219,5 +226,30 @@ public class MessageListFragment extends Fragment {
 
         params.height = totalHeight+(listView.getDividerHeight()*(listAdapter.getCount()-1));
         listView.setLayoutParams(params);
+    }
+
+    private class RefreshReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+            if(ifRefresh){
+                Log.i("MYBROADCAST","Talkslistrefresh");
+                list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
+                adapter = new TalksListAdapter(list, getContext());
+                messageList.setAdapter(adapter);
+                setListViewHeightBasedOnChildren(messageList);
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.i("MYBROADCAST","Talkslistrefresh");
+        list = DataSupport.select("*").where("MyID = ?",MyID).order("LastMessageDate").find(Talks.class);
+        adapter = new TalksListAdapter(list, getContext());
+        messageList.setAdapter(adapter);
+        setListViewHeightBasedOnChildren(messageList);
     }
 }

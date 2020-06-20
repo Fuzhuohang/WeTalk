@@ -9,6 +9,16 @@ import java.io.ByteArrayOutputStream;
 
 public class MomentsMessage extends DataSupport {
     private String momentID;
+
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(long timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    private long timeStamp;
     public MomentsMessage(){
         likeCounter=0;
         imageCounter=0;

@@ -58,6 +58,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -96,10 +97,17 @@ Context context;
         refreshData();
     }
 
+    Comparator<MomentsMessage> comparator = new Comparator<MomentsMessage>() {
+        public int compare(MomentsMessage o1, MomentsMessage o2) {
+            return (int)(o2.getTimeStamp()-o1.getTimeStamp()); //升序
+//return Integer.valueOf(s2) - Integer.valueOf(s1); //降序
+        }
+    };
     public  void refreshData(){//更新数据库
         //comments= (ArrayList<Comments>)DataSupport.findAll(Comments.class);
         moments=(ArrayList<MomentsMessage>)DataSupport.findAll(MomentsMessage.class);
-        Collections.reverse(moments);
+        Collections.sort(moments,comparator);
+        //moments.sort
         isLikedList=new ArrayList<Boolean>();
         for(int i=0;i<moments.size();i++){
             isLikedList.add(false);

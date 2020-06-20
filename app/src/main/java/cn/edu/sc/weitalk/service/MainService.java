@@ -27,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.TalksActivity;
@@ -82,10 +83,12 @@ public class MainService extends Service {
                                 message.setSendName(jsonData.getString("sender"));
 
                                 String Time=jsonData.getString("time");
+                                Log.i("MYTIME","time: "+Time);
                                 Time = Time.replace("Z", " UTC");//是空格+UTC
-                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
                                 timeDate = df.parse(Time);
-                                Log.i("myTime",""+timeDate);
+                                Log.i("MYTIME",""+timeDate);
+                                Log.i("MYTIME",""+timeDate.getTime());
 
                                 message.setDate( timeDate.getTime());
                                 message.setMsgText(jsonData.getString("content"));
@@ -192,7 +195,14 @@ public class MainService extends Service {
                                 momentsMessage.setMomentID(sharedID);
                                 momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
                                 momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
-                                momentsMessage.setDate(jsonDataArray.getJSONObject(i).getString("time"));
+                                String Time=jsonDataArray.getJSONObject(i).getString("time");
+                                Log.i("MYTIME","time: "+Time);
+                                Time = Time.replace("Z", " UTC");//是空格+UTC
+                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
+                                Date timeDate = df.parse(Time);
+                                Log.i("FLY", timeDate.toString()+"vfbfgnbghnfgjnfgngfh");
+                                momentsMessage.setDate(timeDate.toString());
+                                momentsMessage.setTimeStamp(timeDate.getTime());
                                 momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
                                 momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
                                 int imageCounter=0;
@@ -256,6 +266,8 @@ public class MainService extends Service {
                 } catch (JSONException e) {
                     e.printStackTrace();
                     //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -303,7 +315,10 @@ public class MainService extends Service {
                             newFriendReq.setUsername(object.getString("name"));
                             newFriendReq.setHeadUrl(object.getString("headURL"));
                             newFriendReq.setMyID(UserID);
-                            newFriendReq.save();
+                            //判断ReqRes上是否重复
+                            if( !newFriendReq.isSaved()) {
+                                newFriendReq.save();
+                            }
                             Log.i(TAG, "收到来自对方好友请求的信息[ " + (i + 1) + " ]");
                         }
                     }
@@ -323,15 +338,35 @@ public class MainService extends Service {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject object = jsonArray.getJSONObject(i);
+                            //提醒用户查看的消息
                             FriendReqRes friendRes = new FriendReqRes();
                             friendRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
                             friendRes.setUserId(object.getString("userID"));
                             friendRes.setUsername(object.getString("name"));
                             friendRes.setHeadUrl(object.getString("headURL"));
-                            friendRes.setAgreed(object.getBoolean("agree"));
+                            friendRes.setAgreed(Boolean.parseBoolean(object.getString("agree")));
                             friendRes.setMyID(UserID);
+                            //判断ReqRes上是否重复
+                            if( !friendRes.isSaved()) {
+                                friendRes.save();
+                            }
                             friendRes.save();
-                            Log.i(TAG, "收到你想添加对方为好友的回复[ " + (i + 1) + " ]");
+                            //好友添加成功时，将好友信息存入本地数据库
+                            if(friendRes.isAgreed()){
+                                Friend friend = new Friend();
+                                friend.setUserID(object.getString("userID"));
+                                friend.setUsername(object.getString("name"));
+                                friend.setImg(object.getString("headURL"));
+                                friend.setStatus(true);
+                                friend.setMyID(UserID);
+                                //判断好友是否已经在数据库中了
+                                if( !friend.isSaved()) {
+                                    friend.save();
+                                }
+                                Log.i(TAG, "收到你想添加对方为好友的回复（同意）[ " + (i + 1) + " ]");
+                            }else{
+                                Log.i(TAG, "收到你想添加对方为好友的回复（拒绝）[ " + (i + 1) + " ]");
+                            }
                         }
                     }
 
@@ -356,9 +391,10 @@ public class MainService extends Service {
                             friendDel.setUserId(object.getString("userID"));
                             friendDel.setUsername(object.getString("name"));
                             friendDel.setHeadUrl(object.getString("headURL"));
-                            friendDel.setAgreed(object.getBoolean("agree"));
                             friendDel.setMyID(UserID);
                             friendDel.save();
+                            //同时从本地数据库中删除对方
+                            DataSupport.deleteAll(Friend.class, "userID=? and MyID=?", object.getString("userID"), UserID);
                             Log.i(TAG, "收到对方将你从好友列表中移除的消息[ " + (i + 1) + " ]");
                         }
                     }

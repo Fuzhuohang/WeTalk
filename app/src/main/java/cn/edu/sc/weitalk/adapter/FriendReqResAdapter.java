@@ -1,6 +1,7 @@
 package cn.edu.sc.weitalk.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -123,7 +124,12 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                                 friend.setUsername(reqRes.getUsername());
                                 friend.setNote(edtNote.getText().toString());
                                 friend.setMyID(reqRes.getMyID());
-                                friend.save();
+                                //判断好友是否重复
+                                if( !friend.isSaved()) {
+                                    friend.save();
+                                    Intent intent = new Intent("Friend.ReqRes.change");
+                                    context.sendBroadcast(intent);
+                                }
                                 /**
                                  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                                  * 向服务器发送同意好友申请的请求

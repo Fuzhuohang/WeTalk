@@ -318,6 +318,8 @@ public class MainService extends Service {
                             //判断ReqRes上是否重复
                             if( !newFriendReq.isSaved()) {
                                 newFriendReq.save();
+                                Intent intent = new Intent("Friend.ReqRes.change");
+                                MainService.this.sendBroadcast(intent);
                             }
                             Log.i(TAG, "收到来自对方好友请求的信息[ " + (i + 1) + " ]");
                         }
@@ -362,11 +364,14 @@ public class MainService extends Service {
                                 //判断好友是否已经在数据库中了
                                 if( !friend.isSaved()) {
                                     friend.save();
+                                    Intent intent = new Intent("Friend.ReqRes.change");
+                                    MainService.this.sendBroadcast(intent);
                                 }
                                 Log.i(TAG, "收到你想添加对方为好友的回复（同意）[ " + (i + 1) + " ]");
                             }else{
                                 Log.i(TAG, "收到你想添加对方为好友的回复（拒绝）[ " + (i + 1) + " ]");
                             }
+                            Log.i(TAG, "收到你想添加对方为好友的回复[ " + (i + 1) + " ]");
                         }
                     }
 

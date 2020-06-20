@@ -1,7 +1,9 @@
 package cn.edu.sc.weitalk.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -59,6 +61,7 @@ public class FriendListFragment extends Fragment {
     RecyclerView rvFriendReqRes;
     FriendListAdapter friendListAdapter;
     FriendReqResAdapter friendReqResAdapter;
+    private FriendContentReceiver receiver;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -93,36 +96,18 @@ public class FriendListFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        //注册广播接收器
+        receiver = new FriendContentReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("Friend.ReqRes.change");
+        getActivity().registerReceiver(receiver, filter);
+    }
 
-        //test, 生产user数据
-//        list = new ArrayList<>();
-//        for(int i = 0;i < 50;i++){
-//            Friend friend = new Friend("A", R.drawable.dragon,"long", "龙");
-//            list.add(friend);
-//        }
-
-        //test
-//        friendReqResList = new ArrayList<>();
-//        FriendReqRes reqRes = new FriendReqRes();
-//        reqRes.setUsername("李可");
-//        reqRes.setType(0);
-//        friendReqResList.add(reqRes);
-//        reqRes = new FriendReqRes();
-//        reqRes.setUsername("范重阳");
-//        reqRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
-//        reqRes.setAgreed(false);
-//        friendReqResList.add(reqRes);
-//        reqRes = new FriendReqRes();
-//        reqRes.setUsername("付卓航");
-//        reqRes.setType(1);
-//        reqRes.setType(FriendReqRes.NEW_FRIEND_RESPONSE);
-//        reqRes.setAgreed(true);
-//        friendReqResList.add(reqRes);
-//        reqRes = new FriendReqRes();
-//        reqRes.setUsername("何老实");
-//        reqRes.setType(FriendReqRes.DELETE_BY_FRIEND);
-//        friendReqResList.add(reqRes);
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //注销广播接受器
+        getActivity().unregisterReceiver(receiver);
     }
 
     @Override
@@ -216,6 +201,7 @@ public class FriendListFragment extends Fragment {
         updateListData();
     }
 
+    //从本地数据库获取好友列表，以及好友请求和回复等信息
     public void updateListData(){
         initFriendList();
         friendListAdapter.setList(friendList);
@@ -225,4 +211,19 @@ public class FriendListFragment extends Fragment {
         friendReqResAdapter.setList(friendReqResList);
         friendReqResAdapter.notifyDataSetChanged();
     }
+
+    /**
+     * 朋友相关内容消息的广播接受器
+     *      1. 当MainService收到接受到好友请求，好友请求的回复，和被对方删除好友的消息时，发送此广播
+     *      2. 当用户同意对方的好友请求时，发送此广播
+     *
+     *      接收到广播后，FriendListFragment会从本地数据库获取好友请求和回复等信息（FriendReqRes），以及好友列表（Friend）
+     */
+    public class FriendContentReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateListData();
+        }
+    }
+
 }

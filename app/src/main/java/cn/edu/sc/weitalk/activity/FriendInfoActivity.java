@@ -133,10 +133,11 @@ public class FriendInfoActivity extends BaseActivity {
             @Override
             public void run() {
                 headIcFriendInfo.setImageURI(getString(R.string.IPAddress) + friend.getImg());
-                if(friend.getNote().length()!=0){
-                    tvNickFriendInfo.setText(friend.getNote());
-                }else {
+                HeaderUrl = friend.getImg();
+                if(friend.getNote() == null || friend.getNote().length()==0){
                     tvNickFriendInfo.setText(friend.getUsername());
+                }else {
+                    tvNickFriendInfo.setText(friend.getNote());
                 }
                 tvIdNickFriendInfo.setText(friend.getUserID());
                 tvNicknameFriendInfo.setText(friend.getUsername());

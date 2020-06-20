@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -168,6 +167,7 @@ public class FriendListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), SearchFriendActivity.class);
+                intent.putExtra("searchID", "");
                 startActivity(intent);
             }
         });
@@ -188,7 +188,7 @@ public class FriendListFragment extends Fragment {
             linearParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
             rvFriendReqRes.setLayoutParams(linearParams);
         }else{
-            linearParams.height=((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, getResources().getDisplayMetrics()));
+            linearParams.height=((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100, getResources().getDisplayMetrics()));
             rvFriendReqRes.setLayoutParams(linearParams);
         }
     }

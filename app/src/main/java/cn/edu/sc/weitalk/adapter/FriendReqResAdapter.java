@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.gson.Gson;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
@@ -124,8 +123,10 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                                 friend.setUsername(reqRes.getUsername());
                                 friend.setNote(edtNote.getText().toString());
                                 friend.setMyID(reqRes.getMyID());
+//                                Log.i("FLLL", reqRes.getUserID() == null ? "null":"not null");
+//                                Log.i("FLLL", reqRes.getMyID() == null ? "null":"not null");
                                 //判断好友是否重复
-                                if( !friend.isSaved()) {
+                                if( DataSupport.select("*").where("userId=? and MyID=?", reqRes.getUserId(), reqRes.getMyID()).find(Friend.class).size() == 0) {
                                     friend.save();
                                     Intent intent = new Intent("Friend.ReqRes.change");
                                     context.sendBroadcast(intent);
@@ -140,7 +141,7 @@ public class FriendReqResAdapter extends RecyclerView.Adapter<FriendReqResAdapte
                                         OkHttpClient okHttpClient = new OkHttpClient();
                                         String arg = "?recipient=" + friend.getUserID() + "&sender=" + friend.getMyID() + "&agree=1&note=" + friend.getNote();
                                         Request request = new Request.Builder()
-                                                .url(context.getResources().getString(R.string.IPAddress) + "/get-api/sendDelFriend" + arg)
+                                                .url(context.getResources().getString(R.string.IPAddress) + "/get-api/sendAddFriend" + arg)
                                                 .build();
                                         Response response = null;
                                         try {

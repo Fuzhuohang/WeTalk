@@ -56,6 +56,9 @@ import java.util.Date;
 
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.AddNewCommentActivity;
+import cn.edu.sc.weitalk.activity.FriendInfoActivity;
+import cn.edu.sc.weitalk.activity.LoginActivity;
+import cn.edu.sc.weitalk.activity.SearchFriendActivity;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.activity.UserInfoActivity;
 import cn.edu.sc.weitalk.adapter.ViewPagerAdapter;
@@ -268,7 +271,10 @@ public class MainFragment extends Fragment {
                         params1.topMargin = 30;
                         params1.bottomMargin = 30;
                         btn.setLayoutParams(params1);
-                        circleOfFriendsFragment.adapter.refreshData();
+                        if(circleOfFriendsFragment.thread!=null)
+                            circleOfFriendsFragment.thread.interrupt();
+                        circleOfFriendsFragment.updateMoments();
+                        //circleOfFriendsFragment.adapter.refreshData();
                         btn.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -326,6 +332,8 @@ public class MainFragment extends Fragment {
                     String status = jsonObject.getString("status");
                     if (status.equals("200")) {
                         //Toast.makeText(getContext(), "退出登录啦！", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getContext(), LoginActivity.class);
+                        startActivity(intent);
                         getActivity().finish();
                     } else {
                         JSONObject returnData = jsonObject.getJSONObject("data");
@@ -390,7 +398,7 @@ public class MainFragment extends Fragment {
             temp.setPublisherName(userName);
             temp.setPublisherID(userID);
             //temp.setMomentID(0+"");
-            temp.setHeadshot("res://drawable/" + R.drawable.dragon);
+            temp.setHeadshot(getString(R.string.IPAddress)+headURL);
             temp.setLikeCounter(0);
             temp.setImageCounter(data.getIntExtra("imageNumber", 0));
             File file = new File(temp.getMomentImage());
@@ -461,11 +469,17 @@ public class MainFragment extends Fragment {
                     }
                 }
         }).start();
-        }else if (requestCode == Constant.REQ_QR_CODE && resultCode == RESULT_OK){
+        }else if (requestCode == Constant.REQ_PERM_CAMERA && resultCode == RESULT_OK){
+            Log.i("SCANQRCODE","scanqrcode");
             Bundle bundle = data.getExtras();
             String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
             Log.i("SCANQRCODE","扫描结果是："+scanResult);
             QRCodeMessage = scanResult;
+            String[] s = QRCodeMessage.split(" ");
+            Intent intent = new Intent(getContext(), FriendInfoActivity.class);
+            intent.putExtra("id",s[s.length-1]);
+            startActivity(intent);
+
         }
 //            Toast.makeText(getContext(),data.getStringExtra("txt"),Toast.LENGTH_SHORT).show();
         }

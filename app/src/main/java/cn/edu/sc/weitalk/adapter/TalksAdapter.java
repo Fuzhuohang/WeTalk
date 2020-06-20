@@ -20,6 +20,8 @@ import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.javabean.Message;
 
+import static android.provider.Settings.System.getString;
+
 public class TalksAdapter extends BaseAdapter {
 
     public static interface IMsgViewType{
@@ -106,9 +108,9 @@ public class TalksAdapter extends BaseAdapter {
             viewHolder=(ViewHolder)convertView.getTag();
         }
         if(isComMsg){
-            viewHolder.header_img.setImageURI(Receive_Header);
+            viewHolder.header_img.setImageURI(context.getString(R.string.IPAddress)+Receive_Header);
         }else {
-            viewHolder.header_img.setImageURI(Receive_Header);
+            viewHolder.header_img.setImageURI(context.getString(R.string.IPAddress) + Send_Header);
         }
         viewHolder.talks_message.setText(message.getMsgText());
 

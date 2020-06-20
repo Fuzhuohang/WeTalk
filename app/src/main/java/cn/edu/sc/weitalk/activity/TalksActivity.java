@@ -277,7 +277,8 @@ public class TalksActivity extends AppCompatActivity {
 //        }
 //        list = DataSupport.findAll(Message.class);
         list = (ArrayList<Message>)DataSupport.select("*").where("(sendID=? and receiveID=?) or (receiveID=? and sendID=?)",FriendsID,MyID,FriendsID,MyID).order("date").find(Message.class);
-//        showlist = new ArrayList<>();
+        Log.i("LIST",""+list.size());
+        //        showlist = new ArrayList<>();
 //        Collections.reverse(list);
 //        if(list.size()<10){
 //            showlist.addAll(list.subList(count,list.size()));

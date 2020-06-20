@@ -76,6 +76,7 @@ public class CircleOfFriendsFragment extends Fragment {
     private String headUrl;
     private String lastTime;
     private String name;
+    public Thread thread;
     public CircleOfFriendsFragment() {
         // Required empty public constructor
 
@@ -133,7 +134,7 @@ public class CircleOfFriendsFragment extends Fragment {
         recyclerView.setLayoutManager(layout);
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setItemViewCacheSize(10);
-
+        thread=null;
         new Thread(new Runnable() {//开线程，进行耗时操作，等到页面加载成功，才可以调用getTop方法，获得与顶部的距离，之后对ScrollView的滑动进行监听，若移动位置超过一定距离，可以滚动recyclerview
             @Override
             public void run() {
@@ -178,6 +179,8 @@ public class CircleOfFriendsFragment extends Fragment {
             @Override
             public void onRefresh() {
                 Toast.makeText(getContext(),"朋友圈刷新成功！",Toast.LENGTH_LONG).show();
+                if(thread!=null)
+                    thread.interrupt();
                 updateMoments();
                 refresh_message.positiveRefreshComplete();
             }
@@ -186,7 +189,8 @@ public class CircleOfFriendsFragment extends Fragment {
     }
 
     public void updateMoments() {
-        new Thread(new Runnable() {
+        Log.i("MMMM","haha");
+        thread=new Thread(new Runnable() {
             @Override
             public void run() {
                 String time = "2016-01-01 01:01:01";
@@ -207,15 +211,19 @@ public class CircleOfFriendsFragment extends Fragment {
                         if (status.equals("200")) {
                             //，写入两个json数组中
                             JSONArray jsonDataArray = jsonObject.getJSONArray("data");
+                            Log.i("FLY", jsonDataArray.length() + "");
                             JSONObject jsonData;
                             for (int i = 0; i < jsonDataArray.length(); i++) {
+                                Log.i("FLY", i + "start");
                                 String sharedID = jsonDataArray.getJSONObject(i).getString("shareID");
                                 MomentsMessage momentsMessage = new MomentsMessage();
-                                int commentCounter = Integer.parseInt(jsonDataArray.getJSONObject(i).getString("commentNum"));
+                                int commentCounter=Integer.parseInt( jsonDataArray.getJSONObject(i).getString("commentNum"));
+                                Log.i("FLY", commentCounter + "   commentCounter");
                                 List<MomentsMessage> list = DataSupport.select("*").where("MomentID=?", sharedID).find(MomentsMessage.class);
 
                                 if (list.size() == 0) {
                                     momentsMessage.setMomentID(sharedID);
+                                    Log.i("FLY1", sharedID);
                                     momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
                                     momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
                                     String Time=jsonDataArray.getJSONObject(i).getString("time");
@@ -223,14 +231,14 @@ public class CircleOfFriendsFragment extends Fragment {
                                     Time = Time.replace("Z", " UTC");//是空格+UTC
                                     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
                                     Date timeDate = df.parse(Time);
-                                    Log.i("FLY", timeDate.toString());
+                                    Log.i("FLY", timeDate.toString()+"vfbfgnbghnfgjnfgngfh");
                                     momentsMessage.setDate(timeDate.toString());
                                     momentsMessage.setTimeStamp(timeDate.getTime());
                                     momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
                                     momentsMessage.setPublisherName(jsonDataArray.getJSONObject(i).getString("sendername"));
-                                    int imageCounter = 0;
-                                    for (int m = 0; m < 3; m++) {
-                                        if (jsonDataArray.getJSONObject(i).getString("imgURL" + (m + 1)).length() != 0)
+                                    int imageCounter=0;
+                                    for(int m=0;m<3;m++) {
+                                        if(!jsonDataArray.getJSONObject(i).getString("imgURL"+(m+1)).equals("undefined"))
                                             imageCounter++;
                                     }
                                     momentsMessage.setImageCounter(imageCounter);
@@ -254,10 +262,14 @@ public class CircleOfFriendsFragment extends Fragment {
                                     momentsMessage.setMomentImage3(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL3"));
                                     momentsMessage.updateAll("MomentID=?", sharedID);
                                 }
-                                if (commentCounter != 0) {
+                                Log.i("FLY", i + "middle");
+                                if(commentCounter!=0) {
                                     JSONArray jsonCommentsArray = jsonDataArray.getJSONObject(i).getJSONArray("comment");
+                                    Log.i("FLY", i + "middle11");
 
-                                    for (int j = 0; j < jsonCommentsArray.length(); j++) {
+                                    for (int j = 0; j < commentCounter; j++) {
+                                        Log.i("FLY", j + "");
+
                                         JSONObject jsonComments = jsonCommentsArray.getJSONObject(j);
                                         if (DataSupport.select("*").where("content=? and commentPerID=?", jsonComments.getString("content"),jsonComments.getString("senderID")).find(Comments.class).size() == 0) {
                                             Comments comments = new Comments();
@@ -269,19 +281,20 @@ public class CircleOfFriendsFragment extends Fragment {
                                         }
                                     }
                                 }
+                                Log.i("FLY", i + "end");
                             }
+                            recyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.refreshData();
+                                }
+                            });
                             //BroadCastMethod(true, "cn.edu.sc.weitalk.fragment.moment");
                         } else {
                             JSONObject data = jsonObject.getJSONObject("data");
                             String msg = data.getString("msg");
                             //Toast.makeText(MainService.this,msg,Toast.LENGTH_SHORT).show();
                         }
-                        recyclerView.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.refreshData();
-                            }
-                        });
                     } catch (IOException e) {
                         e.printStackTrace();
                         //Toast.makeText(MainService.this, "网络连接错误,请检测你的网络连接", Toast.LENGTH_SHORT).show();
@@ -294,7 +307,8 @@ public class CircleOfFriendsFragment extends Fragment {
                 }
 
 
-        }).start();
+        });
+        thread.start();
     }
 
     private class RefreshReceiver extends BroadcastReceiver {

@@ -1,19 +1,13 @@
 package cn.edu.sc.weitalk.service;
 
-import android.app.DownloadManager;
-import android.app.IntentService;
 import android.app.Service;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.textclassifier.TextLinks;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,26 +15,20 @@ import org.json.JSONObject;
 import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import cn.edu.sc.weitalk.R;
-import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.javabean.FriendReqRes;
 import cn.edu.sc.weitalk.javabean.Comments;
 import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.Message;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import cn.edu.sc.weitalk.javabean.Talks;
-import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainService extends Service {
@@ -75,20 +63,21 @@ public class MainService extends Service {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonData = jsonArray.getJSONObject(i);
-                            List<Message> ms = DataSupport.select("*").where("sendID=? and date=? and msgText=?",jsonData.getString("sender"),jsonData.getString("time"),jsonData.getString("content")).find(Message.class);
                             Date timeDate;
+                            String Time=jsonData.getString("time");
+                            Log.i("MYTIME","time: "+Time);
+                            Time = Time.replace("Z", " UTC");//是空格+UTC
+                            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
+                            timeDate = df.parse(Time);
+                            Log.i("MYTIME",""+timeDate);
+                            Log.i("MYTIME",""+timeDate.getTime());
+                            List<Message> ms = DataSupport.select("*").where("sendID=? and date=? and msgText=?",jsonData.getString("sender"),""+timeDate.getTime(),jsonData.getString("content")).find(Message.class);
                             if(ms.size()==0){
                                 cn.edu.sc.weitalk.javabean.Message message = new Message();
                                 message.setReceiveName(UserID);
                                 message.setSendName(jsonData.getString("sender"));
 
-                                String Time=jsonData.getString("time");
-                                Log.i("MYTIME","time: "+Time);
-                                Time = Time.replace("Z", " UTC");//是空格+UTC
-                                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
-                                timeDate = df.parse(Time);
-                                Log.i("MYTIME",""+timeDate);
-                                Log.i("MYTIME",""+timeDate.getTime());
+
 
                                 message.setDate( timeDate.getTime());
                                 message.setMsgText(jsonData.getString("content"));
@@ -112,6 +101,7 @@ public class MainService extends Service {
                                         } else {
                                             talks.setTalksName(friend.getUsername());
                                         }
+                                        talks.setFriendHeaderURL(friend.getImg());
                                     } else {
                                         talks.setTalksName(jsonData.getString("sender"));
                                     }
@@ -161,7 +151,7 @@ public class MainService extends Service {
             String time = LastDate;
             while (true) {
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(1000000);
                     OkHttpClient okHttpClient = new OkHttpClient();
                     String info = "?recipient=" + UserID + "&time=" + time;
                     Request request = new Request.Builder()
@@ -193,6 +183,7 @@ public class MainService extends Service {
 
                             if (list.size() == 0) {
                                 momentsMessage.setMomentID(sharedID);
+                                Log.i("FLY1", sharedID);
                                 momentsMessage.setPublisherID(jsonDataArray.getJSONObject(i).getString("senderID"));
                                 momentsMessage.setContent(jsonDataArray.getJSONObject(i).getString("content"));
                                 String Time=jsonDataArray.getJSONObject(i).getString("time");
@@ -285,7 +276,7 @@ public class MainService extends Service {
     }
 
 
-    class FriendThread extends Thread {
+    class FriendThread1 extends Thread {
         public void run() {
             while (true) {
                 try {
@@ -316,26 +307,48 @@ public class MainService extends Service {
                             newFriendReq.setHeadUrl(object.getString("headURL"));
                             newFriendReq.setMyID(UserID);
                             //判断ReqRes上是否重复
-                            if( !newFriendReq.isSaved()) {
+                            if(DataSupport.select("*").where("userId=? and MyID=? and type=?", newFriendReq.getUserId(), newFriendReq.getMyID(), "" + FriendReqRes.NEW_FRIEND_REQUEST).find(FriendReqRes.class).size() == 0 ) {
                                 newFriendReq.save();
                                 Intent intent = new Intent("Friend.ReqRes.change");
                                 MainService.this.sendBroadcast(intent);
                             }
                             Log.i(TAG, "收到来自对方好友请求的信息[ " + (i + 1) + " ]");
                         }
+                        if(jsonArray.length() == 0)
+                            Log.i(TAG, "没有收到来自对方好友请求的信息");
                     }
+                    sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }catch (IOException e){
+                    Log.i(TAG, "其他问题 1");
+                    e.printStackTrace();
+                }catch(JSONException e){
+                    Log.i(TAG, "Json error 1");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class FriendThread2 extends Thread {
+        public void run() {
+            while (true) {
+                try {
                     /***********************************
                      *  2. 收到想要添加对方为好友的回复消息
                      ***********************************/
-                    okHttpClient = new OkHttpClient();
-                    request = new Request.Builder()
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    String arg = "?userID=" + UserID;
+                    Request request = new Request.Builder()
                             .url(getResources().getString(R.string.IPAddress) + "/get-api/getSAddFriend" + arg)
                             .build();
-                    response = okHttpClient.newCall(request).execute();
-                    responseData = response.body().string();
-                    gson = new Gson();
-                    jsonObject = new JSONObject(responseData);
-                    status = jsonObject.getString("status");
+                    //Log.i(TAG, "URL=" + getResources().getString(R.string.IPAddress) + "/get-api/getSAddFriend" + arg);
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
                     if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length(); i++) {
@@ -346,13 +359,15 @@ public class MainService extends Service {
                             friendRes.setUserId(object.getString("userID"));
                             friendRes.setUsername(object.getString("name"));
                             friendRes.setHeadUrl(object.getString("headURL"));
-                            friendRes.setAgreed(Boolean.parseBoolean(object.getString("agree")));
+                            friendRes.setAgreed(object.getString("agree").equals("1"));
+                            Log.i(TAG, friendRes.isAgreed()?"1":"0");
                             friendRes.setMyID(UserID);
+                            Log.i(TAG, "ReqRes存储中");
                             //判断ReqRes上是否重复
-                            if( !friendRes.isSaved()) {
+                            if( DataSupport.select("*").where("userId=? and MyID=? and type=?", friendRes.getUserId(), friendRes.getMyID(), "" + FriendReqRes.NEW_FRIEND_RESPONSE).find(FriendReqRes.class).size() == 0) {
                                 friendRes.save();
+                                Log.i(TAG, "ReqRes存储成功");
                             }
-                            friendRes.save();
                             //好友添加成功时，将好友信息存入本地数据库
                             if(friendRes.isAgreed()){
                                 Friend friend = new Friend();
@@ -362,7 +377,7 @@ public class MainService extends Service {
                                 friend.setStatus(true);
                                 friend.setMyID(UserID);
                                 //判断好友是否已经在数据库中了
-                                if( !friend.isSaved()) {
+                                if( DataSupport.select("*").where("userID=? and MyID=?", friend.getUserID(), friend.getMyID()).find(Friend.class).size() == 0) {
                                     friend.save();
                                     Intent intent = new Intent("Friend.ReqRes.change");
                                     MainService.this.sendBroadcast(intent);
@@ -371,22 +386,41 @@ public class MainService extends Service {
                             }else{
                                 Log.i(TAG, "收到你想添加对方为好友的回复（拒绝）[ " + (i + 1) + " ]");
                             }
-                            Log.i(TAG, "收到你想添加对方为好友的回复[ " + (i + 1) + " ]");
                         }
+                        if(jsonArray.length() == 0)
+                            Log.i(TAG, "没有收到你想添加对方为好友的回复");
                     }
+                    sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }catch (IOException e){
+                    Log.i(TAG, "其他问题 2");
+                    e.printStackTrace();
+                }catch(JSONException e){
+                    Log.i(TAG, "Json error 2");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
+    class FriendThread3 extends Thread {
+        public void run() {
+            while (true) {
+                try {
                     /******************************
                      *  3. 收到对方已删除你好友的消息
                      ******************************/
-                    okHttpClient = new OkHttpClient();
-                    request = new Request.Builder()
+                    OkHttpClient okHttpClient = new OkHttpClient();
+                    String arg = "?userID=" + UserID;
+                    Request request = new Request.Builder()
                             .url(getResources().getString(R.string.IPAddress) + "/get-api/getDelFriend" + arg)
                             .build();
-                    response = okHttpClient.newCall(request).execute();
-                    responseData = response.body().string();
-                    gson = new Gson();
-                    jsonObject = new JSONObject(responseData);
-                    status = jsonObject.getString("status");
+                    Response response = okHttpClient.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Gson gson = new Gson();
+                    JSONObject jsonObject = new JSONObject(responseData);
+                    String status = jsonObject.getString("status");
                     if (status.equals("200")) {
                         JSONArray jsonArray = jsonObject.getJSONArray("data");
                         for (int i = 0; i < jsonArray.length(); i++) {
@@ -401,17 +435,20 @@ public class MainService extends Service {
                             //同时从本地数据库中删除对方
                             DataSupport.deleteAll(Friend.class, "userID=? and MyID=?", object.getString("userID"), UserID);
                             Log.i(TAG, "收到对方将你从好友列表中移除的消息[ " + (i + 1) + " ]");
+                            Intent intent = new Intent("Friend.ReqRes.change");
+                            MainService.this.sendBroadcast(intent);
                         }
+                        if(jsonArray.length() == 0)
+                            Log.i(TAG, "没有收到对方将你从好友列表中移除的消息");
                     }
-
                     sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }catch (IOException e){
-                    Log.i(TAG, "其他问题");
+                    Log.i(TAG, "其他问题 3");
                     e.printStackTrace();
                 }catch(JSONException e){
-                    Log.i(TAG, "Json error");
+                    Log.i(TAG, "Json error 3");
                     e.printStackTrace();
                 }
             }
@@ -428,7 +465,9 @@ public class MainService extends Service {
         LastDate = "2016-01-01 01:01:01";
         new Thread(new GetMessageThread()).start();
         new Thread(new GetMomentsThread()).start();
-        new Thread(new FriendThread()).start();
+        new Thread(new FriendThread1()).start();
+        new Thread(new FriendThread2()).start();
+        new Thread(new FriendThread3()).start();
         return new MainBinder();
     }
 

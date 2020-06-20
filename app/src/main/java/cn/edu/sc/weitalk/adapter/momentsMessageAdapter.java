@@ -66,6 +66,7 @@ import java.util.TimerTask;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.activity.MainActivity;
 import cn.edu.sc.weitalk.javabean.Comments;
+import cn.edu.sc.weitalk.javabean.Friend;
 import cn.edu.sc.weitalk.javabean.MomentsMessage;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -112,7 +113,7 @@ Context context;
         for(int i=0;i<moments.size();i++){
             isLikedList.add(false);
         }
-
+        Log.i("number",moments.size()+"");
         notifyDataSetChanged();
     }
     @Override
@@ -152,7 +153,16 @@ Context context;
         //设置头像，bitmap转为URI，后显示为图片
         //Uri uri = Uri.parse(MediaStore.Images.Media.insertImage(context.getContentResolver(), icons.get(position), null, null));
         //holder.icon.setImageURI(uri);
-        holder.icon.setImageURI("res://drawable/" + R.drawable.dragon);
+        if(temp.getPublisherID().equals(userID))
+            holder.icon.setImageURI(temp.getHeadshot());
+        else{
+            List<Friend> list=DataSupport.select("*").where("userID=? and MyID=?",temp.getPublisherID(),userID).find(Friend.class);
+            if(list.size()>0){
+                holder.icon.setImageURI(context.getString(R.string.IPAddress)+list.get(0).getImg());
+            }
+        }
+
+        //holder.icon.setImageURI("res://drawable/" + R.drawable.dragon);
         if(temp.getLikeCounter()>0){
             holder.likeCounter.setVisibility(View.VISIBLE);
             holder.likeCounter.setText(temp.getLikeCounter()+"");

@@ -156,7 +156,7 @@ public class CaptureActivity extends AppCompatActivity implements Callback {
                 Result result = scanningImage(uri);
                 mProgress.dismiss();
                 if (result != null) {
-                    Intent resultIntent = new Intent();
+                    Intent resultIntent = getIntent();
                     Bundle bundle = new Bundle();
                     bundle.putString(Constant.INTENT_EXTRA_KEY_QR_SCAN ,result.getText());
 

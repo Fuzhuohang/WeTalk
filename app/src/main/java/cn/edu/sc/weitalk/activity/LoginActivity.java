@@ -73,8 +73,8 @@ public class LoginActivity extends AppCompatActivity {
         });
         //从注册页面跳转回来
         Intent intent=getIntent();
-        if(intent!=null){
-            String UserID=intent.getStringExtra("userID");
+        String UserID=intent.getStringExtra("userID");
+        if(UserID!=null){
             edtUserID.setText(UserID);
         }else{
             //先查询本地登录信息，有的话直接主界面

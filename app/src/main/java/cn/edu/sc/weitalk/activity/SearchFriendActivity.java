@@ -1,6 +1,9 @@
 package cn.edu.sc.weitalk.activity;
 
+import android.Manifest;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,11 +12,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.google.zxing.activity.CaptureActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +38,7 @@ import butterknife.OnClick;
 import cn.edu.sc.weitalk.R;
 import cn.edu.sc.weitalk.adapter.FriendFoundListAdapter;
 import cn.edu.sc.weitalk.javabean.Friend;
+import cn.edu.sc.weitalk.util.Constant;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -38,6 +47,7 @@ public class SearchFriendActivity extends BaseActivity {
 
     private final String TAG = "SearchFriendActivity";
     private final String IPaddress = "http://10.132.162.182:8081";
+    private String searchID;
     @BindView(R.id.iv_scan_search_friend)
     ImageView ivScanSearchFriend;
     @BindView(R.id.tv_tip_search_friend)
@@ -61,6 +71,14 @@ public class SearchFriendActivity extends BaseActivity {
         setContentView(R.layout.activity_search_friend);
         ButterKnife.bind(this);
 
+        Intent intent = getIntent();
+        searchID = intent.getStringExtra("searchID");
+        edtSearchFriend.setText(searchID);
+
+        if(searchID.length()!=0){
+            searchFriend();
+        }
+
         SharedPreferences config = getSharedPreferences("USER_INFO", MODE_PRIVATE);
         MyID = config.getString("userID", "");
 
@@ -77,6 +95,10 @@ public class SearchFriendActivity extends BaseActivity {
      * 然后将输入内容作为userID，去服务器查找好友
      */
     private void setTextChangeListener() {
+        searchFriend();
+    }
+
+    private void searchFriend(){
         edtSearchFriend.addTextChangedListener(new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -180,6 +202,20 @@ public class SearchFriendActivity extends BaseActivity {
         }).start();
     }
 
+    private void scanQRCode() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+                Toast.makeText(this, "请到权限中心打开相机访问权限", Toast.LENGTH_SHORT).show();
+            }
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, Constant.REQ_PERM_CAMERA);
+            return;
+        }
+
+        Intent intent = new Intent(this, CaptureActivity.class);
+        startActivityForResult(intent, Constant.REQ_PERM_CAMERA);
+    }
+
     @OnClick({R.id.btn_back_search_friend, R.id.iv_scan_search_friend})
     public void onViewClicked(View view) {
         switch (view.getId()) {
@@ -187,7 +223,29 @@ public class SearchFriendActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.iv_scan_search_friend:
+                Log.i("SCANQRCODE","点击扫一扫");
+                scanQRCode();
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constant.REQ_PERM_CAMERA && resultCode == RESULT_OK){
+            Log.i("SCANQRCODE","scanqrcode");
+            Bundle bundle = data.getExtras();
+            String scanResult = bundle.getString(Constant.INTENT_EXTRA_KEY_QR_SCAN);
+            Log.i("SCANQRCODE","扫描结果是："+scanResult);
+            String QRCodeMessage = scanResult;
+            String[] s = QRCodeMessage.split(" ");
+            String[] t = QRCodeMessage.split(" ");
+            Log.i("SCANQRCODE", s[s.length-1]+ t[t.length-1]);
+            searchID = s[s.length-1];
+            Intent intent = new Intent(SearchFriendActivity.this, FriendInfoActivity.class);
+            intent.putExtra("id",s[s.length-1]);
+            startActivity(intent);
+            edtSearchFriend.setText(searchID);
         }
     }
 }

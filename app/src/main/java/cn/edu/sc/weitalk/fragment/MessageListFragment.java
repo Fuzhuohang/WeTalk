@@ -189,6 +189,7 @@ public class MessageListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), SearchFriendActivity.class);
+                intent.putExtra("searchID", "");
                 startActivity(intent);
             }
         });

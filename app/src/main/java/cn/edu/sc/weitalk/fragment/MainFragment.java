@@ -432,6 +432,7 @@ public class MainFragment extends Fragment {
                             JSONObject returnData = jsonObject.getJSONObject("data");
                             temp.setMomentID(returnData.getString("shareID"));
                             temp.save();
+                            circleOfFriendsFragment.updateMoments();
                             circleOfFriendsFragment.recyclerView.post(new Runnable() {
                                 @Override
                                 public void run() {

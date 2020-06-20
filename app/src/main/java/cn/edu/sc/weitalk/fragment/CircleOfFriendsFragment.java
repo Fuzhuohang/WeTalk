@@ -233,9 +233,18 @@ public class CircleOfFriendsFragment extends Fragment {
                                     momentsMessage.saveThrows();
 
                                 } else {
-                                    momentsMessage = list.get(0);
+                                    momentsMessage=list.get(0);
+                                    momentsMessage.setMomentID(sharedID);
                                     momentsMessage.setLikeCounter(Integer.parseInt(jsonDataArray.getJSONObject(i).getString("likeNum")));
-                                    //momentsMessage.setMomentImage(jsonDataArray.getJSONObject(i).getString("imgURL"));
+                                    int imageCounter=0;
+                                    for(int m=0;m<3;m++) {
+                                        if(!jsonDataArray.getJSONObject(i).getString("imgURL"+(m+1)).equals("undefined"))
+                                            imageCounter++;
+                                    }
+                                    momentsMessage.setImageCounter(imageCounter);
+                                    momentsMessage.setMomentImage(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL1"));
+                                    momentsMessage.setMomentImage2(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL2"));
+                                    momentsMessage.setMomentImage3(getString(R.string.IPAddress) + jsonDataArray.getJSONObject(i).getString("imgURL3"));
                                     momentsMessage.updateAll("MomentID=?", sharedID);
                                 }
                                 if (commentCounter != 0) {

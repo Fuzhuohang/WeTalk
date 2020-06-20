@@ -151,7 +151,7 @@ public class TalksActivity extends AppCompatActivity {
                 message.setMsgType(false);
                 message.setDate(date.getTime());
                 message.setSendName(MyID);
-                message.setReceiveName(talksName);
+                message.setReceiveName(FriendsID);
                 list.add(message);
                 editMessage.setText("");
                 talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
@@ -170,7 +170,7 @@ public class TalksActivity extends AppCompatActivity {
                             OkHttpClient okHttpClient = new OkHttpClient();
                             RequestBody requestBody = new FormBody.Builder()
                                     .add("senderID",MyID)
-                                    .add("recipient",talksName)
+                                    .add("recipient",FriendsID)
                                     .add("content",msgContent)
                                     .build();
                             Request request = new Request.Builder()

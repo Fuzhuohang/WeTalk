@@ -44,6 +44,8 @@ import cn.edu.sc.weitalk.activity.TalksActivity;
 import cn.edu.sc.weitalk.adapter.TalksListAdapter;
 import cn.edu.sc.weitalk.javabean.Talks;
 
+import static cn.edu.sc.weitalk.R2.id.time;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MessageListFragment#newInstance} factory method to

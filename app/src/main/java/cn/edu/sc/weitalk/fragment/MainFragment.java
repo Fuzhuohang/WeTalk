@@ -152,7 +152,7 @@ public class MainFragment extends Fragment {
         View headerView = navigationView.getHeaderView(0);
         SimpleDraweeView temp = headerView.findViewById(R.id.icon);
 //        temp.setImageURI("res://drawable/" + R.drawable.dragon);
-        temp.setImageURI(headURL);
+        temp.setImageURI(getString(R.string.IPAddress)+headURL);
         TextView name = headerView.findViewById(R.id.Username);
         name.setText(userName);
         TextView userid = headerView.findViewById(R.id.UserID);
@@ -163,7 +163,7 @@ public class MainFragment extends Fragment {
         toolbar = view.findViewById(R.id.toolbar);
         SimpleDraweeView temp2 = view.findViewById(R.id.toolbar_img);
 //        temp2.setImageURI("res://drawable/" + R.drawable.dragon);
-        temp2.setImageURI(headURL);
+        temp2.setImageURI(getString(R.string.IPAddress)+headURL);
         pagename = view.findViewById(R.id.page_name);
         //btnVector=view.findViewById(R.id.btnVector);
         btn = view.findViewById(R.id.buttonview);
@@ -380,10 +380,9 @@ public class MainFragment extends Fragment {
             temp.setMomentImage2(data.getStringExtra("imagePath2"));
             temp.setMomentImage3(data.getStringExtra("imagePath3"));
 //            temp.setPublisherID("123456");
-//            temp.setPublisherName("小明");
+            temp.setPublisherName(userName);
             temp.setPublisherID(userID);
             //temp.setMomentID(0+"");
-            temp.setPublisherName(data.getStringExtra("name"));
             temp.setHeadshot("res://drawable/" + R.drawable.dragon);
             temp.setLikeCounter(0);
             temp.setImageCounter(data.getIntExtra("imageNumber", 0));
@@ -394,20 +393,20 @@ public class MainFragment extends Fragment {
 //            Log.i("FLLL", temp.getMomentImage2());
 //            Log.i("FLLL", temp.getMomentImage3());
 //            temp.save();
-//            circleOfFriendsFragment.adapter.refreshData();
+//           circleOfFriendsFragment.adapter.refreshData();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     //发送数据到服务器，发送成功则存入本地数据库，并提示，否则不存并提示
                     try {
                         OkHttpClient okHttpClient = new OkHttpClient();
-                        RequestBody filebody = RequestBody.create(MediaType.parse("image/jpg"),file);
+                        RequestBody filebody = RequestBody.create(file,MediaType.parse("image/jpg"));
                         RequestBody filebody2 = RequestBody.create( file2,MediaType.parse("image/jpg"));
                         RequestBody filebody3 = RequestBody.create(file3,MediaType.parse("image/jpg"));
                         MultipartBody.Builder builder = new MultipartBody.Builder();
                         builder.setType(MultipartBody.FORM);
                         builder.addFormDataPart("userID", userID);
-                        //builder.addFormDataPart("userName",userName);
+                        builder.addFormDataPart("userName",userName);
                         builder.addFormDataPart("content", temp.getContent());
                         ArrayList<RequestBody> list=new ArrayList<RequestBody>();
                         list.add(filebody);
@@ -425,45 +424,6 @@ public class MainFragment extends Fragment {
                                 .url(getString(R.string.IPAddress) + "/post-api/sendShare")
                                 .post(multipartBody)
                                 .build();
-
-//                Call call = okHttpClient.newCall(request);
-//
-//                call.enqueue(new Callback() {
-//                    @Override
-//                    public void onFailure(Call call, IOException e) {
-//
-//                        new Thread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-//
-//                    }
-//                    @Override
-//                    public void onResponse(Call call, Response response) throws IOException {
-//                        String responseData = response.body().string();
-//                        JSONObject jsonObject = null;
-//                        try {
-//                            jsonObject = new JSONObject(responseData);
-//                            String status = jsonObject.getString("status");
-//                            if (status.equals("200")){
-//                                JSONObject returnData = jsonObject.getJSONObject("data");
-//                                temp.setMomentID(returnData.getString("shareID"));
-//                                Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
-//                            }else {
-//                                JSONObject returnData = jsonObject.getJSONObject("data");
-//                                String msg = returnData.getString("msg");
-//                                Toast.makeText(getContext(),msg,Toast.LENGTH_SHORT).show();
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//
-//                    }
-//                });
-
                         Response response = okHttpClient.newCall(request).execute();
                         String responseData = response.body().string();
                         JSONObject jsonObject = new JSONObject(responseData);
@@ -471,6 +431,13 @@ public class MainFragment extends Fragment {
                         if (status.equals("200")) {
                             JSONObject returnData = jsonObject.getJSONObject("data");
                             temp.setMomentID(returnData.getString("shareID"));
+                            temp.save();
+                            circleOfFriendsFragment.recyclerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    circleOfFriendsFragment.adapter.refreshData();
+                                }
+                            });
                             //Toast.makeText(getContext(),"朋友圈发送成功啦！",Toast.LENGTH_SHORT).show();
                         } else {
                             JSONObject returnData = jsonObject.getJSONObject("data");

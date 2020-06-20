@@ -60,13 +60,14 @@ import okhttp3.Response;
 
 public class TalksActivity extends AppCompatActivity {
     private String IPaddress="http://10.133.30.160:8081";
-    private List<Message> list,showlist;
+    private ArrayList<Message> list,showlist;
     private String talksName,FriendHeaderURL,FriendsID;
     private String MyHeaderURL,MyID,MyName;
     private TalksAdapter talksAdapter;
     private ListView talks_list;
     private Talks tTalk;
     private int count=0;
+    private ScrollView scrollView;
     private LocalBroadcastManager broadcastManager;
     private BroadcastReceiver broadcastReceiver;
 
@@ -81,6 +82,8 @@ public class TalksActivity extends AppCompatActivity {
         FriendsID = intent.getStringExtra("FriendsID");
         talksName=intent.getStringExtra("TalksName");
         FriendHeaderURL=intent.getStringExtra("FriendHeaderURL");
+
+        list = new ArrayList<Message>();
 
         List<Talks> Tl = DataSupport.select("*").where("FriendID=?",FriendsID).find(Talks.class);
         if(Tl.size()==1){
@@ -113,7 +116,7 @@ public class TalksActivity extends AppCompatActivity {
         talks_list.setAdapter(talksAdapter);
         setListViewHeightBasedOnChildren(talks_list);
 
-        ScrollView scrollView = findViewById(R.id.talks_scroll);
+        scrollView = findViewById(R.id.talks_scroll);
         scrollView.post(new Runnable() {
             @Override
             public void run() {
@@ -146,12 +149,12 @@ public class TalksActivity extends AppCompatActivity {
                 Message message = new Message();
                 message.setMsgText(msgContent);
                 message.setMsgType(false);
-                message.setDate(format.format(date));
+                message.setDate(date.getTime());
                 message.setSendName(MyID);
                 message.setReceiveName(talksName);
-                showlist.add(message);
+                list.add(message);
                 editMessage.setText("");
-                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+                talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
                 talks_list.setAdapter(talksAdapter);
                 setListViewHeightBasedOnChildren(talks_list);
                 scrollView.post(new Runnable() {
@@ -212,10 +215,10 @@ public class TalksActivity extends AppCompatActivity {
         refresh_talks_message.addPositiveRefreshListener(new ISingleRefreshListener() {
             @Override
             public void onRefresh() {
-                refresh();
-                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
-                talks_list.setAdapter(talksAdapter);
-                setListViewHeightBasedOnChildren(talks_list);
+//                refresh();
+//                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
+//                talks_list.setAdapter(talksAdapter);
+//                setListViewHeightBasedOnChildren(talks_list);
                 refresh_talks_message.positiveRefreshComplete();
             }
         });
@@ -272,17 +275,17 @@ public class TalksActivity extends AppCompatActivity {
 //            message.save();
 //        }
 //        list = DataSupport.findAll(Message.class);
-        list = DataSupport.select("*").where("sendID=? or receiveID=?",FriendsID,FriendsID).find(Message.class);
-        showlist = new ArrayList<>();
-        Collections.reverse(list);
-        if(list.size()<10){
-            showlist.addAll(list.subList(count,list.size()));
-            count=list.size();
-        }else {
-            showlist.addAll(list.subList(count,count+10));
-            count+=10;
-        }
-        Collections.reverse(showlist);
+        list = (ArrayList<Message>)DataSupport.select("*").where("sendID=? or receiveID=?",FriendsID,FriendsID).order("date").find(Message.class);
+//        showlist = new ArrayList<>();
+//        Collections.reverse(list);
+//        if(list.size()<10){
+//            showlist.addAll(list.subList(count,list.size()));
+//            count=list.size();
+//        }else {
+//            showlist.addAll(list.subList(count,count+10));
+//            count+=10;
+//        }
+//        Collections.reverse(showlist);
     }
 
     private void refresh(){
@@ -319,17 +322,29 @@ public class TalksActivity extends AppCompatActivity {
         listView.setLayoutParams(params);
     }
 
-//    private class RefreshReceiver extends BroadcastReceiver {
-//
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
-//            if(ifRefresh){
-//                initMessageList();
-//                talksAdapter = new TalksAdapter(TalksActivity.this,showlist,FriendHeaderURL,MyHeaderURL);
-//                talks_list.setAdapter(talksAdapter);
-//                setListViewHeightBasedOnChildren(talks_list);
-//            }
-//        }
-//    }
+    private class RefreshReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            boolean ifRefresh = intent.getExtras().getBoolean("ifrefresh");
+            if(ifRefresh){
+                initMessageList();
+                talksAdapter = new TalksAdapter(TalksActivity.this,list,FriendHeaderURL,MyHeaderURL);
+                talks_list.setAdapter(talksAdapter);
+//                talksAdapter.data=list;
+//                talksAdapter.notifyDataSetChanged();
+                scrollView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                    }
+                });
+                setListViewHeightBasedOnChildren(talks_list);
+            }
+        }
+    }
+
+
+
+
 }

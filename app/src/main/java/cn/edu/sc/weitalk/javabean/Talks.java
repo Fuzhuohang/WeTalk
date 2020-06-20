@@ -15,7 +15,7 @@ public class Talks extends DataSupport {
     public String FriendHeaderURL;
     public String MyID;
     public String LastMessage;
-    public String LastMessageDate;
+    public long LastMessageDate;
     public int UnReadNum;
 
     public String getTalksName(){
@@ -58,11 +58,11 @@ public class Talks extends DataSupport {
         this.LastMessage = LastMessage;
     }
 
-    public String getLastMessageDate(){
+    public long getLastMessageDate(){
         return LastMessageDate;
     }
 
-    public void setLastMessageDate(String lastMessageDate){
+    public void setLastMessageDate(long lastMessageDate){
         this.LastMessageDate=lastMessageDate;
     }
 
